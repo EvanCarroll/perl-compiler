@@ -44,3 +44,6 @@ log.*
 .DS_Store
 B-C-*.tar.gz
 .commit
+*-c.result
+*-bc.result
+*-cc.result
