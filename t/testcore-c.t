@@ -1,5 +1,5 @@
 # -*- cperl -*-
-# t/testcore.t - run the core testsuite with the compilers C, CC and ByteCode
+# t/testcore.t - run the core testsuite with the compilers B::C ONLY
 # Usage:
 #   t/testcore.t -fail             known failing tests only
 #   t/testcore.t -c                run C compiler tests only (also -bc or -cc)
@@ -66,22 +66,12 @@ my $SKIP = { "CC" =>
 
 my @fail = map { "t/CORE/$_" }
   qw{
-     base/lex.t
      base/rs.t
      base/term.t
      cmd/while.t
-     comp/bproto.t
      comp/colon.t
-     comp/decl.t
-     comp/fold.t
-     comp/form_scope.t
-     comp/line_debug.t
-     comp/hints.t
-     comp/our.t
-     comp/package.t
      comp/packagev.t
      comp/parser.t
-     comp/proto.t
      comp/require.t
      comp/retainedlines.t
      comp/script.t
@@ -97,7 +87,6 @@ my @fail = map { "t/CORE/$_" }
      op/ref.t
      op/sort.t
      op/substr.t
-     op/undef.t
      op/write.t
    };
 
