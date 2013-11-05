@@ -1,10 +1,9 @@
 #!./perl
 
-BEGIN {
-    chdir 't/CORE' if -d 't';
-#     @INC = ('../lib', 'lib');
-    $INC{"feature.pm"} = 1; # so we don't attempt to load feature.pm
-}
+
+chdir 't/CORE' if -d 't';
+push @INC, './lib';
+$INC{"feature.pm"} = 1; # so we don't attempt to load feature.pm
 
 print "1..73\n";
 
@@ -135,7 +134,7 @@ is ($@, "");
 eval '{use 5.11.0;} ${"foo"} = "bar";';
 is ($@, "");
 
-{ use test_use }	# check that subparse saves pending tokens
+{ eval 'use test_use'; }	# check that subparse saves pending tokens
 
 local $test_use::VERSION = 1.0;
 
