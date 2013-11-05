@@ -1,5 +1,8 @@
 #!./perl
 
+INIT {
+    chdir 't/CORE';
+}
 print "1..13\n";
 
 print "ok 1\n" if 1;
