@@ -133,6 +133,7 @@ print "1..", $numtests, "\n";
 my $i = 1;
 
 for my $t (@tests) {
+    next if $t =~ m/^-/;
     if ($runtests{C}) {
         (print "ok $i #skip $SKIP->{C}->{$t}\n" and next)
         if exists $SKIP->{C}->{$t};
@@ -141,6 +142,8 @@ for my $t (@tests) {
 }
 
 END {
-#  unlink ( "t/perl", "t/CORE/perl", "harness", "TEST" );
-  unlink ("a.c","t/a.c","t/CORE/a.c","aa.c","aa","t/aa.c","t/CORE/aa.c","b.plc");
+  unless ( grep { m/-noclean/ } @ARGV ) {
+    unlink ( "t/perl", "t/CORE/perl", "harness", "TEST" );
+    unlink ("a","a.c","t/a.c","t/CORE/a.c","aa.c","aa","t/aa.c","t/CORE/aa.c","b.plc");
+  }
 }
