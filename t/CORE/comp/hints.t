@@ -1,9 +1,8 @@
 #!./perl
 
 # Tests the scoping of $^H and %^H
-
-BEGIN {
-    unshift @INC, "./lib";
+BEGIN { 
+   chdir 't/CORE' if -d 't';
 }
 
 BEGIN { print "1..24\n"; }
@@ -127,7 +126,7 @@ BEGIN {
 
 
 # Add new tests above this require, in case it fails.
-require './test.pl';
+require 'test.pl';
 
 # bug #27040: hints hash was being double-freed
 my $result = runperl(
