@@ -28,7 +28,7 @@ require "test.pl";
 sub vcmd {
   my $cmd = join "", @_;
   print "#",$cmd,"\n";
-  run_cmd($cmd, 120); # timeout 2min
+  return run_cmd($cmd, 120); # timeout 2min
 }
 
 my $dir = getcwd();
@@ -100,6 +100,7 @@ sub run_c {
   my $backopts = $backend eq 'C' ? "-qq,C,-O2" : "-qq,CC";
   $backopts .= ",-fno-warnings" if $backend =~ /^C/ and $] >= 5.013005;
   $backopts .= ",-fno-fold"     if $backend =~ /^C/ and $] >= 5.013009;
+
   vcmd "$^X $Mblib -MO=$backopts,-o$a.c $t";
   # CORE often does BEGIN chdir "t", patched to chdir "t/CORE"
   chdir $dir;
@@ -108,8 +109,13 @@ sub run_c {
   my $d = "";
   $d = "-DALLOW_PERL_OPTIONS" if $ALLOW_PERL_OPTIONS{$t};
   vcmd "$^X $Mblib script/cc_harness -q $d $a.c -o $a" if -e "$a.c";
-  vcmd "./$a | tee $result" if -e "$a";
-  my $ok = prove ($a, $result, $i, $t, $backend);
+  my $ok = 1;
+  if ( -e "$a" ) {
+    my ( $result, $out, $err ) = vcmd "./$a | tee $result";  
+    $ok = 0 if $out =~ m{^\s+Failed tests:\s+}im;
+    $ok = 0 if $out =~ m{^not\s+ok\s+}im;
+  }  
+  $ok &&= prove ($a, $result, $i, $t, $backend);
   $i++;
   return $ok;
 }
@@ -126,7 +132,7 @@ sub prove {
 }
 
 {
-  system 'mkdir', 'locks'; 
+  system 'mkdir', 'locks' unless -d 'locks'; 
   # skip tests flags as working in a previous run
   @tests = map {
     my $lock = get_lock_for_test($_);
