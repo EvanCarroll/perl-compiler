@@ -2,7 +2,7 @@
 
 BEGIN {
     chdir 't/CORE' if -d 't';
-    @INC = qw(. ../lib);
+    unshift @INC, "./lib"
     require './test.pl';
     eval 'use Errno';
     die $@ if $@ and !is_miniperl();

@@ -2,7 +2,7 @@
 
 BEGIN {
     chdir 't/CORE' if -d 't';
-    @INC = qw(. ../lib);
+    unshift @INC, "./lib"
     $SIG{'__WARN__'} = sub { warn $_[0] if $DOWARN };
 }
 

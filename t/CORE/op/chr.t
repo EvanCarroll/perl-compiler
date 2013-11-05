@@ -2,7 +2,7 @@
 
 BEGIN {
     chdir 't/CORE' if -d 't';
-    @INC = qw(. ../lib); # ../lib needed for test.deparse
+    unshift @INC, "./lib"
     require "test.pl";
 }
 
