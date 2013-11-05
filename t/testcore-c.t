@@ -55,30 +55,7 @@ for (qw(
 }
 
 my @fail = map { "t/CORE/$_" }
-  qw{
-     base/rs.t
-     base/term.t
-     cmd/while.t
-     comp/colon.t
-     comp/packagev.t
-     comp/parser.t
-     comp/require.t
-     comp/retainedlines.t
-     comp/script.t
-     comp/use.t
-     op/anonsub.t
-     op/avhv.t
-     op/bop.t
-     op/chop.t
-     op/eval.t
-     op/goto.t
-     op/overload.t
-     op/pat.t
-     op/ref.t
-     op/sort.t
-     op/substr.t
-     op/write.t
-   };
+  qw{};
 
 my @tests = $ARGV[0] eq '-fail'
   ? @fail
