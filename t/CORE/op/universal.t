@@ -4,7 +4,7 @@
 #
 
 BEGIN {
-    chdir 't' if -d 't';
+    chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
     $| = 1;
     require "./test.pl";

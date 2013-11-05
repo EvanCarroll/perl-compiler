@@ -5,7 +5,7 @@
 #
 
 BEGIN {
-    chdir 't' if -d 't';
+    chdir 't/CORE' if -d 't';
     @INC = qw(. ../lib);
     require "test.pl";
 }

@@ -9,7 +9,7 @@
 # Warn or die msgs (if any) at - line 1234
 #
 
-chdir 't' if -d 't';
+chdir 't/CORE' if -d 't';
 unshift @INC, './lib';
 require './test.pl';
 

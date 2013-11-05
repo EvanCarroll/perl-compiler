@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
+    chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
     require './test.pl';
     eval { my $q = pack "q", 0 };

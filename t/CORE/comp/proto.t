@@ -10,7 +10,7 @@
 #
 
 BEGIN {
-    chdir 't' if -d 't';
+    chdir 't/CORE' if -d 't';
     @INC = '../lib';
 }
 

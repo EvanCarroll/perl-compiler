@@ -1,3 +1,3 @@
 #!./perl
-chdir 't' if -d 't';
+chdir 't/CORE' if -d 't';
 require './thread_it.pl';

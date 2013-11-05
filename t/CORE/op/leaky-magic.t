@@ -5,7 +5,7 @@
 # in other packages (%Net::DNS::RR::SIG, ${"'Oh no'!"}, etc.).
 
 BEGIN {
-    chdir 't' if -d 't';
+    chdir 't/CORE' if -d 't';
     require './test.pl';
     unshift @INC, './lib';
 }

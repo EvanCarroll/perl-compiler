@@ -3,7 +3,7 @@
 # Tests for the source filters in coderef-in-@INC
 
 BEGIN {
-    chdir 't' if -d 't';
+    chdir 't/CORE' if -d 't';
     @INC = qw(. ../lib);
     require 'test.pl';
     skip_all_if_miniperl('no dynamic loading on miniperl, no Filter::Util::Call');

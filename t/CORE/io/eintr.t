@@ -7,7 +7,7 @@
 # principally, don't segfault).
 
 BEGIN {
-    chdir 't' if -d 't';
+    chdir 't/CORE' if -d 't';
     @INC = '../lib';
 }
 

@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
+    chdir 't/CORE' if -d 't';
     @INC = qw(../lib .);
     require Config; import Config;
     require "test.pl";

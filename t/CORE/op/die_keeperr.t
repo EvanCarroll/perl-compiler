@@ -1,7 +1,7 @@
 #!perl -w
 
 BEGIN {
-    chdir 't' if -d 't';
+    chdir 't/CORE' if -d 't';
     require 'test.pl';
     plan(20);
 }

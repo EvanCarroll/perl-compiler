@@ -1,5 +1,5 @@
 BEGIN {
-	chdir 't' if -d 't';
+	chdir 't/CORE' if -d 't';
 	@INC = '../lib';
 	require Config; import Config;
 	require './test.pl';

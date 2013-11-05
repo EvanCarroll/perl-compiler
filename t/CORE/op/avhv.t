@@ -4,7 +4,7 @@
 # they were properly removed in 5.9.
 
 BEGIN {
-    chdir 't' if -d 't';
+    chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
 }
 

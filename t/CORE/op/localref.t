@@ -1,6 +1,6 @@
 #!./perl
 
-chdir 't' if -d 't';
+chdir 't/CORE' if -d 't';
 @INC = qw(. ../lib);
 require "test.pl";
 plan( tests => 64 );

@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
+    chdir 't/CORE' if -d 't';
     @INC = '../lib';
     require "../t/test.pl";
     skip_all_without_perlio();

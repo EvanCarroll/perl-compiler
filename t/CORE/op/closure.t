@@ -7,7 +7,7 @@
 #   Run with -debug for debugging output.
 
 BEGIN {
-    chdir 't' if -d 't';
+    chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
 }
 

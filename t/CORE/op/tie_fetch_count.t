@@ -4,7 +4,7 @@
 # See Bugs #76814 and #87708.
 
 BEGIN {
-    chdir 't' if -d 't';
+    chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
     require './test.pl';
     plan (tests => 210);

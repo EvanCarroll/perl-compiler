@@ -6,7 +6,7 @@
 ## Adapted and expanded by Gurusamy Sarathy <gsar@activestate.com>
 ##
 
-chdir 't' if -d 't';
+chdir 't/CORE' if -d 't';
 unshift @INC, './lib';
 require './test.pl';
 

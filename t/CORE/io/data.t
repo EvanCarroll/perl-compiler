@@ -3,7 +3,7 @@
 # tests for DATA filehandle operations
 
 BEGIN {
-    chdir 't' if -d 't';
+    chdir 't/CORE' if -d 't';
     @INC = '../lib';
     require './test.pl';
 }
