@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 BEGIN {
-    require './test.pl';
+    require './t/CORE/test.pl';
 }
 
 plan(tests => 3);
