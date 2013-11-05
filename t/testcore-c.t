@@ -20,13 +20,8 @@
 use Cwd;
 use File::Copy;
 
-BEGIN {
-  unless (-d "t/CORE") {
-    print "1..0 #skip t/CORE missing. Read t/testcore.t how to setup.\n";
-    exit 0;
-  }
-  unshift @INC, ("t");
-}
+print "1..0 #skip t/CORE missing. Read t/testcore.t how to setup.\n";
+unshift @INC, ("t");
 
 require "test.pl";
 
@@ -46,10 +41,10 @@ unlink ("t/perl", "t/CORE/perl");
 `ln -sf $^X t/perl`;
 `ln -sf $^X t/CORE/perl`;
 # CORE t/test.pl would be better, but this fails only on 2 tests
--e "t/CORE/test.pl" or `ln -s t/test.pl t/CORE/test.pl`;
--e "t/CORE/harness" or `ln -s t/test.pl t/CORE/harness`; # better than nothing
-`ln -s t/test.pl harness`; # base/term
-`ln -s t/test.pl TEST`;  # cmd/mod 8
+#-e "t/CORE/test.pl" or `ln -sf t/test.pl t/CORE/test.pl`;
+#-e "t/CORE/harness" or `ln -s t/test.pl t/CORE/harness`; # better than nothing
+#`ln -s t/test.pl harness`; # base/term
+#`ln -s t/test.pl TEST`;  # cmd/mod 8
 
 my %ALLOW_PERL_OPTIONS;
 for (qw(
@@ -58,11 +53,6 @@ for (qw(
        )) {
   $ALLOW_PERL_OPTIONS{"t/CORE/$_"} = 1;
 }
-my $SKIP = { "CC" =>
-             { "t/CORE/op/bop.t" => "hangs",
-               "t/CORE/op/die.t" => "hangs",
-             }
-           };
 
 my @fail = map { "t/CORE/$_" }
   qw{
@@ -151,6 +141,6 @@ for my $t (@tests) {
 }
 
 END {
-  unlink ( "t/perl", "t/CORE/perl", "harness", "TEST" );
+#  unlink ( "t/perl", "t/CORE/perl", "harness", "TEST" );
   unlink ("a","a.c","t/a.c","t/CORE/a.c","aa.c","aa","t/aa.c","t/CORE/aa.c","b.plc");
 }
