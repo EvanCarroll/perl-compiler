@@ -3,6 +3,7 @@
 # Calls all tests in op/inccode.t after tying @INC first.
 
 use Tie::Array;
+chdir 't/CORE';
 my @orig_INC = @INC;
 tie @INC, 'Tie::StdArray';
 @INC = @orig_INC;
