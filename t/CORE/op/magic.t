@@ -23,11 +23,7 @@ $Is_Cygwin   = $^O eq 'cygwin';
 $Is_MPE      = $^O eq 'mpeix';		
 $Is_BeOS     = $^O eq 'beos';
 
-$PERL = $ENV{PERL}
-    || ($Is_NetWare           ? 'perl'   :
-       $Is_VMS                ? $^X      :
-       $Is_MSWin32            ? '.\perl' :
-       './perl');
+$PERL = $^X;
 
 END {
     # On VMS, environment variable changes are peristent after perl exits
