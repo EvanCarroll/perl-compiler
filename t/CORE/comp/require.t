@@ -1,10 +1,8 @@
 #!./perl
 
-BEGIN {
-    chdir 't/CORE' if -d 't';
-#     @INC = '.';
-    push @INC, '../lib';
-}
+
+chdir 't/CORE' if -d 't';
+push @INC, '../lib';
 
 sub do_require {
     %INC = ();
@@ -101,7 +99,7 @@ print "ok ",$i++,"\n";
 
 # interaction with pod (see the eof)
 write_file('bleah.pm', "print 'ok $i\n'; 1;\n");
-require "bleah.pm";
+eval 'require "bleah.pm"'; # perlcc help ( not a bug by itself, it s the expected behavior with perlcc )
 $i++;
 
 # run-time failure in require
