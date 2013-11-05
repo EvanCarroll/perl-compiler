@@ -2,7 +2,7 @@
 
 BEGIN {
     chdir 't/CORE' if -d 't';
-    @INC = ('../lib');
+    push @INC, ('./lib');
     require './test.pl';
 }
 
