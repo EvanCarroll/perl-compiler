@@ -4,7 +4,7 @@ my $PERLIO;
 
 BEGIN {
     chdir 't/CORE' if -d 't';
-    @INC = '../lib';
+    unshift @INC, './lib';
     require './test.pl';
     skip_all_without_perlio();
     # FIXME - more of these could be tested without Encode or full perl

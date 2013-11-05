@@ -2,7 +2,7 @@
 
 BEGIN {
     chdir 't/CORE' if -d 't';
-    @INC = '../lib';
+    unshift @INC, './lib';
 }
 
 no warnings 'once';

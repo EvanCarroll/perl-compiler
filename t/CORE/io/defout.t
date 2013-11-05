@@ -8,7 +8,7 @@
 
 BEGIN {
     chdir 't/CORE';
-    @INC = '../lib';
+    unshift @INC, './lib';
     require './test.pl';
 }
 
