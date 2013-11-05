@@ -3,7 +3,7 @@
 BEGIN {
     chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
-    require "../t/test.pl";
+    require "./test.pl";
     skip_all_without_perlio();
     plan (15);
 }
