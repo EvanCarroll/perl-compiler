@@ -1,19 +1,18 @@
 #!./perl
 
-BEGIN {
-    require "test.pl";
-}
+
+require "t/CORE/test.pl";
 
 plan(25);
 
 my $tmpfile = tempfile();
-open (tmp,'>', $tmpfile) || die "Can't create Cmd_while.tmp.";
-print tmp "tvi925\n";
-print tmp "tvi920\n";
-print tmp "vt100\n";
-print tmp "Amiga\n";
-print tmp "paper\n";
-close tmp or die "Could not close: $!";
+open ($tmp,'>', $tmpfile) || die "Can't create Cmd_while.tmp.";
+print $tmp "tvi925\n";
+print $tmp "tvi920\n";
+print $tmp "vt100\n";
+print $tmp "Amiga\n";
+print $tmp "paper\n";
+close $tmp or die "Could not close: $!";
 
 # test "last" command
 
