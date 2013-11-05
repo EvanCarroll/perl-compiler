@@ -1,6 +1,6 @@
 #!./perl -w
 
-require './test.pl';
+require './t/CORE/test.pl';
 use strict;
 
 # Verify that addition/subtraction properly upgrade to doubles.
