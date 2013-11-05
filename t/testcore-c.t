@@ -109,8 +109,9 @@ sub run_c {
   $d = "-DALLOW_PERL_OPTIONS" if $ALLOW_PERL_OPTIONS{$t};
   vcmd "$^X $Mblib script/cc_harness -q $d $a.c -o $a" if -e "$a.c";
   vcmd "./$a | tee $result" if -e "$a";
-  prove ($a, $result, $i, $t, $backend);
+  my $ok = prove ($a, $result, $i, $t, $backend);
   $i++;
+  return $ok;
 }
 
 sub prove {
@@ -119,7 +120,18 @@ sub prove {
     system(qq[prove -Q --exec cat $result || echo -n "n";echo "ok $i - $backend $t"]);
   } else {
     print "not ok $i - $backend $t\n";
+    return 0;
   }
+  return 1;
+}
+
+{
+  system 'mkdir', 'locks'; 
+  # skip tests flags as working in a previous run
+  @tests = map {
+    my $lock = get_lock_for_test($_);
+    -e $lock ? () : $_ 
+   } @tests;
 }
 
 my @runtests = qw(C CC BC);
@@ -132,13 +144,25 @@ my %runtests = map {$_ => 1} @runtests;
 print "1..", $numtests, "\n";
 my $i = 1;
 
+my $add_lock = grep { m/-add-?lock/ } @ARGV;
+
 for my $t (@tests) {
     next if $t =~ m/^-/;
     if ($runtests{C}) {
         (print "ok $i #skip $SKIP->{C}->{$t}\n" and next)
         if exists $SKIP->{C}->{$t};
-        run_c($t, "C");
+        my $ok = run_c($t, "C");
+        system 'touch', get_lock_for_test($t) if $add_lock && $ok;
     }
+}
+
+sub get_lock_for_test {
+  my $test = shift;
+  $test =~ s{/}{-}g;
+  $test =~ s{\s+}{-}g;
+  $test =~ s{--+}{-}g;
+
+  return 'locks/'.$test;
 }
 
 END {
