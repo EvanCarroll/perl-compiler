@@ -22,9 +22,9 @@ for (@prgs){
        $switch = $1;
     }
     my($prog,$expected) = split(/\nEXPECT\n/, $_);
-    open TEST, ">$tmpfile";
-    print TEST "$prog\n";
-    close TEST;
+    open $TEST, ">$tmpfile";
+    print $TEST "$prog\n";
+    close $TEST;
     my $results = $Is_VMS ?
                   `MCR $^X "-I[-.lib]" $switch $tmpfile 2>&1` :
 		      $Is_MSWin32 ?  
