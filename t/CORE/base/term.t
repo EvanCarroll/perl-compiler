@@ -36,9 +36,9 @@ if (($x | 1) == 101) {print "ok 5\n";} else {print "not ok 5\n";}
 
 # check <> pseudoliteral
 
-open(try, "/dev/null") || open(try,"nla0:") || (die "Can't open /dev/null.");
+open($try, "/dev/null") || open($try,"nla0:") || (die "Can't open /dev/null.");
 
-if (<try> eq '') {
+if (<$try> eq '') {
     print "ok 6\n";
 }
 else {
@@ -46,5 +46,5 @@ else {
     die "/dev/null IS NOT A CHARACTER SPECIAL FILE!!!!\n" unless -c '/dev/null';
 }
 
-open(try, "harness") || (die "Can't open harness.");
-if (<try> ne '') {print "ok 7\n";} else {print "not ok 7\n";}
+open($try, "harness") || (die "Can't open harness.");
+if (<$try> ne '') {print "ok 7\n";} else {print "not ok 7\n";}
