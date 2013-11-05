@@ -1,8 +1,6 @@
 #!./perl
 
-BEGIN {
-    chdir 't/CORE' if -d 't';
-}
+chdir 't/CORE' if -d 't';
 
 print "1..7\n";
 
