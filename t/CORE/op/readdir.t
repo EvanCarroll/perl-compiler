@@ -25,7 +25,7 @@ closedir(OP);
 
 my $expect;
 {
-    open my $man, '<', '../MANIFEST' or die "Can't open ../MANIFEST: $!";
+    open my $man, '<', 'MANIFEST' or die "Can't open MANIFEST: $!";
     while (<$man>) {
 	++$expect if m!^t/op/[^/]+\t!;
     }
