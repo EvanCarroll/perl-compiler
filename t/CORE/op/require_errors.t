@@ -10,7 +10,7 @@ plan(tests => 3);
 
 my $nonfile = tempfile();
 
-@INC = qw(Perl Rules);
+unshift @INC, "./lib";
 
 eval {
     require $nonfile;

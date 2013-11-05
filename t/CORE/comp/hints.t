@@ -3,7 +3,7 @@
 # Tests the scoping of $^H and %^H
 
 BEGIN {
-    unshift @INC, "./lib"
+    unshift @INC, "./lib";
 }
 
 BEGIN { print "1..24\n"; }

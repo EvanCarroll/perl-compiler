@@ -17,7 +17,7 @@
 
 BEGIN {
     chdir "t" if -d "t";
-    unshift @INC, "./lib"
+    unshift @INC, "./lib";
 }
 
 use strict;
