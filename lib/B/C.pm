@@ -3286,6 +3286,10 @@ if (0) {
     $init->add( sprintf( "SvREFCNT($sym) += %u;", $refcnt ) ) if $refcnt > 0;
     return $sym;
   }
+  if ($fullname eq 'main::0') { # dollar_0 already handled before, so don't overwrite it
+    $init->add(qq[$sym = gv_fetchpv($name, FALSE, SVt_PV);]);
+    return $sym;
+  }
   # defer to the end because we remove compiler-internal and skipped stuff
   #if ($fullname eq 'main::INC' and !$_[2]) {
   #  return $sym;
@@ -5859,6 +5863,7 @@ sub compile {
   $DB::single=1 if defined &DB::DB;
   my ( $option, $opt, $arg );
   my @eval_at_startup;
+  $B::C::can_delete_pkg = 1;
   $B::C::destruct = 1;
   $B::C::stash    = 1;
   $B::C::save_sig = 1;
@@ -5868,7 +5873,7 @@ sub compile {
   my %optimization_map = (
     0 => [qw()],                # special case
     1 => [qw(-fcog -fppaddr -fwarn-sv -fav-init2)], # falls back to -fav-init
-    2 => [qw(-fro-inc -fsave-data -fdelete-pkg)],
+    2 => [qw(-fro-inc -fsave-data)],
     3 => [qw(-fno-destruct -fconst-strings -fno-fold -fno-warnings)],
     4 => [qw(-fcop)],
   );
@@ -6262,11 +6267,11 @@ Enabled with C<-O2>.
 =item B<-fdelete-pkg>
 
 Delete packages which appear to be nowhere used automatically.
-This creates smaller executables but might miss run-time called
-methods. Note that you can always use -u to add automatically
-deleted packages.
+This might miss run-time called stringified methods.
+Note that you can always use C<-u> to add automatically deleted
+packages.
 
-Enabled with C<-O2>.
+Needs to be used with C<-fno-delete-pkg>.
 
 =item B<-fconst-strings>
 
