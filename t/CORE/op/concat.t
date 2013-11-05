@@ -2,7 +2,7 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
+    unshift @INC, './lib';
 }
 
 # This ok() function is specially written to avoid any concatenation.

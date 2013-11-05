@@ -11,7 +11,7 @@ BEGIN {
     $ENV{LANGUAGE} = 'C'; # GNU locale extension
 
     chdir 't';
-    @INC = '../lib';
+    unshift @INC, './lib';
     require './test.pl';
     skip_all_if_miniperl("no dynamic loading on miniperl, no POSIX");
 }

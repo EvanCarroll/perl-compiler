@@ -2,7 +2,7 @@
 
 BEGIN {
        chdir 't' if -d 't';
-       @INC = '../lib';
+       unshift @INC, './lib';
 }
 
 # 2s complement assumption. Won't break test, just makes the internals of

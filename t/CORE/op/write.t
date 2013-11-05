@@ -1,8 +1,8 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
+    chdir 't/CORE' if -d 't/CORE';
+    unshift @INC, './lib';
     require './test.pl';
 }
 

@@ -3,7 +3,7 @@
 BEGIN {
     $| = 1;
     chdir 't' if -d 't';
-    @INC = '../lib';
+    unshift @INC, './lib';
     $ENV{PATH} = '/bin' if ${^TAINT};
     $SIG{__WARN__} = sub { die "Dying on warning: ", @_ };
     require './test.pl';

@@ -1,7 +1,7 @@
 #!./perl -w
 
 chdir 't' if -d 't';
-@INC = '../lib';
+unshift @INC, './lib';
 require './test.pl';
 use strict;
 

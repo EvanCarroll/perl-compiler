@@ -4,7 +4,7 @@
 
 BEGIN {
 	chdir 't' if -d 't';
-	@INC = '../lib';
+	unshift @INC, './lib';
 	require './test.pl';
 	require Config;
 	# Don't bother if there are no quad offsets.

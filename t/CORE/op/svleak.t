@@ -6,7 +6,7 @@
 
 BEGIN {
     chdir 't';
-    @INC = '../lib';
+    unshift @INC, './lib';
     require './test.pl';
 
     eval { require XS::APItest; XS::APItest->import('sv_count'); 1 }

@@ -2,7 +2,7 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
+    unshift @INC, './lib';
     require './test.pl';
     eval { my $q = pack "q", 0 };
     skip_all('no 64-bit types') if $@;

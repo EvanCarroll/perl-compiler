@@ -2,7 +2,7 @@
 
 BEGIN {
     chdir 't';
-    @INC = '../lib';
+    unshift @INC, './lib';
     require './test.pl';
 
     eval { require AnyDBM_File }; # not all places have dbm* functions
