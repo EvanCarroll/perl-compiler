@@ -142,5 +142,5 @@ for my $t (@tests) {
 
 END {
 #  unlink ( "t/perl", "t/CORE/perl", "harness", "TEST" );
-  unlink ("a","a.c","t/a.c","t/CORE/a.c","aa.c","aa","t/aa.c","t/CORE/aa.c","b.plc");
+  unlink ("a.c","t/a.c","t/CORE/a.c","aa.c","aa","t/aa.c","t/CORE/aa.c","b.plc");
 }

@@ -47,3 +47,5 @@ B-C-*.tar.gz
 *-c.result
 *-bc.result
 *-cc.result
+t/CORE/perl
+t/perl
