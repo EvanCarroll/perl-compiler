@@ -1,11 +1,6 @@
 #!./perl
 
-INIT {
-    chdir 't/CORE' if -d 't';
-    unshift @INC, './lib';
-}
-
-INIT { require "./test.pl"; }
+require "t/CORE/test.pl";
 
 plan(tests => 23);
 
