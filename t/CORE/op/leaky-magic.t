@@ -4,17 +4,23 @@
 # etc.) only applies to the globals, and not to similarly-named variables
 # in other packages (%Net::DNS::RR::SIG, ${"'Oh no'!"}, etc.).
 
+
 BEGIN {
-    chdir 't/CORE' if -d 't';
-    require './test.pl';
-    unshift @INC, './lib';
+    *ok = sub ($@) { };
+    *fresh_perl_is = sub {};
+    *is = sub ($$@) {};
+}
+
+INIT {
+  chdir 't/CORE' if -d 't';
+  require './test.pl';
+  unshift @INC, './lib';
 }
 
 # Hack to allow test counts to be specified piecemeal
 BEGIN { ++$INC{'tests.pm'} }
 sub tests::VERSION { $tests += pop };
 plan (tests => $tests);
-
 
 use tests 2; # First make sure that %! %- %+ do not load extra modules.
 map %{"foo::$_"}, qw< ! - + >;
