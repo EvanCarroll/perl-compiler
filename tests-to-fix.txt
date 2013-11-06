@@ -26,7 +26,6 @@ t/CORE/io/perlio_open.t
 t/CORE/io/pipe.t
 cleland - t/CORE/io/print.t
 cleland - t/CORE/io/pvbm.t
-cleland - t/CORE/io/read.t
 t/CORE/io/say.t
 t/CORE/io/tell.t
 t/CORE/io/through.t
@@ -39,7 +38,6 @@ t/CORE/op/blocks.t
 t/CORE/op/bop.t
 justin - t/CORE/op/caller.t
 justin - t/CORE/op/chdir.t
-kyle - t/CORE/op/chop.t -- http://target.cpanel.net/RestUI/TpView.aspx?acid=EE4194B31661EF07ABC14DB4C0243592#bug/16825
 kyle - t/CORE/op/chr.t
 kyle - t/CORE/op/concat2.t
 kyle - t/CORE/op/cproto.t
@@ -142,3 +140,5 @@ t/CORE/op/warn.t
 t/CORE/op/while_readdir.t
 t/CORE/op/write.t
 t/CORE/op/yadayada.t
+rurban - t/CORE/io/read.t broken by perlcc issue 148 and 150
+rurban - t/CORE/op/chop.t -- http://target.cpanel.net/RestUI/TpView.aspx?acid=EE4194B31661EF07ABC14DB4C0243592#bug/16825
