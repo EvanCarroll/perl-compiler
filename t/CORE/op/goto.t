@@ -2,17 +2,13 @@
 
 # "This IS structured code.  It's just randomly structured."
 
-INIT {
-    require "t/CORE/test.pl";
+BEGIN {
+  require "t/CORE/test.pl";
 }
-# INIT {
-#     chdir 't/CORE' if -d 't';
-#     unshift @INC, "./lib";
-# }
 
 use warnings;
 use strict;
-plan(tests => 77 - 1); # skip TODO
+plan(tests => 77 - 1);
 our $TODO;
 
 my $deprecated = 0;
