@@ -1,6 +1,6 @@
 #!./perl -w
 
-BEGIN {
+INIT {
     chdir "t" if -d "t";
     unshift @INC, "./lib";
 }
