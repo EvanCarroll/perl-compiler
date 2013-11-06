@@ -60,18 +60,18 @@ t/CORE/op/fork.t
 t/CORE/op/getpid.t
 t/CORE/op/getppid.t
 t/CORE/op/gmagic.t
-t/CORE/op/goto.t
-t/CORE/op/grent.t
-t/CORE/op/groups.t
-t/CORE/op/gv.t
-t/CORE/op/hash.t
-t/CORE/op/hashassign.t
-t/CORE/op/inccode.t
-t/CORE/op/incfilter.t
-t/CORE/op/index.t
-t/CORE/op/int.t
-t/CORE/op/kill0.t
-t/CORE/op/lc.t
+nico - t/CORE/op/goto.t
+nico - t/CORE/op/grent.t
+nico - t/CORE/op/groups.t
+nico - t/CORE/op/gv.t
+nico - t/CORE/op/hash.t
+nico - t/CORE/op/hashassign.t
+nico - t/CORE/op/inccode.t
+nico - t/CORE/op/incfilter.t
+nico - t/CORE/op/index.t
+nico - t/CORE/op/int.t
+nico - t/CORE/op/kill0.t
+nico - t/CORE/op/lc.t
 t/CORE/op/lc_user.t
 t/CORE/op/length.t
 t/CORE/op/lfs.t
