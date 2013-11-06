@@ -11,13 +11,13 @@ toddr - t/CORE/io/crlf.t
 toddr - t/CORE/io/crlf_through.t
 toddr - t/CORE/io/data.t
 t/CORE/io/defout.t
-t//CORE/io/dup.t
+cleland - t/CORE/io/dup.t
 t/CORE/io/fflush.t
-t/CORE/io/fs.t
+cleland - t/CORE/io/fs.t
 t/CORE/io/iofile.t
 t/CORE/io/layers.t
 t/CORE/io/nargv.t
-t/CORE/io/open.t
+cleland - t/CORE/io/open.t
 t/CORE/io/openpid.t
 t/CORE/io/perlio.t
 t/CORE/io/perlio_fail.t
