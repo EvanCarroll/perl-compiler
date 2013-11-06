@@ -25,9 +25,9 @@ t/CORE/io/perlio_fail.t
 t/CORE/io/perlio_leaks.t
 t/CORE/io/perlio_open.t
 t/CORE/io/pipe.t
-t/CORE/io/print.t
-t/CORE/io/pvbm.t
-t/CORE/io/read.t
+cleland - t/CORE/io/print.t
+cleland - t/CORE/io/pvbm.t
+cleland - t/CORE/io/read.t
 t/CORE/io/say.t
 t/CORE/io/tell.t
 t/CORE/io/through.t
