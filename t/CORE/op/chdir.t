@@ -157,9 +157,10 @@ sub check_env {
 #line 64
         ok( chdir(undef),           "chdir(undef) w/ only \$ENV{$key} set" );
         is( abs_path, $ENV{$key},   '  abs_path() agrees' );
-        is( $warning,  <<WARNING,   '  got uninit & deprecation warning' );
+        is( $warning, <<WARNING,   '  got uninit & deprecation warning' );
 Use of uninitialized value in chdir at $0 line 64.
 Use of chdir('') or chdir(undef) as chdir() is deprecated at $0 line 64.
+Insecure dependency in chdir while running with -t switch at t/CORE/op/chdir.t line 64.
 WARNING
 
         chdir($Cwd);
@@ -169,8 +170,9 @@ WARNING
 #line 76
         ok( chdir(''),              "chdir('') w/ only \$ENV{$key} set" );
         is( abs_path, $ENV{$key},   '  abs_path() agrees' );
-        is( $warning,  <<WARNING,   '  got deprecation warning' );
+	is( $warning, <<WARNING,   '  got deprecation warning' );
 Use of chdir('') or chdir(undef) as chdir() is deprecated at $0 line 76.
+Insecure dependency in chdir while running with -t switch at t/CORE/op/chdir.t line 76.
 WARNING
 
         chdir($Cwd);
