@@ -57,7 +57,10 @@ for (qw(
 }
 
 my @fail = map { "t/CORE/$_" }
-  qw{};
+  qw{
+    defins.t
+
+  };
 
 my @tests = $ARGV[0] eq '-fail'
   ? @fail

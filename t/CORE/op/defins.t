@@ -27,7 +27,7 @@ if ($^O eq 'VMS') {
     } else {
         my $unix_report = $ENV{'DECC$FILENAME_UNIX_REPORT'} || '';
         $unix_rpt = $unix_report =~ /^[ET1]/i; 
-        my $drop_dot_notype = $ENV{'DECC$READ$DIR_DROPDOTNOTYPE'} || '';
+        my $drop_dot_notype = $ENV{'DECC$READDIR_DROPDOTNOTYPE'} || '';
         $drop_dot = $drop_dot_notype =~ /^[ET1]/i;
     }
     $unix_mode = 1 if $drop_dot && unix_rpt;
@@ -83,27 +83,27 @@ close FILE;
 
 # perlcc issue #154 https://code.google.com/p/perl-compiler/issues/detail?id=154
 # replace DIR by $DIR solves the problem
-opendir($DIR,'.');
-ok(defined($DIR),'opened current directory');
+opendir(DIR,'.');
+ok(defined(DIR),'opened current directory');
 $seen = 0;
-while (my $name = readdir($DIR))
+while (my $name = readdir(DIR))
  {
   $seen++ if $name eq $wanted_filename;
  }
 cmp_ok($seen,'==',1,'saw work file once');
 
-rewinddir($DIR);
+rewinddir(DIR);
 $seen = 0;
 $dummy = '';
-while (($seen ? $dummy : $name) = readdir($DIR))
+while (($seen ? $dummy : $name) = readdir(DIR))
  {
   $seen++ if $name eq $wanted_filename;
  }
 cmp_ok($seen,'>',0,'saw file in while() ternary');
 
-rewinddir($DIR);
+rewinddir(DIR);
 $seen = 0;
-while ($where{$seen} = readdir($DIR))
+while ($where{$seen} = readdir(DIR))
  {
   $seen++ if $where{$seen} eq $wanted_filename;
  }
