@@ -20,7 +20,6 @@
 use Cwd;
 use File::Copy;
 
-print "1..0 #skip t/CORE missing. Read t/testcore.t how to setup.\n";
 unshift @INC, ("t");
 
 require "test.pl";
@@ -90,7 +89,7 @@ sub run_c {
   if ( -e "$a" ) {
     my ( $result, $out, $err ) = vcmd "./$a | tee $result";  
     $ok = 0 if $out =~ m{^\s+Failed tests:\s+}im;
-    $ok = 0 if $out =~ m{^not\s+ok\s+}im;
+    $ok = 0 if $out =~ m{^not\s+ok\s+(?!.*# TODO)}im;
   }  
   $ok &&= prove ($a, $result, $i, $t, $backend);
   $i++;
