@@ -41,16 +41,16 @@ t/CORE/op/blocks.t
 t/CORE/op/bop.t
 t/CORE/op/caller.t
 t/CORE/op/chdir.t
-t/CORE/op/chop.t
-t/CORE/op/chr.t
-t/CORE/op/concat2.t
-t/CORE/op/cproto.t
-t/CORE/op/crypt.t
-t/CORE/op/dbm.t
-t/CORE/op/die_exit.t
-t/CORE/op/die_keeperr.t
-t/CORE/op/each.t
-t/CORE/op/each_array.t
+kyle - t/CORE/op/chop.t
+kyle - t/CORE/op/chr.t
+kyle - t/CORE/op/concat2.t
+kyle - t/CORE/op/cproto.t
+kyle - t/CORE/op/crypt.t
+kyle - t/CORE/op/dbm.t
+kyle - t/CORE/op/die_exit.t
+kyle - t/CORE/op/die_keeperr.t
+kyle - t/CORE/op/each.t
+kyle - t/CORE/op/each_array.t
 t/CORE/op/eval.t
 t/CORE/op/exec.t
 t/CORE/op/exp.t
