@@ -1,6 +1,6 @@
 #!./perl
 
-BEGIN {
+INIT {
     chdir 't/CORE' if -d 't/CORE';
     unshift @INC, './lib';
     require './test.pl';
@@ -10,7 +10,7 @@ $|  = 1;
 use warnings;
 use Config;
 
-plan tests => 114;
+plan(114);
 
 my $Perl = which_perl();
 
@@ -91,11 +91,11 @@ EOC
     my @rows = <$f>;
     my $test = curr_test;
     print $f "not ok $test - piped in\n";
-    next_test;
+    next_test();
 
     $test = curr_test;
     print $f "not ok $test - piped in\n";
-    next_test;
+    next_test();
     ok( close($f),                      '       close' );
     sleep 1;
     pass('flushing');
@@ -182,11 +182,11 @@ EOC
     my @rows = <$f>;
     my $test = curr_test;
     print $f "not ok $test - piping\n";
-    next_test;
+    next_test();
 
     $test = curr_test;
     print $f "not ok $test - piping\n";
-    next_test;
+    next_test();
     ok( close($f),                      '       close' );
     sleep 1;
     pass("Flush");
@@ -227,10 +227,10 @@ like( $@, qr/Bad filehandle:\s+$afile/,          '       right error' );
 }
 
 SKIP: {
-    skip "This perl uses perlio", 1 if $Config{useperlio};
+    skip("This perl uses perlio", 1) if $Config{useperlio};
     skip_if_miniperl("miniperl can't rely on loading %Errno", 1);
     # Force the reference to %! to be run time by writing ! as {"!"}
-    skip "This system doesn't understand EINVAL", 1
+    skip("This system doesn't understand EINVAL", 1)
 	unless exists ${"!"}{EINVAL};
 
     no warnings 'io';
@@ -344,7 +344,7 @@ SKIP: {
     my $var = *STDOUT;
     open my $fh, ">", \$var;
     print $fh "hello";
-    is $var, "hello", '[perl #77684]: open $fh, ">", \$glob_copy'
+    is($var, "hello", '[perl #77684]: open $fh, ">", \$glob_copy')
         # when this fails, it leaves an extra file:
         or unlink \*STDOUT;
 }
