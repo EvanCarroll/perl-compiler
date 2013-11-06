@@ -59,6 +59,7 @@ for (qw(
 my @fail = map { "t/CORE/$_" }
   qw{
     defins.t
+    taint.t
 
   };
 

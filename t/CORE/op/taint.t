@@ -7,6 +7,8 @@
 # better than having no tests at all, right?
 #
 
+# view perlcc issue #151 https://code.google.com/p/perl-compiler/issues/detail?id=151
+
 BEGIN {
     chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
