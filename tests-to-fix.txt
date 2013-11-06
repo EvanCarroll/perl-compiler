@@ -1,16 +1,16 @@
-t-CORE-op-defins.t
-t-CORE-op-srand.t
-t-CORE-op-taint.t
-t-CORE-op-64bitint.t
-t-CORE-op-leaky-magic.t
-t-CORE-op-method.t
-t-CORE-op-reset.t
-t-CORE-op-ord.t
-t-CORE-op-closure.t
-t-CORE-io-binmode.t
-t-CORE-op-recurse.t
-t-CORE-op-time_loop.t
-t-CORE-op-sysio.t
+nico #t-CORE-op-defins.t
+nico #t-CORE-op-srand.t
+nico #t-CORE-op-taint.t
+nico #t-CORE-op-64bitint.t
+nico #t-CORE-op-leaky-magic.t
+nico #t-CORE-op-method.t
+nico #t-CORE-op-reset.t
+nico #t-CORE-op-ord.t
+nico #t-CORE-op-closure.t
+nico #t-CORE-io-binmode.t
+nico #t-CORE-op-recurse.t
+nico #t-CORE-op-time_loop.t
+nico #t-CORE-op-sysio.t
 t-CORE-op-context.t
 t-CORE-op-cmp.t
 t-CORE-op-range.t
