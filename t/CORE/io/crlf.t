@@ -1,11 +1,7 @@
 #!./perl -w
 
-BEGIN {
-    chdir 't/CORE' if -d 't';
-    unshift @INC, "./lib";
-    require "test.pl";
-    skip_all_without_perlio();
-}
+require "t/CORE/test.pl";
+skip_all_without_perlio();
 
 use Config;
 
