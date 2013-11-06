@@ -5,7 +5,6 @@ nico - t/CORE/op/ord.t
 nico - t/CORE/op/recurse.t
 nico - t/CORE/op/time_loop.t
 nico - t/CORE/op/sysio.t
-toddr - t/CORE/comp/final_line_num.t
 toddr - t/CORE/comp/hints.t
 toddr - t/CORE/comp/opsubs.t
 toddr - t/CORE/io/bom.t
