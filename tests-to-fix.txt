@@ -38,8 +38,8 @@ t/CORE/op/attrs.t
 t/CORE/op/bless.t
 t/CORE/op/blocks.t
 t/CORE/op/bop.t
-t/CORE/op/caller.t
-t/CORE/op/chdir.t
+justin - t/CORE/op/caller.t
+justin - t/CORE/op/chdir.t
 kyle - t/CORE/op/chop.t
 kyle - t/CORE/op/chr.t
 kyle - t/CORE/op/concat2.t
