@@ -6,11 +6,11 @@
 
 use strict;
 
-BEGIN { require './t/CORE/test.pl'; }
+INIT { require './t/CORE/test.pl'; }
 
-plan tests => 2;
+plan(tests => 2);
 watchdog(2);
 
 local $SIG{__WARN__} = sub {};
-is gmtime(2**69),    undef;
-is localtime(2**69), undef;
+is(gmtime(2**69),    undef);
+is(localtime(2**69), undef);
