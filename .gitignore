@@ -50,3 +50,4 @@ B-C-*.tar.gz
 t/CORE/perl
 t/perl
 locks/*.t
+fails

@@ -1,3 +1,5 @@
+#!/bin/env perl
+
 # -*- cperl -*-
 # t/testcore.t - run the core testsuite with the compilers B::C ONLY
 # Usage:
@@ -19,6 +21,7 @@
 
 use Cwd;
 use File::Copy;
+use File::Slurp ();
 
 unshift @INC, ("t");
 
@@ -91,9 +94,9 @@ sub run_c {
     $ok = 0 if $out =~ m{^\s+Failed tests:\s+}im;
     $ok = 0 if $out =~ m{^not\s+ok\s+(?!.*# TODO)}im;
   }  
-  $ok &&= prove ($a, $result, $i, $t, $backend);
+  $ok &&= prove($a, $result, $i, $t, $backend);
   $i++;
-  return $ok;
+  return ( $ok, $result );
 }
 
 sub prove {
@@ -108,9 +111,12 @@ sub prove {
 }
 
 {
-  system 'mkdir', 'locks' unless -d 'locks'; 
+  for ( qw{locks fails} ) {
+    system 'mkdir', $_ unless -d $_;   
+  }
+  
   # skip tests flags as working in a previous run
-  @tests = map {
+  @tests = grep { $_ !~ m/^-/ } map {
     my $lock = get_lock_for_test($_);
     -e $lock ? () : $_ 
    } @tests;
@@ -133,18 +139,30 @@ for my $t (@tests) {
     if ($runtests{C}) {
         (print "ok $i #skip $SKIP->{C}->{$t}\n" and next)
         if exists $SKIP->{C}->{$t};
-        my $ok = run_c($t, "C");
-        system 'touch', get_lock_for_test($t) if $add_lock && $ok;
+        my ( $ok, $result ) = run_c($t, "C");
+        if ( $add_lock ) {
+          if ( $ok ) {
+              system 'touch', get_lock_for_test($t)
+          } else {
+            if ( $result && -f $result ) {
+              system 'cp', $result, get_lock_for_test($t, 'fails');  
+            } else {
+              File::Slurp::write_file( get_lock_for_test($t, 'fails'), $result );  
+            }
+          }
+        }
     }
 }
 
 sub get_lock_for_test {
-  my $test = shift;
+  my ( $test, $dir ) = @_;
+  
+  $dir ||= 'locks';
   $test =~ s{/}{-}g;
   $test =~ s{\s+}{-}g;
   $test =~ s{--+}{-}g;
 
-  return 'locks/'.$test;
+  return $dir.'/'.$test;
 }
 
 END {
