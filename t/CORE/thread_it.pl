@@ -8,8 +8,6 @@ use warnings;
 # Otherwise if we require 'test.pl' and they require './test.pl', it is loaded
 # twice.
 require './test.pl';
-skip_all_without_config('useithreads');
-skip_all_if_miniperl("no dynamic loading on miniperl, no threads");
 
 require threads;
 

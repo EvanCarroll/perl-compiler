@@ -4,8 +4,6 @@ BEGIN {
     chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
     require './test.pl';
-    skip_all_without_perlio();
-    skip_all_without_dynamic_extension('Fcntl'); # how did you get this far?
 }
 
 use strict;

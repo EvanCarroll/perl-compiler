@@ -13,10 +13,7 @@ if(eval {require File::Spec; 1}) {
     $Null = File::Spec->devnull;
     $Curdir = File::Spec->curdir;
 } else {
-    die $@ unless is_miniperl();
-    $Curdir = '.';
-    diag("miniperl failed to load File::Spec, error is:\n$@");
-    diag("\ncontinuing, assuming '.' for current directory. Some tests will be skipped.");
+    die $@;
 }
 
 
@@ -113,7 +110,6 @@ SKIP: {
     }
 
     SKIP: {
-	skip_if_miniperl("File::Spec not built for minitest", 2);
         my $cwd = File::Spec->rel2abs($Curdir);
         skip "Solaris tmpfs has different mtime/ctime link semantics", 2
                                      if $Is_Solaris and $cwd =~ m#^/tmp# and

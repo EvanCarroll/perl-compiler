@@ -6,8 +6,6 @@ BEGIN {
     chdir 't/CORE' if -d 't';
     unshift @INC, "./lib";
     require 'test.pl';
-    skip_all_if_miniperl('no dynamic loading on miniperl, no Filter::Util::Call');
-    skip_all_without_perlio();
 }
 use strict;
 use Config;

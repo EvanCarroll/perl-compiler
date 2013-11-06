@@ -228,7 +228,6 @@ like( $@, qr/Bad filehandle:\s+$afile/,          '       right error' );
 
 SKIP: {
     skip("This perl uses perlio", 1) if $Config{useperlio};
-    skip_if_miniperl("miniperl can't rely on loading %Errno", 1);
     # Force the reference to %! to be run time by writing ! as {"!"}
     skip("This system doesn't understand EINVAL", 1)
 	unless exists ${"!"}{EINVAL};
@@ -339,8 +338,7 @@ fresh_perl_is(
     '[perl #77492]: open $fh, ">", \*glob causes SEGV');
 
 # [perl #77684] Opening a reference to a glob copy.
-SKIP: {
-    skip_if_miniperl("no dynamic loading on miniperl, so can't load PerlIO::scalar", 1);
+{
     my $var = *STDOUT;
     open my $fh, ">", \$var;
     print $fh "hello";
@@ -351,11 +349,8 @@ SKIP: {
 
 # check that we can call methods on filehandles auto-magically
 # and have IO::File loaded for us
-SKIP: {
-    skip_if_miniperl("no dynamic loading on miniperl, so can't load IO::File", 3);
-    is( $INC{'IO/File.pm'}, undef, "IO::File not loaded" );
-    my $var = "";
-    open my $fh, ">", \$var;
-    ok( eval { $fh->autoflush(1); 1 }, '$fh->autoflush(1) lives' );
-    ok( $INC{'IO/File.pm'}, "IO::File now loaded" );
-}
+is( $INC{'IO/File.pm'}, undef, "IO::File not loaded" );
+my $var = "";
+open my $fh, ">", \$var;
+ok( eval { $fh->autoflush(1); 1 }, '$fh->autoflush(1) lives' );
+ok( $INC{'IO/File.pm'}, "IO::File now loaded" );

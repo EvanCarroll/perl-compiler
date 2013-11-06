@@ -1,22 +1,16 @@
 #!./perl
 
+use Errno;
 INIT {
     chdir 't/CORE' if -d 't';
     unshift @INC, "./lib";
     require './test.pl';
-    eval 'use Errno';
-    die $@ if $@ and !is_miniperl();
 }
 
 plan(tests => 9);
 
 ok( binmode(STDERR),            'STDERR made binary' );
-SKIP: {
-    #skip('skip unix discipline without PerlIO layers', 1)
-	# perlcc bug #152
-    #unless find PerlIO::Layer 'perlio';
-    ok( binmode(STDERR, ":unix"),   '  with unix discipline' );
-}
+ok( binmode(STDERR, ":unix"),   '  with unix discipline' );
 ok( binmode(STDERR, ":raw"),    '  raw' );
 ok( binmode(STDERR, ":crlf"),   '  and crlf' );
 

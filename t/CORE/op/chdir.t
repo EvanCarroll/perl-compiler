@@ -4,13 +4,9 @@ BEGIN {
     # We're not going to chdir() into 't' because we don't know if
     # chdir() works!  Instead, we'll hedge our bets and put both
     # possibilities into @INC.
-    unshift @INC, "./t/CORE/lib", 't/CORE';
-    require "test.pl";
+    require "t/CORE/test.pl";
     # Really want to know if chdir is working, as the build process will all go
     # wrong if it is not.
-    if (is_miniperl() && !eval {require File::Spec::Functions; 1}) {
-	push @INC, qw(dist/Cwd/lib dist/Cwd ../dist/Cwd/lib ../dist/Cwd);
-    }
     plan(tests => 48);
 }
 

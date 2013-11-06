@@ -100,10 +100,6 @@ sub note {
     _print( _comment(@_) );
 }
 
-sub is_miniperl {
-    return !defined &DynaLoader::boot_DynaLoader;
-}
-
 sub _comment {
     return map { /^#/ ? "$_\n" : "# $_\n" }
            map { split /\n/ } @_;
@@ -116,40 +112,6 @@ sub skip_all {
 	_print "1..0\n";
     }
     exit(0);
-}
-
-sub skip_all_if_miniperl {
-    skip_all(@_) if is_miniperl();
-}
-
-sub skip_all_without_dynamic_extension {
-    my $extension = shift;
-    skip_all("no dynamic loading on miniperl, no $extension") if is_miniperl();
-    unless (eval {require Config; 1}) {
-	warn "test.pl had problems loading Config: $@";
-	return;
-    }
-    $extension =~ s!::!/!g;
-    return if ($Config::Config{extensions} =~ /\b$extension\b/);
-    skip_all("$extension was not built");
-}
-
-sub skip_all_without_perlio {
-    skip_all('no PerlIO') unless PerlIO::Layer->find('perlio');
-}
-
-sub skip_all_without_config {
-    unless (eval {require Config; 1}) {
-	warn "test.pl had problems loading Config: $@";
-	return;
-    }
-    foreach (@_) {
-	next if $Config::Config{$_};
-	my $key = $_; # Need to copy, before trying to modify.
-	$key =~ s/^use//;
-	$key =~ s/^d_//;
-	skip_all("no $key");
-    }
 }
 
 sub _ok {
@@ -402,10 +364,6 @@ sub skip {
     }
     local $^W = 0;
     last SKIP;
-}
-
-sub skip_if_miniperl {
-    skip(@_) if is_miniperl();
 }
 
 sub todo_skip {

@@ -9,7 +9,6 @@ BEGIN {
     chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
     require './test.pl';
-    skip_all_if_miniperl("no dynamic loading on miniperl, no Encode");
 }
 
 plan 1;

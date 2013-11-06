@@ -4,7 +4,6 @@ INIT { # https://code.google.com/p/perl-compiler/issues/detail?id=155
     chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
     require './test.pl';
-    skip_all_without_perlio();
 }
 
 no utf8; # needed for use utf8 not griping about the raw octets

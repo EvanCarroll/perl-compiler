@@ -3,7 +3,6 @@
 BEGIN {
     $SIG{__WARN__} = sub { die "Dying on warning: ", @_ };
     require './t/CORE/test.pl';
-    skip_all_if_miniperl("no dynamic loading on miniperl, no Tie::Hash::NamedCapture");
     plan(tests => 2);
 }
 

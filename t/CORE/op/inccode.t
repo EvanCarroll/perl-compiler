@@ -13,15 +13,13 @@ use Config;
 my $can_fork   = 0;
 my $has_perlio = $Config{useperlio};
 
-unless (is_miniperl()) {
-    if ($Config{d_fork} && eval 'require POSIX; 1') {
+if ($Config{d_fork} && eval 'require POSIX; 1') {
 	$can_fork = 1;
-    }
 }
 
 use strict;
 
-plan(tests => 49 + !is_miniperl() * (3 + 14 * $can_fork));
+plan(tests => 49 + (3 + 14 * $can_fork));
 
 sub get_temp_fh {
     my $f = tempfile();
@@ -225,8 +223,6 @@ ok( 1, 'returning PVBM ref doesn\'t segfault require' );
 eval 'use foo';
 ok( 1, 'returning PVBM ref doesn\'t segfault use' );
 shift @INC;
-
-exit if is_miniperl();
 
 SKIP: {
     skip( "No PerlIO available", 3 ) unless $has_perlio;

@@ -5,7 +5,6 @@ BEGIN {
     chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
     require './test.pl';
-    skip_all_without_dynamic_extension('Devel::Peek');
 }
 
 use strict;

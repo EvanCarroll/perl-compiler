@@ -1,7 +1,6 @@
 #!./perl -w
 
 require "t/CORE/test.pl";
-skip_all_without_perlio();
 
 use Config;
 
@@ -26,7 +25,6 @@ my $file = tempfile();
 
     SKIP:
     {
-	skip_if_miniperl("miniperl can't rely on loading PerlIO::scalar");
 	skip("no PerlIO::scalar") unless $Config{extensions} =~ m!\bPerlIO/scalar\b!;
 	require PerlIO::scalar;
 	my $fcontents = join "", map {"$_\015\012"} "a".."zzz";

@@ -3,7 +3,6 @@ BEGIN {
 	unshift @INC, './lib';
 	require Config; import Config;
 	require './test.pl';
-	skip_all_without_perlio();
 }
 
 plan tests => 44;

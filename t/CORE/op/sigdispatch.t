@@ -40,7 +40,7 @@ is($@, "Alarm!\n", 'after the second loop');
 
 SKIP: {
     skip('We can\'t test blocking without sigprocmask', 11)
-	if is_miniperl() || !$Config{d_sigprocmask};
+	if !$Config{d_sigprocmask};
     skip('This doesn\'t work on OpenBSD threaded builds RT#88814', 11)
         if $^O eq 'openbsd' && $Config{useithreads};
 

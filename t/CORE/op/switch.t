@@ -783,8 +783,7 @@ sub contains_x {
     is($ok2, 1, "Calling sub indirectly (false)");
 }
 
-SKIP: {
-    skip_if_miniperl("no dynamic loading on miniperl, no Scalar::Util", 14);
+{
     # Test overloading
     { package OverloadTest;
 

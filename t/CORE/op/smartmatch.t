@@ -61,11 +61,9 @@ our $obj = Test::Object::NoOverload->new;
 our $str_obj = Test::Object::StringOverload->new;
 
 my %refh;
-unless (is_miniperl()) {
-    require Tie::RefHash;
-    tie %refh, 'Tie::RefHash';
-    $refh{$ov_obj} = 1;
-}
+require Tie::RefHash;
+tie %refh, 'Tie::RefHash';
+$refh{$ov_obj} = 1;
 
 my @keyandmore = qw(key and more);
 my @fooormore = qw(foo or more);
@@ -93,8 +91,6 @@ while (<DATA>) {
 	$res = eval "no warnings; $tstr";
     }
     else {
-	skip_if_miniperl("Doesn't work with miniperl", $yn =~ /=/ ? 2 : 1)
-	    if $note =~ /MINISKIP/;
 	$res = eval $tstr;
     }
 
