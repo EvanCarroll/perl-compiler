@@ -750,7 +750,7 @@ sub _fresh_perl {
     $runperl_args->{progfile} = $tmpfile;
     $runperl_args->{stderr} = 1;
 
-    open TEST, ">$tmpfile" or die "Cannot open $tmpfile: $!";
+    open(my $TEST, '>', $tmpfile) or die "Cannot open $tmpfile: $!";
 
     # VMS adjustments
     if( $is_vms ) {
@@ -761,8 +761,8 @@ sub _fresh_perl {
                   {if (-e _ and -f _)}
     }
 
-    print TEST $prog;
-    close TEST or die "Cannot close $tmpfile: $!";
+    print {$TEST} $prog;
+    close $TEST or die "Cannot close $tmpfile: $!";
 
     my $results = runperl(%$runperl_args);
     my $status = $?;
