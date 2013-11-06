@@ -40,7 +40,7 @@ t/CORE/op/blocks.t
 t/CORE/op/bop.t
 justin - t/CORE/op/caller.t
 justin - t/CORE/op/chdir.t
-kyle - t/CORE/op/chop.t
+kyle - t/CORE/op/chop.t -- http://target.cpanel.net/RestUI/TpView.aspx?acid=EE4194B31661EF07ABC14DB4C0243592#bug/16825
 kyle - t/CORE/op/chr.t
 kyle - t/CORE/op/concat2.t
 kyle - t/CORE/op/cproto.t
