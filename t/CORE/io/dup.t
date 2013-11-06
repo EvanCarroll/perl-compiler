@@ -1,10 +1,6 @@
 #!./perl
 
-BEGIN {
-    chdir 't/CORE' if -d 't';
-    unshift @INC, "./lib";
-    require "./test.pl";
-}
+require 't/CORE/test.pl';
 
 use Config;
 no warnings 'once';
