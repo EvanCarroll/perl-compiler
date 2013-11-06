@@ -1,5 +1,5 @@
 #!./perl
-BEGIN {
+INIT {
     if ( $^O eq 'VMS' ) {
         my $p = "/bin:/usr/bin:/usr/xpg4/bin:/usr/ucb";
         if ( $ENV{PATH} ) {
