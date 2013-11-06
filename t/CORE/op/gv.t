@@ -5,6 +5,11 @@
 #
 
 BEGIN {
+    *main::ok = sub ($@) { die "undef" };
+    *main::is = sub ($$@) { die "undef" };
+    *main::like = sub ($$@) { die "undef" };
+}
+INIT {
     chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
     require './test.pl';
