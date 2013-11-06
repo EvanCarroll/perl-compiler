@@ -1,0 +1,31 @@
+#!/usr/local/cpanel/3rdparty/perl/514/bin/perl
+
+use strict;
+use warnings;
+
+use Running::Commentary;
+run_with -critical;
+
+my $t = shift @ARGV;
+die "Please give me the .t file you'd pass to t/testcore-c.t\n" if !defined $t || !-f $t;
+
+$SIG{__DIE__} = sub { print "\n[These might help]\n    perl -MO=Concise $t    perlcc -v5 -r $t\n"; };
+
+run 'Building .c' => sub {
+    run 'building' => "/usr/local/cpanel/3rdparty/perl/514/bin/perl -Iblib/arch -Iblib/lib -MO=-qq,C,-O2,-fno-warnings,-fno-fold,-oa.c $t";
+    run 'checking' => sub {
+        die ".c does not exist\n" if !-f "a.c";
+        die ".c is empty\n" if -z _;
+    };
+};
+
+run 'Compiling .c' => sub {
+    run 'compiling' => '/usr/local/cpanel/3rdparty/perl/514/bin/perl -Iblib/arch -Iblib/lib script/cc_harness a.c -o a';
+    run 'checking'  => sub {
+        die "binary does not exist\n"    if !-f "a";
+        die "binary is empty\n"          if -z _;
+        die "binary is not executable\n" if !-x _;
+    };
+};
+
+run 'Running binary' => './a';
