@@ -3,9 +3,10 @@
 # This test was originally for pseudo-hashes.  It now exists to ensure
 # they were properly removed in 5.9.
 
-BEGIN {
+INIT {
     chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
+    require './test.pl';
 }
 
 require Tie::Array;
@@ -20,7 +21,6 @@ sub STORESIZE { $#{$_[0]} = $_[1]+1 }
 
 package main;
 
-require './test.pl';
 plan(tests => 40);
 
 # Helper function to check the typical error message.

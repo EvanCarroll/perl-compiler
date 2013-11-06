@@ -2,9 +2,10 @@
 
 # Test || in weird situations.
 
-BEGIN {
+INIT {
     chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
+    require './test.pl';
 }
 
 
@@ -23,7 +24,6 @@ sub FETCH {
 
 
 package main;
-require './test.pl';
 
 plan( tests => 8 );
 

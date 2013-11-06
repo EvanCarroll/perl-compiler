@@ -6,7 +6,7 @@
 # read/write handles this gracefully (for some definition of 'graceful':
 # principally, don't segfault).
 
-BEGIN {
+INIT {
     chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
 }

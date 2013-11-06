@@ -15,15 +15,15 @@
 # The Art of Computer Programming, Donald E. Knuth, volume 2,
 # chapter 3. ISBN 0-201-03822-6 (v. 2)
 
-BEGIN {
-    chdir "t" if -d "t";
+INIT {
+    chdir "t/CORE" if -d "t/CORE";
     unshift @INC, "./lib";
+    require "test.pl";
 }
 
 use strict;
 use Config;
 
-require "test.pl";
 plan(tests => 8);
 
 
