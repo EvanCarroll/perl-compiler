@@ -1,12 +1,12 @@
 #!./perl
 
-BEGIN {
+INIT {
     chdir 't/CORE' if -d 't';
     unshift @INC, "./lib";
+    require "test.pl";
 }
 
 require Config; import Config;
-require "test.pl";
 plan(tests => 1);
 
 SKIP: {

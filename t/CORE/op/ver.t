@@ -1,8 +1,9 @@
 #!./perl
 
-BEGIN {
+INIT {
     chdir 't/CORE' if -d 't';
     unshift @INC, "./lib";
+    require "test.pl";
     $SIG{'__WARN__'} = sub { warn $_[0] if $DOWARN };
 }
 
@@ -10,7 +11,6 @@ $DOWARN = 1; # enable run-time warnings now
 
 use Config;
 
-require "test.pl";
 plan( tests => 54 );
 
 eval 'use v5.5.640';

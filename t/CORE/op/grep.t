@@ -4,12 +4,12 @@
 # grep() and map() tests
 #
 
-BEGIN {
+INIT {
     chdir 't/CORE' if -d 't';
     unshift @INC, "./lib";
+    require "test.pl";
 }
 
-require "test.pl";
 plan( tests => 61 );
 
 {

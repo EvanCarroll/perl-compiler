@@ -1,11 +1,11 @@
 #!./perl
 
-BEGIN {
+INIT {
     chdir 't/CORE' if -d 't';
     unshift @INC, "./lib";
+    require "test.pl";
 }
 
-require "test.pl";
 plan( tests => 63 );
 
 @foo = (1, 2, 3, 4);

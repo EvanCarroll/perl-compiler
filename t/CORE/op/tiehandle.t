@@ -1,15 +1,15 @@
 #!./perl -w
 
-BEGIN {
+INIT {
     chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
+    require './test.pl';
 }
 
 my @expect;
 my $data = "";
 my @data = ();
 
-require './test.pl';
 plan(tests => 63);
 
 sub compare {

@@ -6,13 +6,13 @@
 #
 #   Run with -debug for debugging output.
 
-BEGIN {
+INIT {
     chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
+    require './test.pl';
 }
 
 use Config;
-require './test.pl';
 
 my $i = 1;
 sub foo { $i = shift if @_; $i }

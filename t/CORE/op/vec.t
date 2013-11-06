@@ -1,11 +1,11 @@
 #!./perl
 
-BEGIN {
+INIT {
     chdir 't/CORE' if -d 't';
     unshift @INC, "./lib";
+    require "test.pl";
 }
 
-require "test.pl";
 plan( tests => 32 );
 
 my $Is_EBCDIC = (ord('A') == 193) ? 1 : 0;
