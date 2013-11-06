@@ -11,7 +11,7 @@ toddr - t/CORE/io/crlf.t
 toddr - t/CORE/io/crlf_through.t
 toddr - t/CORE/io/data.t
 t/CORE/io/defout.t
-cleland - t/CORE/io/dup.t
+t/CORE/io/dup.t
 t/CORE/io/fflush.t
 cleland - t/CORE/io/fs.t
 t/CORE/io/iofile.t
