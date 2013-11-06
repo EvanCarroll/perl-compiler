@@ -1,11 +1,11 @@
 #!./perl
 
-BEGIN {
+INIT {
     chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
 }
 
-BEGIN { require "./test.pl"; }
+INIT { require "./test.pl"; }
 
 plan(tests => 23);
 
@@ -18,9 +18,9 @@ if (is_miniperl()) {
     $devnull = File::Spec->devnull;
 }
 
-open(TRY, '>Io_argv1.tmp') || (die "Can't open temp file: $!");
-print TRY "a line\n";
-close TRY or die "Could not close: $!";
+open($TRY, '>Io_argv1.tmp') || (die "Can't open temp file: $!");
+print $TRY "a line\n";
+close $TRY or die "Could not close: $!";
 
 $x = runperl(
     prog	=> 'while (<>) { print $., $_; }',
@@ -147,6 +147,7 @@ close IN;
 unlink "Io_argv3.tmp";
 **PROG**
 
+__END__
 END {
     unlink_all 'Io_argv1.tmp', 'Io_argv1.tmp_bak',
 	'Io_argv2.tmp', 'Io_argv2.tmp_bak', 'Io_argv3.tmp';
