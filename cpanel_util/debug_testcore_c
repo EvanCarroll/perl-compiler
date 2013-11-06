@@ -11,6 +11,10 @@ die "Please give me the .t file you'd pass to t/testcore-c.t\n" if !defined $t |
 my $fyi = 0;
 $SIG{__DIE__} = sub { _fyi(); };
 
+unlink 'a.c', 'a';
+warn "a.c still exists!\n" if -e "a.c";
+warn "a still exists!\n" if -e "a";
+
 run 'Building .c' => sub {
     run 'building' => "/usr/local/cpanel/3rdparty/perl/514/bin/perl -Iblib/arch -Iblib/lib -MO=-qq,C,-O2,-fno-warnings,-fno-fold,-oa.c $t";
     run 'checking' => sub {
