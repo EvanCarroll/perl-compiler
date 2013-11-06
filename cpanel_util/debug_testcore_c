@@ -8,8 +8,8 @@ run_with -critical;
 
 my $t = shift @ARGV;
 die "Please give me the .t file you'd pass to t/testcore-c.t\n" if !defined $t || !-f $t;
-
-$SIG{__DIE__} = sub { print "\n[These might help]\n    perl -MO=Concise $t    perlcc -v5 -r $t\n"; };
+my $fyi = 0;
+$SIG{__DIE__} = sub { _fyi(); };
 
 run 'Building .c' => sub {
     run 'building' => "/usr/local/cpanel/3rdparty/perl/514/bin/perl -Iblib/arch -Iblib/lib -MO=-qq,C,-O2,-fno-warnings,-fno-fold,-oa.c $t";
@@ -29,3 +29,9 @@ run 'Compiling .c' => sub {
 };
 
 run 'Running binary' => './a';
+
+_fyi();    # We call it here since nothing died and we want the info in case of test failure (which does not result in the binary exiuting uncleanly).
+
+sub _fyi {
+    print "\n\n[These might help]\n    perl -MO=Concise $t\n    perlcc -v5 -r $t\n--\n" unless $fyi++;
+}
