@@ -49,3 +49,4 @@ B-C-*.tar.gz
 *-cc.result
 t/CORE/perl
 t/perl
+locks/*.t
