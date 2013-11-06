@@ -4,7 +4,7 @@
 # test auto defined() test insertion
 #
 
-BEGIN {
+INIT {
     chdir 't/CORE' if -d 't';
     unshift @INC, "./lib";
     $SIG{__WARN__} = sub { $warns++; warn $_[0] };
@@ -38,11 +38,11 @@ $saved_filename = './0';
 
 cmp_ok($warns,'==',0,'no warns at start');
 
-open(FILE,">$saved_filename");
-ok(defined(FILE),'created work file');
-print FILE "1\n";
-print FILE "0";
-close(FILE);
+open(my $FILE,">$saved_filename");
+ok(defined($FILE),'created work file');
+print $FILE "1\n";
+print $FILE "0";
+close($FILE);
 
 open(FILE,"<$saved_filename");
 ok(defined(FILE),'opened work file');
