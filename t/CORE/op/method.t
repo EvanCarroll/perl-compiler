@@ -4,7 +4,7 @@
 # test method calls and autoloading.
 #
 
-BEGIN {
+INIT {
     chdir 't/CORE' if -d 't';
     unshift @INC, "./lib";
     require "test.pl";
@@ -83,6 +83,7 @@ is(A->d, "B::d2");		# Update hash table;
 # are already linked to "pruned" globs. Say, `undef &B::d' if it were
 # after `delete $B::{d}; sub B::d {}' would reach an old subroutine.
 
+# issue #159 https://code.google.com/p/perl-compiler/issues/detail?id=159
 undef &B::d;
 delete $B::{d};
 is(A->d, "C::d");		# Update hash table;

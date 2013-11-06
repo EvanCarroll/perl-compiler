@@ -5,7 +5,6 @@ nico - t/CORE/op/ord.t
 nico - t/CORE/op/recurse.t
 nico - t/CORE/op/time_loop.t
 nico - t/CORE/op/sysio.t
-toddr - t/CORE/comp/hints.t
 toddr - t/CORE/comp/opsubs.t
 toddr - t/CORE/io/bom.t
 toddr - t/CORE/io/crlf.t
@@ -25,9 +24,9 @@ t/CORE/io/perlio_fail.t
 t/CORE/io/perlio_leaks.t
 t/CORE/io/perlio_open.t
 t/CORE/io/pipe.t
-t/CORE/io/print.t
-t/CORE/io/pvbm.t
-t/CORE/io/read.t
+cleland - t/CORE/io/print.t
+cleland - t/CORE/io/pvbm.t
+cleland - t/CORE/io/read.t
 t/CORE/io/say.t
 t/CORE/io/tell.t
 t/CORE/io/through.t
@@ -40,7 +39,7 @@ t/CORE/op/blocks.t
 t/CORE/op/bop.t
 justin - t/CORE/op/caller.t
 justin - t/CORE/op/chdir.t
-kyle - t/CORE/op/chop.t
+kyle - t/CORE/op/chop.t -- http://target.cpanel.net/RestUI/TpView.aspx?acid=EE4194B31661EF07ABC14DB4C0243592#bug/16825
 kyle - t/CORE/op/chr.t
 kyle - t/CORE/op/concat2.t
 kyle - t/CORE/op/cproto.t
