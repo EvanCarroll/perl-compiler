@@ -1,0 +1,11 @@
+
+        BEGIN {
+            open STDERR, '>&', STDOUT
+              or die "Can't dup STDOUT->STDERR: $!;";
+        }
+	
+#line 1
+$| = 1;
+fork()
+ ? (print("parent\n"),sleep(1))
+ : (print("child\n"),exit) ;

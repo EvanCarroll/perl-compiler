@@ -559,6 +559,9 @@ result[150]='ok'
 tests[230]='sub f1 { my($self) = @_; $self->f2;} sub f2 {} sub new {} print "@ARGV\n";'
 result[230]=''
 
+tests[300]='sub PVBM () { 'foo' } { my $dummy = index 'foo', PVBM } print PVBM'
+result[300]='foo'
+
 init
 
 # 
