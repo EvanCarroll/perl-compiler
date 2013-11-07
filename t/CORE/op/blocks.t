@@ -1,9 +1,7 @@
 #!./perl
 
 BEGIN {
-    chdir 't/CORE';
-    unshift @INC, './lib';
-    require './test.pl';
+    require './t/CORE/test.pl';
 }
 
 plan tests => 5;
@@ -110,6 +108,8 @@ fresh_perl_is(<<'SCRIPT70614', "still here",{switches => [''], stdin => '', stde
 eval "UNITCHECK { eval 0 }"; print "still here";
 SCRIPT70614
 
+# perlcc issue 173 - https://code.google.com/p/perl-compiler/issues/detail?id=173
 # [perl #78634] Make sure block names can be used as constants.
-use constant INIT => 5;
-::is INIT, 5, 'constant named after a special block';
+# use an eval block, can be removed when issue 173 is solved
+eval 'use constant INIT => 5';
+eval "::is INIT, 5, 'constant named after a special block'";
