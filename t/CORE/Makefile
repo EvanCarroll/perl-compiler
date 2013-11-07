@@ -280,8 +280,9 @@ test:
 bc:
 	(cd ../.. && perl Makefile.PL installdirs=vendor && make install)
 
-clean-tests:
+clean:
 	/bin/rm -f $(ALL_TESTS) $(ALL_TESTS:.bin=.c)
+	/bin/rm -f Io_argv*.tmp* tmp*
 
 depend:
 	find * -name \*.t| perl -ne 'chomp; s/\.t$$//; print "$$_.bin: $$_.t\n"' > depend.inc
