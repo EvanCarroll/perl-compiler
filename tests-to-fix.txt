@@ -1,4 +1,3 @@
-nico - t/CORE/op/leaky-magic.t
 toddr - t/CORE/comp/opsubs.t
 t/CORE/io/dup.t
 t/CORE/io/layers.t
@@ -26,9 +25,6 @@ t/CORE/op/flip.t
 t/CORE/op/getpid.t
 t/CORE/op/getppid.t
 nico - t/CORE/op/gv.t
-nico - t/CORE/op/hash.t this is not a B::C issue but a more global problem:
-colliding into the same bucket keys are triggering rehash 
-nico - t/CORE/op/index.t
 t/CORE/op/length.t
 t/CORE/op/magic-27839.t
 t/CORE/op/magic.t
@@ -72,7 +68,8 @@ t/CORE/op/sub.t
 t/CORE/op/filetest.t
 
 # known problems 
-t/CORE/op/lc.t # utf8 perlcc issue #162
+t/CORE/op/lc.t - utf8 perlcc issue #162
+t/CORE/op/index.t - utf8 perlcc issue #162
 t/CORE/io/read.t broken by perlcc issue 148 and 150
 t/CORE/op/chop.t - perlcc issue 142 ( TP task 16825 )
 t/CORE/op/method.t - issue #159
@@ -85,3 +82,5 @@ t/CORE/op/hashassign.t - issue 166
 t/CORE/op/ord.t - utf8 issue 162
 t/CORE/op/reset.t - issue 160
 t/CORE/op/taint.t - issue 151
+t/CORE/op/hash.t - this is not a specific B::C issue but a more global problem:
+colliding into the same bucket keys are triggering rehash
