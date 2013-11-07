@@ -3,7 +3,7 @@ t/CORE/io/dup.t
 t/CORE/io/layers.t
 t/CORE/io/perlio.t
 t/CORE/io/perlio_fail.t
-t/CORE/io/pipe.t
+cleland - t/CORE/io/pipe.t
 cleland - t/CORE/io/print.t
 cleland - t/CORE/io/pvbm.t
 cleland - t/CORE/io/tell.t
