@@ -1,6 +1,6 @@
 TAINT_FAILURES = op/taint.bin
 
-FAILURES = op/bop.bin
+FAILURES = op/bop.bin op/override.bin op/reset.bin io/perlio.bin op/magic-27839.bin
 
 TAINT_OK = op/utftaint.bin comp/opsubs.bin
 
@@ -61,7 +61,6 @@ TESTS_OK = base/cond.bin \
 	io/perlio_fail.bin \
 	io/perlio_leaks.bin \
 	io/perlio_open.bin \
-	io/perlio.bin \
 	io/pipe.bin \
 	io/print.bin \
 	io/pvbm.bin \
@@ -153,7 +152,6 @@ TESTS_OK = base/cond.bin \
 	op/local.bin \
 	op/loopctl.bin \
 	op/lop.bin \
-	op/magic-27839.bin \
 	op/magic_phase.bin \
 	op/magic.bin \
 	op/method.bin \
@@ -168,7 +166,6 @@ TESTS_OK = base/cond.bin \
 	op/ord.bin \
 	op/or.bin \
 	op/overload_integer.bin \
-	op/override.bin \
 	op/packagev.bin \
 	op/pack.bin \
 	op/pos.bin \
@@ -189,7 +186,6 @@ TESTS_OK = base/cond.bin \
 	op/ref.bin \
 	op/repeat.bin \
 	op/require_errors.bin \
-	op/reset.bin \
 	op/reverse.bin \
 	op/runlevel.bin \
 	op/setpgrpstack.bin \
