@@ -21,8 +21,8 @@ kyle - t/CORE/op/crypt.t
 kyle - t/CORE/op/die_keeperr.t
 kyle - t/CORE/op/each.t
 kyle - t/CORE/op/each_array.t
-t/CORE/op/exec.t
-t/CORE/op/filetest.t
+justin - t/CORE/op/exec.t
+justin - t/CORE/op/filetest.t
 t/CORE/op/flip.t
 t/CORE/op/getpid.t
 t/CORE/op/getppid.t
