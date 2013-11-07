@@ -9,7 +9,9 @@ t/CORE/io/perlio_fail.t
 t/CORE/io/pipe.t
 cleland - t/CORE/io/print.t
 t/CORE/io/say.t
+t/CORE/io/tell.t
 t/CORE/op/alarm.t
+t/CORE/op/attrhand.t
 t/CORE/op/attrs.t
 t/CORE/op/bless.t
 t/CORE/op/blocks.t
@@ -21,7 +23,10 @@ kyle - t/CORE/op/die_keeperr.t
 kyle - t/CORE/op/each.t
 kyle - t/CORE/op/each_array.t
 t/CORE/op/exec.t
+t/CORE/op/filetest.t
+t/CORE/op/flip.t
 t/CORE/op/getpid.t
+t/CORE/op/getppid.t
 nico - t/CORE/op/gv.t
 nico - t/CORE/op/hash.t this is not a B::C issue but a more global problem:
 colliding into the same bucket keys are triggering rehash 
@@ -31,12 +36,16 @@ nico - t/CORE/op/lc.t
 t/CORE/op/length.t
 t/CORE/op/magic-27839.t
 t/CORE/op/magic.t
+t/CORE/op/method.t
 t/CORE/op/mkdir.t
 t/CORE/op/override.t
 t/CORE/op/pack.t
+t/CORE/op/packagev.t
 t/CORE/op/pos.t
 t/CORE/op/protowarn.t
 t/CORE/op/readdir.t
+t/CORE/op/read.t
+t/CORE/op/readline.t
 t/CORE/op/ref.t
 t/CORE/op/reset.t
 t/CORE/op/sigdispatch.t
@@ -47,10 +56,13 @@ t/CORE/op/split.t
 t/CORE/op/split_unicode.t
 t/CORE/op/sprintf2.t
 t/CORE/op/sselect.t
+t/CORE/op/stash.t
 t/CORE/op/stat.t
+t/CORE/op/sub.t
 t/CORE/op/svleak.t
 t/CORE/op/switch.t
 t/CORE/op/symbolcache.t
+t/CORE/op/tie_fetch_count.t
 t/CORE/op/threads-dirh.t
 t/CORE/op/threads.t
 t/CORE/op/tr.t
