@@ -1,9 +1,6 @@
 #!./perl
 
-BEGIN {
-    unshift @INC, './lib';
-    require './test.pl';
-}
+BEGIN { require './test.pl' }
 
 plan tests => 24;
 

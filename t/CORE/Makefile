@@ -262,7 +262,7 @@ $(REGULAR_TESTS):
 	/bin/rm $(@:.bin=.c)
 
 test:
-	$(PROVE) -j 6 `find * -name \*.bin|sort`
+	$(PROVE) -j 6 `find * -name \*.bin|grep -v .subtest.bin | sort`
 
 bc:
 	(cd ../.. && perl Makefile.PL installdirs=vendor && make install)
