@@ -8,7 +8,6 @@ cleland - t/CORE/io/print.t
 cleland - t/CORE/io/pvbm.t
 cleland - t/CORE/io/tell.t
 cleland - t/CORE/io/through.t
-cleland - t/CORE/op/alarm.t
 t/CORE/op/assignwarn.t
 t/CORE/op/attrhand.t
 nico - t/CORE/op/attrs.t
