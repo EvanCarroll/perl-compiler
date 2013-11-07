@@ -735,7 +735,7 @@ sub _fresh_perl {
 
     my $results;
     if ( $is_binary ) {
-        $results = runperl_binary($tmpfile);
+        $results = runperl_binary($tmpfile, $runperl_args);
     } else {
         $results = runperl(%$runperl_args);        
     }
@@ -787,14 +787,21 @@ sub _fresh_perl {
 }
 
 sub runperl_binary {
-    my ( $test ) = @_;
+    my ( $test, $opts ) = @_;
+    
+    $opts ||= {};
+
     my $bin = $test;
     $bin =~ s/\.t$/\.bin/;
     unlink $bin if -e $bin;
-    print STDERR "# running: make $bin\n";
-    system('make', $bin); # or return '';
-    print STDERR "# running: ./$bin\n";
+    print STDERR "# running: make $bin ===\n";
+    map { print STDERR "# $_\n" } split /\n/, `make $bin`;
+
+
     # now execute the binary
+    my $foo = $opts->{'stdin'} || '';
+    print STDERR "# running: ./$bin $foo\n";
+    return `echo "$foo" | ./$bin` if $foo;
     return `./$bin`;
 }
 

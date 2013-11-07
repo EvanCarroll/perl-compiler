@@ -1,262 +1,241 @@
-base/if.bin: base/if.t
-base/while.bin: base/while.t
-base/term.bin: base/term.t
-base/num.bin: base/num.t
-base/pat.bin: base/pat.t
-base/lex.bin: base/lex.t
-base/cond.bin: base/cond.t
-base/rs.bin: base/rs.t
-cmd/subval.bin: cmd/subval.t
-cmd/while.bin: cmd/while.t
-cmd/elsif.bin: cmd/elsif.t
-cmd/for.bin: cmd/for.t
-cmd/mod.bin: cmd/mod.t
-cmd/switch.bin: cmd/switch.t
-comp/utf.bin: comp/utf.t
-comp/bproto.bin: comp/bproto.t
-comp/term.bin: comp/term.t
-comp/uproto.bin: comp/uproto.t
-comp/opsubs.bin: comp/opsubs.t
-comp/fold.bin: comp/fold.t
-comp/proto.bin: comp/proto.t
-comp/use.bin: comp/use.t
-comp/retainedlines.bin: comp/retainedlines.t
-comp/parser.bin: comp/parser.t
-comp/require.bin: comp/require.t
-comp/line_debug.bin: comp/line_debug.t
-comp/colon.bin: comp/colon.t
-comp/cmdopt.bin: comp/cmdopt.t
-comp/redef.bin: comp/redef.t
-comp/decl.bin: comp/decl.t
-comp/package.bin: comp/package.t
-comp/our.bin: comp/our.t
-comp/multiline.bin: comp/multiline.t
-comp/package_block.bin: comp/package_block.t
-comp/form_scope.bin: comp/form_scope.t
-io/pipe.bin: io/pipe.t
-io/perlio.bin: io/perlio.t
-io/tell.bin: io/tell.t
-io/fflush.bin: io/fflush.t
-io/dup.bin: io/dup.t
-io/print.bin: io/print.t
-io/crlf.bin: io/crlf.t
-io/bom.bin: io/bom.t
-io/bom.subtest.bin: io/bom.subtest.t
-io/utf8.bin: io/utf8.t
-io/open.subtest.bin: io/open.subtest.t
-io/layers.bin: io/layers.t
-io/eintr.bin: io/eintr.t
-io/layers.subtest.bin: io/layers.subtest.t
-io/open.bin: io/open.t
-io/iofile.bin: io/iofile.t
-io/pvbm.bin: io/pvbm.t
-io/read.bin: io/read.t
-io/nargv.bin: io/nargv.t
-io/errno.bin: io/errno.t
-io/errnosig.bin: io/errnosig.t
-io/defout.bin: io/defout.t
-io/perlio_open.bin: io/perlio_open.t
-io/say.bin: io/say.t
-io/inplace.bin: io/inplace.t
-io/perlio_leaks.bin: io/perlio_leaks.t
-io/iprefix.bin: io/iprefix.t
-io/perlio_fail.bin: io/perlio_fail.t
-io/data.bin: io/data.t
-io/openpid.bin: io/openpid.t
-io/argv.bin: io/argv.t
-io/binmode.bin: io/binmode.t
-io/crlf_through.bin: io/crlf_through.t
-io/through.bin: io/through.t
-io/argv.subtest.bin: io/argv.subtest.t
-io/fs.bin: io/fs.t
-op/die_except.bin: op/die_except.t
-op/index.bin: op/index.t
-op/args.bin: op/args.t
-op/rand.bin: op/rand.t
-op/readdir.subtest.bin: op/readdir.subtest.t
-op/studytied.bin: op/studytied.t
-op/sysio.bin: op/sysio.t
-op/overload_integer.bin: op/overload_integer.t
-op/utfhash.bin: op/utfhash.t
-op/wantarray.bin: op/wantarray.t
-op/mkdir.bin: op/mkdir.t
-op/int.bin: op/int.t
-op/study.bin: op/study.t
-op/filetest_t.bin: op/filetest_t.t
-op/warn.subtest.bin: op/warn.subtest.t
-op/time_loop.bin: op/time_loop.t
-op/write.bin: op/write.t
-op/each.bin: op/each.t
-op/append.bin: op/append.t
-op/context.bin: op/context.t
-op/loopctl.bin: op/loopctl.t
-op/tr.bin: op/tr.t
-op/hashwarn.bin: op/hashwarn.t
-op/smartkve.bin: op/smartkve.t
-op/sub.bin: op/sub.t
-op/qq.bin: op/qq.t
-op/not.bin: op/not.t
-op/mydef.bin: op/mydef.t
-op/while_readdir.bin: op/while_readdir.t
-op/index_thr.bin: op/index_thr.t
-op/inccode.bin: op/inccode.t
-op/utf8cache.bin: op/utf8cache.t
-op/bless.bin: op/bless.t
-op/grent.bin: op/grent.t
-op/split_unicode.bin: op/split_unicode.t
-op/ver.bin: op/ver.t
-op/method.bin: op/method.t
-op/print.bin: op/print.t
-op/do.bin: op/do.t
-op/require_errors.bin: op/require_errors.t
-op/leaky-magic.subtest.bin: op/leaky-magic.subtest.t
-op/my_stash.bin: op/my_stash.t
-op/tiearray.bin: op/tiearray.t
-op/lc.bin: op/lc.t
-op/exists_sub.bin: op/exists_sub.t
-op/utf8magic.bin: op/utf8magic.t
-op/threads.bin: op/threads.t
-op/crypt.bin: op/crypt.t
-op/turkish.bin: op/turkish.t
-op/oct.bin: op/oct.t
-op/qr.bin: op/qr.t
-op/kill0.bin: op/kill0.t
-op/array.bin: op/array.t
-op/die_exit.bin: op/die_exit.t
-op/utftaint.bin: op/utftaint.t
-op/lfs.bin: op/lfs.t
-op/groups.bin: op/groups.t
-op/sprintf2.subtest.bin: op/sprintf2.subtest.t
-op/stash.subtest.bin: op/stash.subtest.t
-op/eval.bin: op/eval.t
-op/smartmatch.bin: op/smartmatch.t
-op/tr.subtest.bin: op/tr.subtest.t
-op/eval.subtest.bin: op/eval.subtest.t
-op/pack.bin: op/pack.t
-op/getpid.bin: op/getpid.t
-op/fork.bin: op/fork.t
-op/quotemeta.bin: op/quotemeta.t
-op/sub_lval.bin: op/sub_lval.t
-op/goto.bin: op/goto.t
-op/pow.bin: op/pow.t
-op/utf8decode.bin: op/utf8decode.t
-op/delete.bin: op/delete.t
-op/yadayada.bin: op/yadayada.t
-op/protowarn.bin: op/protowarn.t
-op/stash.bin: op/stash.t
-op/attrs.bin: op/attrs.t
-op/sort.bin: op/sort.t
-op/alarm.bin: op/alarm.t
-op/push.bin: op/push.t
-op/override.bin: op/override.t
-op/localref.bin: op/localref.t
-op/chars.bin: op/chars.t
-op/magic.bin: op/magic.t
-op/lex.bin: op/lex.t
-op/getppid.bin: op/getppid.t
-op/sigdispatch.bin: op/sigdispatch.t
-op/assignwarn.bin: op/assignwarn.t
-op/ref.subtest.bin: op/ref.subtest.t
-op/auto.bin: op/auto.t
-op/hash.bin: op/hash.t
-op/state.bin: op/state.t
-op/numconvert.bin: op/numconvert.t
-op/range.bin: op/range.t
-op/join.bin: op/join.t
-op/each_array.bin: op/each_array.t
-op/dbm.subtest.bin: op/dbm.subtest.t
-op/flip.bin: op/flip.t
-op/exp.bin: op/exp.t
-op/incfilter.bin: op/incfilter.t
-op/filetest.bin: op/filetest.t
-op/universal.bin: op/universal.t
-op/undef.bin: op/undef.t
-op/lop.bin: op/lop.t
-op/arith.bin: op/arith.t
-op/print.subtest.bin: op/print.subtest.t
-op/read.bin: op/read.t
-op/blocks.subtest.bin: op/blocks.subtest.t
-op/dor.bin: op/dor.t
-op/dbm.bin: op/dbm.t
-op/exec.bin: op/exec.t
-op/inc.bin: op/inc.t
-op/closure.bin: op/closure.t
-op/upgrade.bin: op/upgrade.t
-op/time.bin: op/time.t
-op/readline.subtest.bin: op/readline.subtest.t
-op/srand.bin: op/srand.t
-op/filetest_stack_ok.bin: op/filetest_stack_ok.t
-op/hashassign.bin: op/hashassign.t
-op/magic.subtest.bin: op/magic.subtest.t
-op/split.bin: op/split.t
-op/sprintf.bin: op/sprintf.t
-op/chdir.bin: op/chdir.t
-op/symbolcache.bin: op/symbolcache.t
-op/array_base.bin: op/array_base.t
-op/sprintf2.bin: op/sprintf2.t
-op/packagev.bin: op/packagev.t
-op/splice.bin: op/splice.t
-op/ref.bin: op/ref.t
-op/attrhand.bin: op/attrhand.t
-op/chr.bin: op/chr.t
-op/taint.bin: op/taint.t
-op/svleak.bin: op/svleak.t
-op/fh.bin: op/fh.t
-op/recurse.bin: op/recurse.t
-op/tie_fetch_count.bin: op/tie_fetch_count.t
-op/reverse.bin: op/reverse.t
-op/unshift.bin: op/unshift.t
-op/magic_phase.bin: op/magic_phase.t
-op/list.bin: op/list.t
-op/readline.bin: op/readline.t
-op/die.bin: op/die.t
-op/ord.bin: op/ord.t
-op/defins.bin: op/defins.t
-op/inccode-tie.bin: op/inccode-tie.t
-op/or.bin: op/or.t
-op/64bitint.bin: op/64bitint.t
-op/die_unwind.bin: op/die_unwind.t
-op/magic-27839.bin: op/magic-27839.t
-op/concat.bin: op/concat.t
-op/negate.bin: op/negate.t
-op/tiehandle.bin: op/tiehandle.t
-op/gv.bin: op/gv.t
-op/avhv.bin: op/avhv.t
-op/cproto.bin: op/cproto.t
-op/sub_lval.subtest.bin: op/sub_lval.subtest.t
-op/readdir.bin: op/readdir.t
-op/lc_user.bin: op/lc_user.t
-op/cmp.bin: op/cmp.t
-op/sselect.bin: op/sselect.t
-op/grep.bin: op/grep.t
-op/length.bin: op/length.t
-op/blocks.bin: op/blocks.t
-op/reset.bin: op/reset.t
-op/pwent.bin: op/pwent.t
-op/repeat.bin: op/repeat.t
-op/stat.bin: op/stat.t
-op/lex_assign.bin: op/lex_assign.t
-op/anonsub.bin: op/anonsub.t
-op/cond.bin: op/cond.t
-op/index.subtest.bin: op/index.subtest.t
-op/local.bin: op/local.t
-op/setpgrpstack.bin: op/setpgrpstack.t
-op/vec.bin: op/vec.t
-op/concat2.subtest.bin: op/concat2.subtest.t
-op/warn.bin: op/warn.t
-op/tie.bin: op/tie.t
-op/filehandle.bin: op/filehandle.t
-op/closure.subtest.bin: op/closure.subtest.t
-op/leaky-magic.bin: op/leaky-magic.t
-op/caller.bin: op/caller.t
-op/sleep.bin: op/sleep.t
-op/concat2.bin: op/concat2.t
-op/my.bin: op/my.t
-op/pos.bin: op/pos.t
-op/gmagic.bin: op/gmagic.t
-op/runlevel.bin: op/runlevel.t
-op/universal.subtest.bin: op/universal.subtest.t
-op/switch.bin: op/switch.t
-op/chop.bin: op/chop.t
-op/die_keeperr.bin: op/die_keeperr.t
-op/bop.bin: op/bop.t
+base/cond.bin: base/cond.t test.pl
+base/if.bin: base/if.t test.pl
+base/lex.bin: base/lex.t test.pl
+base/num.bin: base/num.t test.pl
+base/pat.bin: base/pat.t test.pl
+base/rs.bin: base/rs.t test.pl
+base/term.bin: base/term.t test.pl
+base/while.bin: base/while.t test.pl
+cmd/elsif.bin: cmd/elsif.t test.pl
+cmd/for.bin: cmd/for.t test.pl
+cmd/mod.bin: cmd/mod.t test.pl
+cmd/subval.bin: cmd/subval.t test.pl
+cmd/switch.bin: cmd/switch.t test.pl
+cmd/while.bin: cmd/while.t test.pl
+comp/bproto.bin: comp/bproto.t test.pl
+comp/cmdopt.bin: comp/cmdopt.t test.pl
+comp/colon.bin: comp/colon.t test.pl
+comp/decl.bin: comp/decl.t test.pl
+comp/fold.bin: comp/fold.t test.pl
+comp/form_scope.bin: comp/form_scope.t test.pl
+comp/line_debug.bin: comp/line_debug.t test.pl
+comp/multiline.bin: comp/multiline.t test.pl
+comp/opsubs.bin: comp/opsubs.t test.pl
+comp/our.bin: comp/our.t test.pl
+comp/package_block.bin: comp/package_block.t test.pl
+comp/package.bin: comp/package.t test.pl
+comp/parser.bin: comp/parser.t test.pl
+comp/proto.bin: comp/proto.t test.pl
+comp/redef.bin: comp/redef.t test.pl
+comp/require.bin: comp/require.t test.pl
+comp/retainedlines.bin: comp/retainedlines.t test.pl
+comp/term.bin: comp/term.t test.pl
+comp/uproto.bin: comp/uproto.t test.pl
+comp/use.bin: comp/use.t test.pl
+comp/utf.bin: comp/utf.t test.pl
+io/argv.bin: io/argv.t test.pl
+io/binmode.bin: io/binmode.t test.pl
+io/bom.bin: io/bom.t test.pl
+io/crlf.bin: io/crlf.t test.pl
+io/crlf_through.bin: io/crlf_through.t test.pl
+io/data.bin: io/data.t test.pl
+io/defout.bin: io/defout.t test.pl
+io/dup.bin: io/dup.t test.pl
+io/eintr.bin: io/eintr.t test.pl
+io/errnosig.bin: io/errnosig.t test.pl
+io/errno.bin: io/errno.t test.pl
+io/fflush.bin: io/fflush.t test.pl
+io/fs.bin: io/fs.t test.pl
+io/inplace.bin: io/inplace.t test.pl
+io/iofile.bin: io/iofile.t test.pl
+io/iprefix.bin: io/iprefix.t test.pl
+io/layers.bin: io/layers.t test.pl
+io/nargv.bin: io/nargv.t test.pl
+io/openpid.bin: io/openpid.t test.pl
+io/open.bin: io/open.t test.pl
+io/perlio_fail.bin: io/perlio_fail.t test.pl
+io/perlio_leaks.bin: io/perlio_leaks.t test.pl
+io/perlio_open.bin: io/perlio_open.t test.pl
+io/perlio.bin: io/perlio.t test.pl
+io/pipe.bin: io/pipe.t test.pl
+io/print.bin: io/print.t test.pl
+io/pvbm.bin: io/pvbm.t test.pl
+io/read.bin: io/read.t test.pl
+io/say.bin: io/say.t test.pl
+io/tell.bin: io/tell.t test.pl
+io/through.bin: io/through.t test.pl
+io/utf8.bin: io/utf8.t test.pl
+op/64bitint.bin: op/64bitint.t test.pl
+op/alarm.bin: op/alarm.t test.pl
+op/anonsub.bin: op/anonsub.t test.pl
+op/append.bin: op/append.t test.pl
+op/args.bin: op/args.t test.pl
+op/arith.bin: op/arith.t test.pl
+op/array_base.bin: op/array_base.t test.pl
+op/array.bin: op/array.t test.pl
+op/assignwarn.bin: op/assignwarn.t test.pl
+op/attrhand.bin: op/attrhand.t test.pl
+op/attrs.bin: op/attrs.t test.pl
+op/auto.bin: op/auto.t test.pl
+op/avhv.bin: op/avhv.t test.pl
+op/bless.bin: op/bless.t test.pl
+op/blocks.subtest.bin: op/blocks.subtest.t test.pl
+op/blocks.bin: op/blocks.t test.pl
+op/bop.bin: op/bop.t test.pl
+op/caller.bin: op/caller.t test.pl
+op/chars.bin: op/chars.t test.pl
+op/chdir.bin: op/chdir.t test.pl
+op/chop.bin: op/chop.t test.pl
+op/chr.bin: op/chr.t test.pl
+op/closure.bin: op/closure.t test.pl
+op/cmp.bin: op/cmp.t test.pl
+op/concat2.bin: op/concat2.t test.pl
+op/concat.bin: op/concat.t test.pl
+op/cond.bin: op/cond.t test.pl
+op/context.bin: op/context.t test.pl
+op/cproto.bin: op/cproto.t test.pl
+op/crypt.bin: op/crypt.t test.pl
+op/dbm.bin: op/dbm.t test.pl
+op/defins.bin: op/defins.t test.pl
+op/delete.bin: op/delete.t test.pl
+op/die_except.bin: op/die_except.t test.pl
+op/die_exit.bin: op/die_exit.t test.pl
+op/die_keeperr.bin: op/die_keeperr.t test.pl
+op/die.bin: op/die.t test.pl
+op/die_unwind.bin: op/die_unwind.t test.pl
+op/dor.bin: op/dor.t test.pl
+op/do.bin: op/do.t test.pl
+op/each_array.bin: op/each_array.t test.pl
+op/each.bin: op/each.t test.pl
+op/eval.bin: op/eval.t test.pl
+op/exec.bin: op/exec.t test.pl
+op/exists_sub.bin: op/exists_sub.t test.pl
+op/exp.bin: op/exp.t test.pl
+op/fh.bin: op/fh.t test.pl
+op/filehandle.bin: op/filehandle.t test.pl
+op/filetest_stack_ok.bin: op/filetest_stack_ok.t test.pl
+op/filetest.bin: op/filetest.t test.pl
+op/filetest_t.bin: op/filetest_t.t test.pl
+op/flip.bin: op/flip.t test.pl
+op/fork.bin: op/fork.t test.pl
+op/getpid.bin: op/getpid.t test.pl
+op/getppid.bin: op/getppid.t test.pl
+op/gmagic.bin: op/gmagic.t test.pl
+op/goto.bin: op/goto.t test.pl
+op/grent.bin: op/grent.t test.pl
+op/grep.bin: op/grep.t test.pl
+op/groups.bin: op/groups.t test.pl
+op/gv.bin: op/gv.t test.pl
+op/hashassign.bin: op/hashassign.t test.pl
+op/hash.bin: op/hash.t test.pl
+op/hashwarn.bin: op/hashwarn.t test.pl
+op/inccode.bin: op/inccode.t test.pl
+op/inccode-tie.bin: op/inccode-tie.t test.pl
+op/incfilter.bin: op/incfilter.t test.pl
+op/inc.bin: op/inc.t test.pl
+op/index.bin: op/index.t test.pl
+op/index_thr.bin: op/index_thr.t test.pl
+op/int.bin: op/int.t test.pl
+op/join.bin: op/join.t test.pl
+op/kill0.bin: op/kill0.t test.pl
+op/lc.bin: op/lc.t test.pl
+op/lc_user.bin: op/lc_user.t test.pl
+op/leaky-magic.bin: op/leaky-magic.t test.pl
+op/length.bin: op/length.t test.pl
+op/lex_assign.bin: op/lex_assign.t test.pl
+op/lex.bin: op/lex.t test.pl
+op/lfs.bin: op/lfs.t test.pl
+op/list.bin: op/list.t test.pl
+op/localref.bin: op/localref.t test.pl
+op/local.bin: op/local.t test.pl
+op/loopctl.bin: op/loopctl.t test.pl
+op/lop.bin: op/lop.t test.pl
+op/magic-27839.bin: op/magic-27839.t test.pl
+op/magic_phase.bin: op/magic_phase.t test.pl
+op/magic.bin: op/magic.t test.pl
+op/method.bin: op/method.t test.pl
+op/mkdir.bin: op/mkdir.t test.pl
+op/mydef.bin: op/mydef.t test.pl
+op/my_stash.bin: op/my_stash.t test.pl
+op/my.bin: op/my.t test.pl
+op/negate.bin: op/negate.t test.pl
+op/not.bin: op/not.t test.pl
+op/numconvert.bin: op/numconvert.t test.pl
+op/oct.bin: op/oct.t test.pl
+op/ord.bin: op/ord.t test.pl
+op/or.bin: op/or.t test.pl
+op/overload_integer.bin: op/overload_integer.t test.pl
+op/override.bin: op/override.t test.pl
+op/packagev.bin: op/packagev.t test.pl
+op/pack.bin: op/pack.t test.pl
+op/pos.bin: op/pos.t test.pl
+op/pow.bin: op/pow.t test.pl
+op/print.bin: op/print.t test.pl
+op/protowarn.bin: op/protowarn.t test.pl
+op/push.bin: op/push.t test.pl
+op/pwent.bin: op/pwent.t test.pl
+op/qq.bin: op/qq.t test.pl
+op/qr.bin: op/qr.t test.pl
+op/quotemeta.bin: op/quotemeta.t test.pl
+op/rand.bin: op/rand.t test.pl
+op/range.bin: op/range.t test.pl
+op/readdir.bin: op/readdir.t test.pl
+op/readline.subtest.bin: op/readline.subtest.t test.pl
+op/readline.bin: op/readline.t test.pl
+op/read.bin: op/read.t test.pl
+op/recurse.bin: op/recurse.t test.pl
+op/ref.bin: op/ref.t test.pl
+op/repeat.bin: op/repeat.t test.pl
+op/require_errors.bin: op/require_errors.t test.pl
+op/reset.bin: op/reset.t test.pl
+op/reverse.bin: op/reverse.t test.pl
+op/runlevel.bin: op/runlevel.t test.pl
+op/setpgrpstack.bin: op/setpgrpstack.t test.pl
+op/sigdispatch.bin: op/sigdispatch.t test.pl
+op/sleep.bin: op/sleep.t test.pl
+op/smartkve.bin: op/smartkve.t test.pl
+op/smartmatch.bin: op/smartmatch.t test.pl
+op/sort.bin: op/sort.t test.pl
+op/splice.bin: op/splice.t test.pl
+op/split.bin: op/split.t test.pl
+op/split_unicode.bin: op/split_unicode.t test.pl
+op/sprintf2.bin: op/sprintf2.t test.pl
+op/sprintf.bin: op/sprintf.t test.pl
+op/srand.bin: op/srand.t test.pl
+op/sselect.bin: op/sselect.t test.pl
+op/stash.bin: op/stash.t test.pl
+op/state.bin: op/state.t test.pl
+op/stat.bin: op/stat.t test.pl
+op/study.bin: op/study.t test.pl
+op/studytied.bin: op/studytied.t test.pl
+op/sub_lval.bin: op/sub_lval.t test.pl
+op/sub.bin: op/sub.t test.pl
+op/svleak.bin: op/svleak.t test.pl
+op/switch.bin: op/switch.t test.pl
+op/symbolcache.bin: op/symbolcache.t test.pl
+op/sysio.bin: op/sysio.t test.pl
+op/taint.bin: op/taint.t test.pl
+op/tiearray.bin: op/tiearray.t test.pl
+op/tie_fetch_count.bin: op/tie_fetch_count.t test.pl
+op/tiehandle.bin: op/tiehandle.t test.pl
+op/tie.bin: op/tie.t test.pl
+op/time_loop.bin: op/time_loop.t test.pl
+op/time.bin: op/time.t test.pl
+op/tr.bin: op/tr.t test.pl
+op/turkish.bin: op/turkish.t test.pl
+op/undef.bin: op/undef.t test.pl
+op/universal.bin: op/universal.t test.pl
+op/unshift.bin: op/unshift.t test.pl
+op/upgrade.bin: op/upgrade.t test.pl
+op/utf8cache.bin: op/utf8cache.t test.pl
+op/utf8decode.bin: op/utf8decode.t test.pl
+op/utf8magic.bin: op/utf8magic.t test.pl
+op/utfhash.bin: op/utfhash.t test.pl
+op/utftaint.bin: op/utftaint.t test.pl
+op/vec.bin: op/vec.t test.pl
+op/ver.bin: op/ver.t test.pl
+op/wantarray.bin: op/wantarray.t test.pl
+op/warn.bin: op/warn.t test.pl
+op/while_readdir.bin: op/while_readdir.t test.pl
+op/write.bin: op/write.t test.pl
+op/yadayada.bin: op/yadayada.t test.pl

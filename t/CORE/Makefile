@@ -272,6 +272,6 @@ clean:
 	/bin/rm -f Io_argv*.tmp* tmp*
 
 depend:
-	find * -name \*.t| perl -ne 'chomp; s/\.t$$//; print "$$_.bin: $$_.t\n"' > depend.inc
+	find * -name \*.t| sort| perl -ne 'chomp; s/\.t$$//; print "$$_.bin: $$_.t test.pl\n"' > depend.inc
 
 -include depend.inc
