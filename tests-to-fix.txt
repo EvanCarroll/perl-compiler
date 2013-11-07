@@ -7,12 +7,12 @@ t/CORE/io/pipe.t
 cleland - t/CORE/io/print.t
 t/CORE/io/say.t
 t/CORE/io/tell.t
-t/CORE/op/alarm.t
-t/CORE/op/attrhand.t
-t/CORE/op/attrs.t
-t/CORE/op/bless.t
-t/CORE/op/blocks.t
-t/CORE/op/bop.t
+nico - t/CORE/op/alarm.t
+nico - t/CORE/op/attrhand.t
+nico - t/CORE/op/attrs.t
+nico - t/CORE/op/bless.t
+nico - t/CORE/op/blocks.t
+nico - t/CORE/op/bop.t
 justin - t/CORE/op/caller.t
 justin - t/CORE/op/chdir.t
 kyle - t/CORE/op/crypt.t
