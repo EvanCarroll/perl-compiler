@@ -2,9 +2,9 @@ TAINT_FAILURES = op/taint.bin
 
 FAILURES = op/bop.bin
 
-TAINT_TESTS = op/utftaint.bin comp/opsubs.bin
+TAINT_OK = op/utftaint.bin comp/opsubs.bin
 
-TESTS = base/cond.bin \
+TESTS_OK = base/cond.bin \
 	base/if.bin \
 	base/lex.bin \
 	base/num.bin \
@@ -245,22 +245,15 @@ TESTS = base/cond.bin \
 PERL=/usr/local/cpanel/3rdparty/perl/514/bin/perl
 PROVE=/usr/local/cpanel/3rdparty/perl/514/bin/prove
 
+TAINT_TESTS=$(TAINT_OK) $(TAINT_FAILURES)
+
+TESTS=$(TESTS_OK) $(FAILURES)
 REGULAR_TESTS=$(TESTS) $(TESTS:.bin=.subtest.bin)
 ALL_TESTS=$(TAINT_TESTS) $(REGULAR_TESTS)
 
-all: $(ALL_TESTS)
+all: $(TESTS_OK) $(TAINT_TESTS)
 
 taint: $(TAINT_TESTS)
-
-$(TAINT_FAILURES):
-	$(PERL) -T -MO=-qq,C,-O2,-fno-warnings,-fno-fold,-o$(@:.bin=.c) $(@:.bin=.t)
-	$(PERL) ../../script/cc_harness -q  $(@:.bin=.c) -o $@
-	/bin/rm $(@:.bin=.c)
-
-$(FAILURES):
-	$(PERL) -MO=-qq,C,-O2,-fno-warnings,-fno-fold,-o$(@:.bin=.c) $(@:.bin=.t)
-	$(PERL) ../../script/cc_harness -q  $(@:.bin=.c) -o $@
-	/bin/rm $(@:.bin=.c)
 
 failures: $(TAINT_FAILURES) $(FAILURES)
 
