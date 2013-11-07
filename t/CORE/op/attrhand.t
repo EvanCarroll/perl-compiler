@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    require 't/CORE/test.pl';
+    require './test.pl';
 }
 
 # Attribute::Handlers are currently not supported

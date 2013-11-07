@@ -3,7 +3,7 @@
 # "This IS structured code.  It's just randomly structured."
 
 BEGIN {
-  require "t/CORE/test.pl";
+  require "./test.pl";
 }
 
 use warnings;

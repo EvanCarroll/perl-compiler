@@ -1,7 +1,6 @@
 #!./perl
 
 INIT {
-    chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
     require './test.pl';
     skip_all("VMS too picky about line endings for record-oriented pipes")

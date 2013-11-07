@@ -1,7 +1,6 @@
 #!./perl
 
 BEGIN {
-    chdir 't/CORE' if -d 't';
     unshift @INC, '';
     push @INC, '../lib';
 }

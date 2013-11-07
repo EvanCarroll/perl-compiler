@@ -240,8 +240,11 @@ REGULAR_TESTS = base/cond.bin \
 	op/yadayada.bin
 
 PERL=/usr/local/cpanel/3rdparty/perl/514/bin/perl
+PROVE=/usr/local/cpanel/3rdparty/perl/514/bin/prove
 
 ALL_TESTS=$(TAINT_TESTS) $(REGULAR_TESTS)
+
+all: $(ALL_TESTS)
 
 taint: $(TAINT_TESTS)
 
@@ -255,7 +258,8 @@ $(REGULAR_TESTS):
 	$(PERL) ../../script/cc_harness -q  $(@:.bin=.c) -o $@
 	/bin/rm $(@:.bin=.c)
 
-tests: $(ALL_TESTS)
+test:
+	$(PROVE) -j 6 `find * -name \*.bin|sort`
 
 clean-tests:
 	/bin/rm -f $(ALL_TESTS) $(ALL_TESTS:.bin=.c)

@@ -3,7 +3,6 @@
 # Test interaction of threads and directory handles.
 
 BEGIN {
-     chdir 't/CORE' if -d 't';
      unshift @INC, './lib';
      require './test.pl';
      $| = 1;

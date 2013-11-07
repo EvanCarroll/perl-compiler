@@ -2,7 +2,6 @@
 #line 3 warn.t
 
 BEGIN {
-    chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
     require './test.pl';
 }

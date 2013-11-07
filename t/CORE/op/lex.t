@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-require './t/CORE/test.pl';
+require './test.pl';
 
 plan(tests => 4);
 

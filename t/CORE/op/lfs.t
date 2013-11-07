@@ -3,7 +3,6 @@
 # If you modify/add tests here, remember to update also ext/Fcntl/t/syslfs.t.
 
 BEGIN {
-	chdir 't/CORE' if -d 't';
 	unshift @INC, './lib';
 	require './test.pl';
 	require Config;

@@ -3,7 +3,6 @@
 # Tests if $$ and getppid return consistent values across threads
 
 BEGIN {
-    chdir 't/CORE' if -d 't';
     unshift @INC, "./lib";
     require './test.pl';
 }

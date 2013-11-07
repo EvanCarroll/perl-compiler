@@ -2,7 +2,7 @@
 # ioleaks.t
 
 BEGIN {
-    require 't/CORE/test.pl';
+    require './test.pl';
 }
 
 use strict;

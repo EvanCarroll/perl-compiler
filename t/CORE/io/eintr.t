@@ -7,7 +7,6 @@
 # principally, don't segfault).
 
 INIT {
-    chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
 }
 

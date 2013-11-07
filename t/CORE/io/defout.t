@@ -7,7 +7,6 @@
 # it probably needs expanding at some point to cover other stuff.
 
 BEGIN {
-    chdir 't/CORE';
     unshift @INC, './lib';
     require './test.pl';
 }

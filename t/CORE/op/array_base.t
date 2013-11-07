@@ -1,7 +1,7 @@
 #!perl -w
 use strict;
 
-require 't/CORE/test.pl';
+require './test.pl';
 
 plan (tests => 24);
 no warnings 'deprecated';

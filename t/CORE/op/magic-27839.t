@@ -2,7 +2,7 @@
 
 BEGIN {
     $SIG{__WARN__} = sub { die "Dying on warning: ", @_ };
-    require './t/CORE/test.pl';
+    require './test.pl';
     plan(tests => 2);
 }
 

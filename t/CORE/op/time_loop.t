@@ -6,7 +6,7 @@
 
 use strict;
 
-INIT { require './t/CORE/test.pl'; }
+INIT { require './test.pl'; }
 
 plan(tests => 2);
 watchdog(2);

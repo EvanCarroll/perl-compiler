@@ -3,7 +3,6 @@
 # Tests for the source filters in coderef-in-@INC
 
 BEGIN {
-    chdir 't/CORE' if -d 't';
     unshift @INC, "./lib";
     require 'test.pl';
 }
