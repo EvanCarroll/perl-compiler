@@ -464,15 +464,11 @@ cmp_ok($@, 'eq', "", 'length of $@ after eval');
 cmp_ok(length $@, '==', 0, 'length of $@ after eval');
 
 # Check if eval { 1 }; completely resets $@
-SKIP: {
-    skip_if_miniperl('no dynamic loading on miniperl, no Devel::Peek', 2);
-    require Config;
-    skip('Devel::Peek was not built', 2)
-	unless $Config::Config{extensions} =~ /\bDevel\/Peek\b/;
+require Config;
 
-    my $tempfile = tempfile();
-    open $prog, ">", $tempfile or die "Can't create test file";
-    print $prog <<'END_EVAL_TEST';
+my $tempfile = tempfile();
+open $prog, ">", $tempfile or die "Can't create test file";
+print $prog <<'END_EVAL_TEST';
     use Devel::Peek;
     $! = 0;
     $@ = $!;
@@ -499,7 +495,6 @@ END_EVAL_TEST
     $second =~ s/ IV = 0\n\n/ IV = 0\n/ if $^O eq 'VMS';
 
     is($second, $first, 'eval { 1 } completely resets $@');
-}
 
 # Test that "use feature" and other hint transmission in evals and s///ee
 # don't leak memory

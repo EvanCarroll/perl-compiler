@@ -6,12 +6,8 @@ plan(tests => 23);
 
 my ($devnull, $no_devnull);
 
-if (is_miniperl()) {
-    $no_devnull = "no dynamic loading on miniperl, File::Spec not built, so can't determine /dev/null";
-} else {
-    require File::Spec;
-    $devnull = File::Spec->devnull;
-}
+require File::Spec;
+$devnull = File::Spec->devnull;
 
 open($TRY, '>Io_argv1.tmp') || (die "Can't open temp file: $!");
 print $TRY "a line\n";
@@ -45,8 +41,7 @@ is($x, "1a line\n2a line\n", '<> from two files');
     is( 0+$?, 0, q(eof() doesn't segfault) );
 }
 
-@ARGV = is_miniperl() ? ('Io_argv1.tmp', 'Io_argv1.tmp', 'Io_argv1.tmp')
-    : ('Io_argv1.tmp', 'Io_argv1.tmp', $devnull, 'Io_argv1.tmp');
+@ARGV = ('Io_argv1.tmp', 'Io_argv1.tmp', $devnull, 'Io_argv1.tmp');
 while (<>) {
     $y .= $. . $_;
     if (eof()) {
@@ -91,29 +86,24 @@ ok( !eof(),     'STDIN has something' );
 
 is( <>, "ok 7\n" );
 
-SKIP: {
-    skip_if_miniperl($no_devnull, 4);
-    open STDIN, $devnull or die $!;
-    @ARGV = ();
-    ok( eof(),      'eof() true with empty @ARGV' );
+open STDIN, $devnull or die $!;
+@ARGV = ();
+ok( eof(),      'eof() true with empty @ARGV' );
 
-    @ARGV = ('Io_argv1.tmp');
-    ok( !eof() );
+@ARGV = ('Io_argv1.tmp');
+ok( !eof() );
 
-    @ARGV = ($devnull, $devnull);
-    ok( !eof() );
+@ARGV = ($devnull, $devnull);
+ok( !eof() );
 
-    close ARGV or die $!;
-    ok( eof(),      'eof() true after closing ARGV' );
-}
+close ARGV or die $!;
+ok( eof(),      'eof() true after closing ARGV' );
 
-SKIP: {
+{
     local $/;
     open my $fh, 'Io_argv1.tmp' or die "Could not open Io_argv1.tmp: $!";
     <$fh>;	# set $. = 1
     is( <$fh>, undef );
-
-    skip_if_miniperl($no_devnull, 5);
 
     open $fh, $devnull or die;
     ok( defined(<$fh>) );

@@ -119,8 +119,7 @@ fresh_perl_like(
  'warn emits logical characters, not internal bytes [perl #45549]'  
 );
 
-SKIP: {
-    skip_if_miniperl('miniperl ignores -C', 1);
+{
 fresh_perl_like(
  '
    $a = "\xee\n";

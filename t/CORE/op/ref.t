@@ -135,8 +135,7 @@ sub mysub2 { lc shift }
 
 # Test REGEXP assignment
 
-SKIP: {
-    skip_if_miniperl("no dynamic loading on miniperl, so can't load re", 5);
+{
     require re;
     my $x = qr/x/;
     my $str = "$x"; # regex stringification may change
@@ -697,9 +696,7 @@ is (runperl(
 # it doesn't trigger a panic with multiple rounds of global cleanup
 # (Perl_sv_clean_all).
 
-SKIP: {
-    skip_if_miniperl('no Scalar::Util under miniperl', 4);
-
+{
     local $ENV{PERL_DESTRUCT_LEVEL} = 2;
 
     # we do all permutations of array/hash, 1ref/2ref, to account

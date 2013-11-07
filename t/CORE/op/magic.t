@@ -329,8 +329,7 @@ EOP
     ok($ok, $warn);
 }
 
-SKIP: {
-    skip_if_miniperl("miniperl can't rely on loading %Errno", 2);
+{
    no warnings 'void';
 
 # Make sure Errno hasn't been prematurely autoloaded
@@ -345,8 +344,7 @@ SKIP: {
    }, $@;
 }
 
-SKIP:  {
-    skip_if_miniperl("miniperl can't rely on loading %Errno", 1);
+{
     # Make sure that Errno loading doesn't clobber $!
 
     undef %Errno::;

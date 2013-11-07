@@ -1,5 +1,5 @@
 #!./perl
-BEGIN {
+INIT {
     if ( $^O eq 'VMS' ) {
         my $p = "/bin:/usr/bin:/usr/xpg4/bin:/usr/ucb";
         if ( $ENV{PATH} ) {
@@ -13,7 +13,6 @@ BEGIN {
     chdir 't/CORE';
     unshift @INC, './lib';
     require './test.pl';
-    skip_all_if_miniperl("no dynamic loading on miniperl, no POSIX");
 }
 use 5.010;
 use strict;

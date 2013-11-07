@@ -1,11 +1,10 @@
 #!./perl
 
+use Errno;
 INIT {
     chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
     require './test.pl';
-    eval 'use Errno';
-    die $@ if $@ and !is_miniperl();
 }
 
 use strict 'vars';
@@ -45,15 +44,11 @@ print @x,"14\nok",@y;
 
 $\ = '';
 
-if (!exists &Errno::EBADF) {
-    print "ok 19 # skipped: no EBADF\n";
-} else {
-    $! = 0;
-    no warnings 'unopened';
-    print NONEXISTENT "foo";
-    print "not " if ($! != &Errno::EBADF);
-    print "ok 19\n";
-}
+$! = 0;
+no warnings 'unopened';
+print NONEXISTENT "foo";
+print "not " if ($! != &Errno::EBADF);
+print "ok 19\n";
 
 {
     # Change 26009: pp_print didn't extend the stack

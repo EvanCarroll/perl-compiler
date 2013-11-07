@@ -641,6 +641,7 @@ __EOF__
 # After newsub is redefined outside the BEGIN, its CvOUTSIDE should point
 # to main rather than BEGIN, and BEGIN should be freed.
 
+# perl bug #163 https://code.google.com/p/perl-compiler/issues/detail?id=163
 {
     my $flag = 0;
     sub  X::DESTROY { $flag = 1 }

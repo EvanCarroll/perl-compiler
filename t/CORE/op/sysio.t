@@ -1,12 +1,15 @@
 #!./perl
 
 BEGIN {
-  chdir 't/CORE' if -d 't';
-  unshift @INC, './lib';
-  require './test.pl';
+  require './t/CORE/test.pl';
 }
 
-plan tests => 48;
+INIT {
+  chdir 't/CORE' if -d 't';
+  unshift @INC, './lib';
+}
+
+plan(tests => 48);
 
 open(I, 'op/sysio.t') || die "sysio.t: cannot find myself: $!";
 
@@ -209,7 +212,7 @@ ok(not defined sysseek(I, -1, 1));
 
 close(I);
 
-unlink_all $outfile;
+unlink_all($outfile);
 
 # Check that utf8 IO doesn't upgrade the scalar
 open(I, ">$outfile") || die "sysio.t: cannot write $outfile: $!";

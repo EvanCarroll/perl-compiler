@@ -1,6 +1,6 @@
 #!./perl
 
-BEGIN {
+INIT {
     chdir 't/CORE' if -d 't/CORE';
     unshift @INC, './lib';
     require './test.pl';
@@ -10,7 +10,7 @@ $|  = 1;
 use warnings;
 use Config;
 
-plan tests => 114;
+plan(114);
 
 my $Perl = which_perl();
 
@@ -91,11 +91,11 @@ EOC
     my @rows = <$f>;
     my $test = curr_test;
     print $f "not ok $test - piped in\n";
-    next_test;
+    next_test();
 
     $test = curr_test;
     print $f "not ok $test - piped in\n";
-    next_test;
+    next_test();
     ok( close($f),                      '       close' );
     sleep 1;
     pass('flushing');
@@ -182,11 +182,11 @@ EOC
     my @rows = <$f>;
     my $test = curr_test;
     print $f "not ok $test - piping\n";
-    next_test;
+    next_test();
 
     $test = curr_test;
     print $f "not ok $test - piping\n";
-    next_test;
+    next_test();
     ok( close($f),                      '       close' );
     sleep 1;
     pass("Flush");
@@ -227,10 +227,9 @@ like( $@, qr/Bad filehandle:\s+$afile/,          '       right error' );
 }
 
 SKIP: {
-    skip "This perl uses perlio", 1 if $Config{useperlio};
-    skip_if_miniperl("miniperl can't rely on loading %Errno", 1);
+    skip("This perl uses perlio", 1) if $Config{useperlio};
     # Force the reference to %! to be run time by writing ! as {"!"}
-    skip "This system doesn't understand EINVAL", 1
+    skip("This system doesn't understand EINVAL", 1)
 	unless exists ${"!"}{EINVAL};
 
     no warnings 'io';
@@ -339,23 +338,19 @@ fresh_perl_is(
     '[perl #77492]: open $fh, ">", \*glob causes SEGV');
 
 # [perl #77684] Opening a reference to a glob copy.
-SKIP: {
-    skip_if_miniperl("no dynamic loading on miniperl, so can't load PerlIO::scalar", 1);
+{
     my $var = *STDOUT;
     open my $fh, ">", \$var;
     print $fh "hello";
-    is $var, "hello", '[perl #77684]: open $fh, ">", \$glob_copy'
+    is($var, "hello", '[perl #77684]: open $fh, ">", \$glob_copy')
         # when this fails, it leaves an extra file:
         or unlink \*STDOUT;
 }
 
 # check that we can call methods on filehandles auto-magically
 # and have IO::File loaded for us
-SKIP: {
-    skip_if_miniperl("no dynamic loading on miniperl, so can't load IO::File", 3);
-    is( $INC{'IO/File.pm'}, undef, "IO::File not loaded" );
-    my $var = "";
-    open my $fh, ">", \$var;
-    ok( eval { $fh->autoflush(1); 1 }, '$fh->autoflush(1) lives' );
-    ok( $INC{'IO/File.pm'}, "IO::File now loaded" );
-}
+is( $INC{'IO/File.pm'}, undef, "IO::File not loaded" );
+my $var = "";
+open my $fh, ">", \$var;
+ok( eval { $fh->autoflush(1); 1 }, '$fh->autoflush(1) lives' );
+ok( $INC{'IO/File.pm'}, "IO::File now loaded" );

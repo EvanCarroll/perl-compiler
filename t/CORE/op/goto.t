@@ -3,14 +3,12 @@
 # "This IS structured code.  It's just randomly structured."
 
 BEGIN {
-    chdir 't/CORE' if -d 't';
-    unshift @INC, "./lib";
-    require "test.pl";
+  require "t/CORE/test.pl";
 }
 
 use warnings;
 use strict;
-plan tests => 77;
+plan(tests => 77 - 1);
 our $TODO;
 
 my $deprecated = 0;
@@ -231,7 +229,7 @@ close $f;
 
 $r = runperl(prog => 'use Op_goto01; print qq[DONE\n]');
 is($r, "OK\nDONE\n", "goto within use-d file"); 
-unlink_all "Op_goto01.pm";
+unlink_all("Op_goto01.pm");
 
 # test for [perl #24108]
 $ok = 1;
@@ -462,6 +460,7 @@ like($@, qr/Can't goto subroutine from an eval-block/, 'eval block');
     like($r, qr/bar/, "goto &foo in warn");
 }
 
+=pod
 TODO: {
     local $TODO = "[perl #43403] goto() from an if to an else doesn't undo local () changes";
     our $global = "unmodified";
@@ -472,6 +471,7 @@ TODO: {
          ELSE: is($global, "unmodified");
     }
 }
+=cut
 
 is($deprecated, 0);
 
@@ -500,8 +500,7 @@ format CHOLET =
 wellington
 .
 $foo .= "(1)";
-SKIP: {
-    skip_if_miniperl("no dynamic loading on miniperl, so can't load PerlIO::scalar", 1);
+{
     my $cholet;
     open(CHOLET, ">", \$cholet);
     write CHOLET;

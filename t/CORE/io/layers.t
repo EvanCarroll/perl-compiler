@@ -6,9 +6,6 @@ BEGIN {
     chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
     require './test.pl';
-    skip_all_without_perlio();
-    # FIXME - more of these could be tested without Encode or full perl
-    skip_all_without_dynamic_extension('Encode');
 
     # Makes testing easier.
     $ENV{PERLIO} = 'stdio' if exists $ENV{PERLIO} && $ENV{PERLIO} eq '';

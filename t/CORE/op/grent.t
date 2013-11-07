@@ -1,6 +1,6 @@
 #!./perl
 
-BEGIN {
+INIT {
     chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
     require './test.pl';
@@ -8,7 +8,7 @@ BEGIN {
 
 eval {my @n = getgrgid 0};
 if ($@ =~ /(The \w+ function is unimplemented)/) {
-    skip_all "getgrgid unimplemented";
+    skip_all("getgrgid unimplemented");
 }
 
 eval { require Config; import Config; };
@@ -68,13 +68,13 @@ if (not defined $where) {	# Try local.
 }
 
 if ($reason) {
-    skip_all $reason;
+    skip_all($reason);
 }
 
 
 # By now the GR filehandle should be open and full of juicy group entries.
 
-plan tests => 3;
+plan(tests => 3);
 
 # Go through at most this many groups.
 # (note that the first entry has been read away by now)

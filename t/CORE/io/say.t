@@ -1,11 +1,10 @@
 #!./perl
 
+use Errno;
 BEGIN {
     chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
     require './test.pl';
-    eval 'use Errno';
-    die $@ if $@ and !is_miniperl();
 }
 
 # Just a few very basic tests cribbed from t/io/print.t,
@@ -32,15 +31,11 @@ say $bar "ok 7";
 
 say {"STDOUT"} "ok 8";
 
-if (!exists &Errno::EBADF) {
-    print "ok 9 # skipped: no EBADF\n";
-} else {
-    $! = 0;
-    no warnings 'unopened';
-    say NONEXISTENT "foo";
-    print "not " if ($! != &Errno::EBADF);
-    say "ok 9";
-}
+$! = 0;
+no warnings 'unopened';
+say NONEXISTENT "foo";
+print "not " if ($! != &Errno::EBADF);
+say "ok 9";
 
 $_ = "ok 10";
 say;

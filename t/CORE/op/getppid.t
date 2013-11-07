@@ -16,7 +16,6 @@ use strict;
 
 BEGIN {
     require './test.pl';
-    skip_all_without_config(qw(d_pipe d_fork d_waitpid d_getppid));
     plan (8);
 }
 
