@@ -1,4 +1,3 @@
-toddr - comp/opsubs.t
 io/dup.t
 io/layers.t
 io/perlio.t
