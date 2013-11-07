@@ -26,10 +26,10 @@ t/CORE/io/perlio_open.t
 t/CORE/io/pipe.t
 cleland - t/CORE/io/print.t
 cleland - t/CORE/io/pvbm.t
-t/CORE/io/say.t
-t/CORE/io/tell.t
-t/CORE/io/through.t
-t/CORE/op/alarm.t
+cleland - t/CORE/io/say.t
+cleland - t/CORE/io/tell.t
+cleland - t/CORE/io/through.t
+cleland - t/CORE/op/alarm.t
 t/CORE/op/assignwarn.t
 t/CORE/op/attrhand.t
 t/CORE/op/attrs.t
