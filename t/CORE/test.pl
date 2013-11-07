@@ -588,8 +588,8 @@ sub runperl {
 	$runperl = $1;
 
 	$result = `$runperl`;
-    } else {
-	$result = `$runperl`;
+    } else {        
+        $result = `$runperl`;
     }
     $result =~ s/\n\n/\n/ if $is_vms; # XXX pipes sometimes double these
     return $result;
@@ -697,6 +697,15 @@ my $tmpfile = tempfile();
 sub _fresh_perl {
     my($prog, $action, $expect, $runperl_args, $name) = @_;
 
+    my $is_binary;
+    if ( $0 =~ m/\.bin$/ ) {
+        $is_binary = 1;
+        # let makefile do the job
+        $tmpfile = $0;
+        $tmpfile =~ s/\.bin$/.subtest.t/;
+        unlink $tmpfile if -e $tmpfile;
+    }
+
     # Given the choice of the mis-parsable {}
     # (we want an anon hash, but a borked lexer might think that it's a block)
     # or relying on taking a reference to a lexical
@@ -707,6 +716,8 @@ sub _fresh_perl {
     # affect tests using this file but not this function.
     $runperl_args->{progfile} = $tmpfile;
     $runperl_args->{stderr} = 1;
+
+
 
     open(my $TEST, '>', $tmpfile) or die "Cannot open $tmpfile: $!";
 
@@ -722,7 +733,13 @@ sub _fresh_perl {
     print {$TEST} $prog;
     close $TEST or die "Cannot close $tmpfile: $!";
 
-    my $results = runperl(%$runperl_args);
+    my $results;
+    if ( $is_binary ) {
+        $results = runperl_binary($tmpfile);
+    } else {
+        $results = runperl(%$runperl_args);        
+    }
+    
     my $status = $?;
 
     # Clean up the results into something a bit more predictable.
@@ -767,6 +784,18 @@ sub _fresh_perl {
     }
 
     return $pass;
+}
+
+sub runperl_binary {
+    my ( $test ) = @_;
+    my $bin = $test;
+    $bin =~ s/\.t$/\.bin/;
+    unlink $bin if -e $bin;
+    print STDERR "# running: make $bin\n";
+    system('make', $bin); # or return '';
+    print STDERR "# running: ./$bin\n";
+    # now execute the binary
+    return `./$bin`;
 }
 
 #
