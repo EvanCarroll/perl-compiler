@@ -1,9 +1,7 @@
 #!./perl
 
 BEGIN {
-    chdir 't/CORE' if -d 't';
-    unshift @INC, './lib';
-    require './test.pl';
+    require './t/CORE/test.pl';
 }
 
 plan (109);
@@ -122,6 +120,7 @@ isnt ($@, '', "class is a ref");
 # class is an overloaded ref
 {
     package H4;
+    # perlcc issue 172 - https://code.google.com/p/perl-compiler/issues/detail?id=172
     use overload '""' => sub { "C4" };
 }
 $h1 = bless {}, "H4";

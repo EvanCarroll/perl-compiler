@@ -6,6 +6,8 @@ BEGIN {
     require './test.pl';
 }
 
+# perlcc issue #166 https://code.google.com/p/perl-compiler/issues/detail?id=166
+
 # use strict;
 
 plan tests => 218;

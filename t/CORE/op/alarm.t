@@ -13,6 +13,9 @@ BEGIN {
     }
 }
 
+# alarm is triggered twice 
+# perlcc issue 168 https://code.google.com/p/perl-compiler/issues/detail?id=168
+
 plan tests => 5;
 my $Perl = which_perl();
 

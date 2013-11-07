@@ -9,6 +9,9 @@ BEGIN {
 }
 
 use warnings;
+# force perlcc to compile the script with attributes
+#	this is not really a perlcc issue
+use attributes;
 
 $SIG{__WARN__} = sub { die @_ };
 
@@ -19,6 +22,7 @@ sub eval_ok ($;$) {
 
 our $anon1; eval_ok '$anon1 = sub : method { $_[0]++ }';
 
+# perlcc issue 170 - https://code.google.com/p/perl-compiler/issues/detail?id=170
 eval 'sub e1 ($) : plugh ;';
 like $@, qr/^Invalid CODE attributes?: ["']?plugh["']? at/;
 

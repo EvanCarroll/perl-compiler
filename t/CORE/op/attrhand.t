@@ -1,10 +1,11 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    chdir 't/CORE' if -d 't';
-    unshift @INC, './lib';
-    require './test.pl';
+    require 't/CORE/test.pl';
 }
+
+# Attribute::Handlers are currently not supported
+# perlcc issue 169 https://code.google.com/p/perl-compiler/issues/detail?id=169
 
 plan tests => 4;
 
