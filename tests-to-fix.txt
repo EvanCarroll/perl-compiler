@@ -64,7 +64,8 @@ nico - t/CORE/op/goto.t
 nico - t/CORE/op/grent.t
 nico - t/CORE/op/groups.t
 nico - t/CORE/op/gv.t
-nico - t/CORE/op/hash.t
+nico - t/CORE/op/hash.t this is not a B::C issue but a more global problem:
+colliding into the same bucket keys are triggering rehash 
 nico - t/CORE/op/hashassign.t
 nico - t/CORE/op/inccode.t
 nico - t/CORE/op/incfilter.t
