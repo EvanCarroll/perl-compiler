@@ -261,6 +261,9 @@ $(REGULAR_TESTS):
 test:
 	$(PROVE) -j 6 `find * -name \*.bin|sort`
 
+bc:
+	(cd ../.. && perl Makefile.PL installdirs=vendor && make install)
+
 clean-tests:
 	/bin/rm -f $(ALL_TESTS) $(ALL_TESTS:.bin=.c)
 
