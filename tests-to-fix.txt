@@ -7,7 +7,6 @@ t/CORE/io/pipe.t
 cleland - t/CORE/io/print.t
 t/CORE/io/say.t
 t/CORE/io/tell.t
-nico - t/CORE/op/alarm.t
 nico - t/CORE/op/attrhand.t
 nico - t/CORE/op/attrs.t
 nico - t/CORE/op/bless.t
@@ -82,5 +81,6 @@ t/CORE/op/hashassign.t - issue 166
 t/CORE/op/ord.t - utf8 issue 162
 t/CORE/op/reset.t - issue 160
 t/CORE/op/taint.t - issue 151
+t/CORE/op/alarm.t - issue 168
 t/CORE/op/hash.t - this is not a specific B::C issue but a more global problem:
 colliding into the same bucket keys are triggering rehash
