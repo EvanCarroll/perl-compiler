@@ -2,7 +2,6 @@ io/dup.t
 io/layers.t
 io/perlio.t
 io/perlio_fail.t
-cleland - io/pipe.t
 cleland - io/print.t
 cleland - io/pvbm.t
 cleland - io/tell.t
@@ -87,3 +86,4 @@ op/attrhand.t - issue 169 - Attribute::Handlers are currently not supported
 op/hash.t - this is not a specific B::C issue but a more global problem:
 colliding into the same bucket keys are triggering rehash
 io/say.t - issue 150
+io/pipe.t - issue 150
