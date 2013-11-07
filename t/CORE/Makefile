@@ -1,6 +1,6 @@
 TAINT_TESTS = op/utftaint.bin op/taint.bin comp/opsubs.bin
 
-REGULAR_TESTS = base/cond.bin \
+TESTS = base/cond.bin \
 	base/if.bin \
 	base/lex.bin \
 	base/num.bin \
@@ -242,6 +242,7 @@ REGULAR_TESTS = base/cond.bin \
 PERL=/usr/local/cpanel/3rdparty/perl/514/bin/perl
 PROVE=/usr/local/cpanel/3rdparty/perl/514/bin/prove
 
+REGULAR_TESTS=$(TESTS) $(TESTS:.bin=.subtest.bin)
 ALL_TESTS=$(TAINT_TESTS) $(REGULAR_TESTS)
 
 all: $(ALL_TESTS)
