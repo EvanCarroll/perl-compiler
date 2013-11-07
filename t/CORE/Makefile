@@ -259,3 +259,8 @@ tests: $(ALL_TESTS)
 
 clean-tests:
 	/bin/rm -f $(ALL_TESTS) $(ALL_TESTS:.bin=.c)
+
+depend:
+	find * -name \*.t| perl -ne 'chomp; s/\.t$$//; print "$$_.bin: $$_.t\n"' > depend.inc
+
+-include depend.inc
