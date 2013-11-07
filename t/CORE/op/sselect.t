@@ -1,10 +1,6 @@
 #!./perl
 
-BEGIN {
-    @INC = ('.', '../lib');
-}
-
-require 'test.pl';
+require './test.pl';
 
 plan (11);
 

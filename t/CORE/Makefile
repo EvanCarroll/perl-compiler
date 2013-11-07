@@ -216,8 +216,6 @@ TESTS_OK = base/cond.bin \
 	op/switch.bin \
 	op/symbolcache.bin \
 	op/sysio.bin \
-	op/threads-dirh.bin \
-	op/threads.bin \
 	op/tiearray.bin \
 	op/tie_fetch_count.bin \
 	op/tiehandle.bin \
