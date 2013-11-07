@@ -69,7 +69,7 @@ no warnings 'deprecated';
     is($rf0, "z", '$^H{foo} correct before require');
 
     our($ra1, $ri1, $rf1, $rfe1);
-    BEGIN { require "t/CORE/op/array_base.aux"; }
+    BEGIN { require "op/array_base.aux"; }
     cmp_ok($ra1, '==', 0, '$[ cleared for require');
     ok(!($ri1 & 0x04000000), '$^H cleared for require');
     is($rf1, undef, '$^H{foo} cleared for require');
