@@ -1,107 +1,44 @@
 nico - t/CORE/op/taint.t
 nico - t/CORE/op/leaky-magic.t
-nico - t/CORE/op/method.t
 nico - t/CORE/op/ord.t
-nico - t/CORE/op/recurse.t
-nico - t/CORE/op/time_loop.t
-nico - t/CORE/op/sysio.t
 toddr - t/CORE/comp/opsubs.t
-toddr - t/CORE/io/bom.t
-toddr - t/CORE/io/crlf.t
-toddr - t/CORE/io/crlf_through.t
-toddr - t/CORE/io/data.t
-t/CORE/io/defout.t
 t/CORE/io/dup.t
-t/CORE/io/fflush.t
-cleland - t/CORE/io/fs.t
-t/CORE/io/iofile.t
 t/CORE/io/layers.t
-t/CORE/io/nargv.t
-cleland - t/CORE/io/open.t
-t/CORE/io/openpid.t
 t/CORE/io/perlio.t
 t/CORE/io/perlio_fail.t
-t/CORE/io/perlio_leaks.t
-t/CORE/io/perlio_open.t
 t/CORE/io/pipe.t
 cleland - t/CORE/io/print.t
-cleland - t/CORE/io/pvbm.t
 t/CORE/io/say.t
-t/CORE/io/tell.t
-t/CORE/io/through.t
 t/CORE/op/alarm.t
-t/CORE/op/assignwarn.t
-t/CORE/op/attrhand.t
 t/CORE/op/attrs.t
 t/CORE/op/bless.t
 t/CORE/op/blocks.t
 t/CORE/op/bop.t
 justin - t/CORE/op/caller.t
 justin - t/CORE/op/chdir.t
-kyle - t/CORE/op/chr.t
-kyle - t/CORE/op/concat2.t
-kyle - t/CORE/op/cproto.t
 kyle - t/CORE/op/crypt.t
-kyle - t/CORE/op/dbm.t
-kyle - t/CORE/op/die_exit.t
 kyle - t/CORE/op/die_keeperr.t
 kyle - t/CORE/op/each.t
 kyle - t/CORE/op/each_array.t
-t/CORE/op/eval.t
 t/CORE/op/exec.t
-t/CORE/op/exp.t
-t/CORE/op/fh.t
-t/CORE/op/filehandle.t
-t/CORE/op/filetest.t
-t/CORE/op/filetest_stack_ok.t
-t/CORE/op/filetest_t.t
-t/CORE/op/flip.t
-t/CORE/op/fork.t
 t/CORE/op/getpid.t
-t/CORE/op/getppid.t
-t/CORE/op/gmagic.t
-nico - t/CORE/op/goto.t
-nico - t/CORE/op/grent.t
-nico - t/CORE/op/groups.t
 nico - t/CORE/op/gv.t
 nico - t/CORE/op/hash.t this is not a B::C issue but a more global problem:
 colliding into the same bucket keys are triggering rehash 
 nico - t/CORE/op/hashassign.t
-nico - t/CORE/op/inccode.t
-nico - t/CORE/op/incfilter.t
 nico - t/CORE/op/index.t
-nico - t/CORE/op/int.t
-nico - t/CORE/op/kill0.t
 nico - t/CORE/op/lc.t
-t/CORE/op/lc_user.t
 t/CORE/op/length.t
-t/CORE/op/lfs.t
-t/CORE/op/local.t
 t/CORE/op/magic-27839.t
 t/CORE/op/magic.t
 t/CORE/op/mkdir.t
-t/CORE/op/my_stash.t
-t/CORE/op/mydef.t
-t/CORE/op/negate.t
-t/CORE/op/not.t
-t/CORE/op/numconvert.t
 t/CORE/op/override.t
 t/CORE/op/pack.t
-t/CORE/op/packagev.t
 t/CORE/op/pos.t
-t/CORE/op/pow.t
-t/CORE/op/print.t
 t/CORE/op/protowarn.t
-t/CORE/op/pwent.t
-t/CORE/op/quotemeta.t
-t/CORE/op/read.t
 t/CORE/op/readdir.t
-t/CORE/op/readline.t
 t/CORE/op/ref.t
-t/CORE/op/require_errors.t
 t/CORE/op/reset.t
-t/CORE/op/reverse.t
-t/CORE/op/setpgrpstack.t
 t/CORE/op/sigdispatch.t
 t/CORE/op/smartkve.t
 t/CORE/op/smartmatch.t
@@ -110,35 +47,18 @@ t/CORE/op/split.t
 t/CORE/op/split_unicode.t
 t/CORE/op/sprintf2.t
 t/CORE/op/sselect.t
-t/CORE/op/stash.t
 t/CORE/op/stat.t
-t/CORE/op/state.t
-t/CORE/op/study.t
-t/CORE/op/studytied.t
-t/CORE/op/sub.t
-t/CORE/op/sub_lval.t
 t/CORE/op/svleak.t
 t/CORE/op/switch.t
 t/CORE/op/symbolcache.t
 t/CORE/op/threads-dirh.t
 t/CORE/op/threads.t
-t/CORE/op/tie_fetch_count.t
-t/CORE/op/tiearray.t
-t/CORE/op/time.t
 t/CORE/op/tr.t
 t/CORE/op/turkish.t
-t/CORE/op/undef.t
 t/CORE/op/universal.t
-t/CORE/op/unshift.t
-t/CORE/op/upgrade.t
-t/CORE/op/utf8cache.t
-t/CORE/op/utf8decode.t
 t/CORE/op/utf8magic.t
 t/CORE/op/utfhash.t
 t/CORE/op/utftaint.t
-t/CORE/op/wantarray.t
-t/CORE/op/warn.t
-t/CORE/op/while_readdir.t
 t/CORE/op/write.t
 t/CORE/op/yadayada.t
 rurban - t/CORE/io/read.t broken by perlcc issue 148 and 150
