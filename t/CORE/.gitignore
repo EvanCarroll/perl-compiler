@@ -3,3 +3,4 @@
 *.bin
 *.c
 /Io_argv*tmp*
+*.subtest.t
