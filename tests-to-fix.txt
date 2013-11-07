@@ -75,3 +75,8 @@ t/CORE/op/write.t
 t/CORE/op/yadayada.t
 rurban - t/CORE/io/read.t broken by perlcc issue 148 and 150
 rurban - t/CORE/op/chop.t -- http://target.cpanel.net/RestUI/TpView.aspx?acid=EE4194B31661EF07ABC14DB4C0243592#bug/16825
+t/CORE/op/method.t - issue #159
+t/CORE/op/goto.t - issue #165
+t/CORE/op/tie_fetch_count.t
+t/CORE/op/sub.t
+t/CORE/op/filetest.t
