@@ -1,6 +1,5 @@
-/tmp*
-!Makefile
 *.bin
-*.c
-/Io_argv*tmp*
 *.subtest.t
+*.c
+*.tmp
+*.tmp_bak
