@@ -6,18 +6,13 @@ cleland - io/print.t
 cleland - io/pvbm.t
 cleland - io/tell.t
 cleland - io/through.t
-op/assignwarn.t
-op/attrhand.t
-nico - op/attrs.t
-nico - op/bless.t
-nico - op/blocks.t
-nico - op/bop.t
+nico - op/assignwarn.t
 justin - op/caller.t
 justin - op/chdir.t
-kyle - op/crypt.t
-kyle - op/die_keeperr.t
-kyle - op/each.t
-kyle - op/each_array.t
+op/crypt.t
+op/die_keeperr.t
+op/each.t
+op/each_array.t
 justin - op/exec.t
 justin - op/filetest.t
 op/flip.t
@@ -28,18 +23,18 @@ op/length.t
 op/magic-27839.t
 op/magic.t
 op/mkdir.t
-op/override.t
-op/pack.t
-op/packagev.t
-op/pos.t
-op/protowarn.t
-op/readdir.t
-op/read.t
-op/readline.t
-op/ref.t
-op/sigdispatch.t
-op/smartkve.t
-op/smartmatch.t
+nico - op/override.t
+nico - op/pack.t
+nico - op/packagev.t
+nico - op/pos.t
+nico - op/protowarn.t
+nico - op/readdir.t
+nico - op/read.t
+nico - op/readline.t
+nico - op/ref.t
+nico - op/sigdispatch.t
+nico - op/smartkve.t
+nico - op/smartmatch.t
 op/sort.t
 op/split.t
 op/split_unicode.t
@@ -87,3 +82,8 @@ op/hash.t - this is not a specific B::C issue but a more global problem:
 colliding into the same bucket keys are triggering rehash
 io/say.t - issue 150
 io/pipe.t - issue 150
+op/attrs.t - issue 170
+op/bless.t - issue 172
+op/blocks.t - issue 173
+op/bop.t - issues 172 + 174
+op/attrhand.t - issue 169
