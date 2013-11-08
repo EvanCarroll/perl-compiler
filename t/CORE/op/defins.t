@@ -5,7 +5,6 @@
 #
 
 INIT {
-    chdir 't/CORE' if -d 't';
     unshift @INC, "./lib";
     $SIG{__WARN__} = sub { $warns++; warn $_[0] };
 }

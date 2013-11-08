@@ -1,7 +1,6 @@
 #!./perl
 
 BEGIN {
-    chdir 't/CORE' if -d 't/CORE';
     unshift @INC, './lib';
     require './test.pl';
 }

@@ -3,7 +3,6 @@
 # Test // and friends.
 
 INIT {
-    chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
     require './test.pl';
 }

@@ -5,7 +5,6 @@
 #
 
 BEGIN {
-    chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
     require "./test.pl";
     require Config;
@@ -438,6 +437,8 @@ SKIP: {
   no warnings "utf8";
   { use bytes; $str =~ s/\C\C\z//; }
 
+# perlcc issue 174 - https://code.google.com/p/perl-compiler/issues/detail?id=174
+
   # it's really bogus that (~~malformed) is \0.
   my $ref = "\x{10000}\0";
   is(~~$str, $ref);
@@ -539,6 +540,7 @@ my $strval;
 
 {
     package Bar;
+    # perlcc issue 172 - https://code.google.com/p/perl-compiler/issues/detail?id=172
     use overload q/""/ => sub { $strval };
 
     package Baz;

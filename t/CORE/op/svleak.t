@@ -5,7 +5,6 @@
 # see if the count increases.
 
 BEGIN {
-    chdir 't/CORE';
     unshift @INC, './lib';
     require './test.pl';
 

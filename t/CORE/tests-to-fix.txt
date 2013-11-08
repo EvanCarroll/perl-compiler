@@ -1,0 +1,89 @@
+io/dup.t
+io/layers.t
+io/perlio.t
+io/perlio_fail.t
+cleland - io/print.t
+cleland - io/pvbm.t
+cleland - io/tell.t
+cleland - io/through.t
+op/assignwarn.t
+op/attrhand.t
+nico - op/attrs.t
+nico - op/bless.t
+nico - op/blocks.t
+nico - op/bop.t
+justin - op/caller.t
+justin - op/chdir.t
+kyle - op/crypt.t
+kyle - op/die_keeperr.t
+kyle - op/each.t
+kyle - op/each_array.t
+justin - op/exec.t
+justin - op/filetest.t
+op/flip.t
+op/getpid.t
+op/getppid.t
+nico - op/gv.t
+op/length.t
+op/magic-27839.t
+op/magic.t
+op/mkdir.t
+op/override.t
+op/pack.t
+op/packagev.t
+op/pos.t
+op/protowarn.t
+op/readdir.t
+op/read.t
+op/readline.t
+op/ref.t
+op/sigdispatch.t
+op/smartkve.t
+op/smartmatch.t
+op/sort.t
+op/split.t
+op/split_unicode.t
+op/sprintf2.t
+op/sselect.t
+op/stash.t
+op/stat.t
+op/sub.t
+op/svleak.t
+op/switch.t
+op/symbolcache.t
+op/tie_fetch_count.t
+op/threads-dirh.t
+op/threads.t
+op/tr.t
+op/turkish.t
+op/universal.t
+op/utf8magic.t
+op/utfhash.t
+op/utftaint.t
+op/write.t
+op/yadayada.t
+op/tie_fetch_count.t
+op/sub.t
+op/filetest.t
+
+# known problems 
+op/lc.t - utf8 perlcc issue #162
+op/index.t - utf8 perlcc issue #162
+io/read.t broken by perlcc issue 148 and 150
+op/chop.t - perlcc issue 142 ( TP task 16825 )
+op/method.t - issue #159
+op/goto.t - issue #165
+io/utf8.t - issue 155
+op/64bitint.t - issue 156 and 157
+op/closure.t - issue 163
+op/defins.t - issue 154
+op/hashassign.t - issue 166
+op/ord.t - utf8 issue 162
+op/reset.t - issue 160
+op/taint.t - issue 151
+op/alarm.t - issue 168
+op/attrhand.t - issue 169 - Attribute::Handlers are currently not supported
+op/hash.t - this is not a specific B::C issue but a more global problem:
+colliding into the same bucket keys are triggering rehash
+io/say.t - issue 150
+io/pipe.t - issue 150

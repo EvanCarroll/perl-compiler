@@ -4,7 +4,6 @@
 # filehandles. Most of these will segfault perl if they fail.
 
 INIT {
-    chdir 't/CORE' if -d 't';
     unshift @INC, "./lib";
     require "./test.pl";
 }

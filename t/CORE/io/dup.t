@@ -1,6 +1,9 @@
 #!./perl
 
-require 't/CORE/test.pl';
+BEGIN {
+    unshift @INC, "./lib";
+    require "./test.pl";
+}
 
 use Config;
 no warnings 'once';

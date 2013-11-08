@@ -36,7 +36,6 @@
 # sub a5 { "$_[0]" }		# P
 
 BEGIN {
-    chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
     require './test.pl';
 }

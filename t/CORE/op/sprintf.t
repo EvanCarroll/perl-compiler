@@ -7,7 +7,6 @@
 # specific to multi-byte characters (under the utf8 pragma and such).
 
 BEGIN {
-    chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
 }
 use warnings;

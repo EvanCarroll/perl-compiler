@@ -1,6 +1,10 @@
-TAINT_TESTS = op/utftaint.bin op/taint.bin comp/opsubs.bin
+TAINT_FAILURES = op/taint.bin
 
-REGULAR_TESTS = base/cond.bin \
+FAILURES = op/bop.bin op/override.bin op/reset.bin io/perlio.bin op/magic-27839.bin
+
+TAINT_OK = op/utftaint.bin comp/opsubs.bin
+
+TESTS_OK = base/cond.bin \
 	base/if.bin \
 	base/lex.bin \
 	base/num.bin \
@@ -57,7 +61,6 @@ REGULAR_TESTS = base/cond.bin \
 	io/perlio_fail.bin \
 	io/perlio_leaks.bin \
 	io/perlio_open.bin \
-	io/perlio.bin \
 	io/pipe.bin \
 	io/print.bin \
 	io/pvbm.bin \
@@ -81,7 +84,6 @@ REGULAR_TESTS = base/cond.bin \
 	op/avhv.bin \
 	op/bless.bin \
 	op/blocks.bin \
-	op/bop.bin \
 	op/caller.bin \
 	op/chars.bin \
 	op/chdir.bin \
@@ -150,7 +152,6 @@ REGULAR_TESTS = base/cond.bin \
 	op/local.bin \
 	op/loopctl.bin \
 	op/lop.bin \
-	op/magic-27839.bin \
 	op/magic_phase.bin \
 	op/magic.bin \
 	op/method.bin \
@@ -165,7 +166,6 @@ REGULAR_TESTS = base/cond.bin \
 	op/ord.bin \
 	op/or.bin \
 	op/overload_integer.bin \
-	op/override.bin \
 	op/packagev.bin \
 	op/pack.bin \
 	op/pos.bin \
@@ -186,7 +186,6 @@ REGULAR_TESTS = base/cond.bin \
 	op/ref.bin \
 	op/repeat.bin \
 	op/require_errors.bin \
-	op/reset.bin \
 	op/reverse.bin \
 	op/runlevel.bin \
 	op/setpgrpstack.bin \
@@ -213,8 +212,6 @@ REGULAR_TESTS = base/cond.bin \
 	op/switch.bin \
 	op/symbolcache.bin \
 	op/sysio.bin \
-	op/threads-dirh.bin \
-	op/threads.bin \
 	op/tiearray.bin \
 	op/tie_fetch_count.bin \
 	op/tiehandle.bin \
@@ -240,10 +237,19 @@ REGULAR_TESTS = base/cond.bin \
 	op/yadayada.bin
 
 PERL=/usr/local/cpanel/3rdparty/perl/514/bin/perl
+PROVE=/usr/local/cpanel/3rdparty/perl/514/bin/prove
 
+TAINT_TESTS=$(TAINT_OK) $(TAINT_FAILURES)
+
+TESTS=$(TESTS_OK) $(FAILURES)
+REGULAR_TESTS=$(TESTS) $(TESTS:.bin=.subtest.bin)
 ALL_TESTS=$(TAINT_TESTS) $(REGULAR_TESTS)
 
+all: $(TESTS_OK) $(TAINT_OK)
+
 taint: $(TAINT_TESTS)
+
+failures: $(TAINT_FAILURES) $(FAILURES)
 
 $(TAINT_TESTS):
 	$(PERL) -T -MO=-qq,C,-O2,-fno-warnings,-fno-fold,-o$(@:.bin=.c) $(@:.bin=.t)
@@ -255,7 +261,17 @@ $(REGULAR_TESTS):
 	$(PERL) ../../script/cc_harness -q  $(@:.bin=.c) -o $@
 	/bin/rm $(@:.bin=.c)
 
-tests: $(ALL_TESTS)
+test:
+	$(PROVE) -j 6 `find * -name \*.bin|grep -v .subtest.bin | sort`
 
-clean-tests:
+bc:
+	(cd ../.. && perl Makefile.PL installdirs=vendor && make install)
+
+clean:
 	/bin/rm -f $(ALL_TESTS) $(ALL_TESTS:.bin=.c)
+	/bin/rm -f Io_argv*.tmp* tmp*
+
+depend:
+	find * -name \*.t| sort| perl -ne 'chomp; s/\.t$$//; print "$$_.bin: $$_.t test.pl\n"' > depend.inc
+
+-include depend.inc

@@ -1,7 +1,6 @@
 #!./perl
 
 BEGIN {
-    chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
     require './test.pl';
 }
@@ -10,7 +9,7 @@ use strict;
 
 plan 5;
 
-my $err = "Unimplemented at $0 line " . ( __LINE__ + 2 ) . ".\n";
+my $err = "Unimplemented at op/yadayada.t line " . ( __LINE__ + 2 ) . ".\n";
 
 eval { ... };
 

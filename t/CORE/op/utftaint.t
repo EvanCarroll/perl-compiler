@@ -2,7 +2,6 @@
 # tests whether tainting works with UTF-8
 
 BEGIN {
-    chdir 't/CORE' if -d 't';
     unshift @INC, "./lib";
 }
 

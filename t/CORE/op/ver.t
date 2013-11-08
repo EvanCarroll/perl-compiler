@@ -1,7 +1,6 @@
 #!./perl
 
 INIT {
-    chdir 't/CORE' if -d 't';
     unshift @INC, "./lib";
     require "test.pl";
     $SIG{'__WARN__'} = sub { warn $_[0] if $DOWARN };

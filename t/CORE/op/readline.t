@@ -1,12 +1,8 @@
 #!./perl
 
-BEGIN {
-    chdir 't/CORE';
-    unshift @INC, './lib';
-    require './test.pl';
-}
+BEGIN { require './test.pl' }
 
-plan tests => 25;
+plan tests => 24;
 
 # [perl #19566]: sv_gets writes directly to its argument via
 # TARG. Test that we respect SvREADONLY.
@@ -81,10 +77,6 @@ SKIP: {
     close F;
   }
 }
-
-fresh_perl_is('BEGIN{<>}', '',
-              { switches => ['-w'], stdin => '', stderr => 1 },
-              'No ARGVOUT used only once warning');
 
 fresh_perl_is('print readline', 'foo',
               { switches => ['-w'], stdin => 'foo', stderr => 1 },

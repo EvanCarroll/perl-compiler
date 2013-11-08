@@ -16,7 +16,6 @@
 # chapter 3. ISBN 0-201-03822-6 (v. 2)
 
 INIT {
-    chdir "t/CORE" if -d "t/CORE";
     unshift @INC, "./lib";
     require "test.pl";
 }

@@ -8,7 +8,6 @@
 # the same. (and not ours)
 
 BEGIN {
-    chdir 't/CORE' if -d 't';
     unshift @INC, "./lib";
 }
 

@@ -31,7 +31,6 @@
 #
 #  -- .robin. <robin@kitsite.com>  2001-03-13
 INIT {
-    chdir 't/CORE' if -d 't';
     unshift @INC, "./lib";
     require "test.pl";
 }

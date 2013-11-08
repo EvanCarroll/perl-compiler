@@ -4,7 +4,6 @@
 # they were properly removed in 5.9.
 
 INIT {
-    chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
     require './test.pl';
 }

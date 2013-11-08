@@ -10,7 +10,6 @@ INIT {
     $ENV{LC_ALL} = "C"; # so that external utilities speak English
     $ENV{LANGUAGE} = 'C'; # GNU locale extension
 
-    chdir 't/CORE';
     unshift @INC, './lib';
     require './test.pl';
 }

@@ -1,7 +1,6 @@
 #!./perl
 
 INIT {
-    chdir 't/CORE';
 }
 print "1..13\n";
 

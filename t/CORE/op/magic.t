@@ -2,7 +2,6 @@
 
 BEGIN {
     $| = 1;
-    chdir 't/CORE' if -d 't';
     unshift @INC, './lib';
     $ENV{PATH} = '/bin' if ${^TAINT};
     $SIG{__WARN__} = sub { die "Dying on warning: ", @_ };
