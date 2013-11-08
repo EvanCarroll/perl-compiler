@@ -802,7 +802,7 @@ sub runperl_binary {
     my $foo = $opts->{'stdin'} || '';
     print STDERR "# running: ./$bin $foo\n";
     return `echo "$foo" | ./$bin` if $foo;
-    return `./$bin`;
+    return `./$bin 2>&1`;
 }
 
 #
