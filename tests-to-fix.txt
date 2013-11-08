@@ -63,11 +63,11 @@ t/CORE/op/universal.t
 t/CORE/op/utf8magic.t
 t/CORE/op/utfhash.t
 t/CORE/op/utftaint.t
-t/CORE/op/write.t
-t/CORE/op/yadayada.t
-t/CORE/op/tie_fetch_count.t
-t/CORE/op/sub.t
-t/CORE/op/filetest.t
+dan - t/CORE/op/write.t
+dan - t/CORE/op/yadayada.t
+dan - t/CORE/op/tie_fetch_count.t
+dan - t/CORE/op/sub.t
+dan - t/CORE/op/filetest.t
 
 # known problems 
 t/CORE/op/lc.t - utf8 perlcc issue #162
