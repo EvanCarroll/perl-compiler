@@ -87,7 +87,7 @@ keys array_sub();       pass('Void: keys array_sub();');
 keys $obj->array;       pass('Void: keys $obj->array;');
 
 # Keys -- scalar
-
+# perlcc issue 178 - https://code.google.com/p/perl-compiler/issues/detail?id=178
 is(keys $hash           ,3, 'Scalar: keys $hash');
 is(keys $data->{hash}   ,3, 'Scalar: keys $data->{hash}');
 is(keys CONST_HASH      ,3, 'Scalar: keys CONST_HASH');
