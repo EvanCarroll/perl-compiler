@@ -3,6 +3,8 @@
 BEGIN {
     unshift @INC, './lib';
     require './test.pl';
+    # help B
+    use Tie::Hash::NamedCapture;
 }
 
 plan tests => 26;
