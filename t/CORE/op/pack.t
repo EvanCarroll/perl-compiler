@@ -165,8 +165,10 @@ sub list_eq ($$) {
     is(scalar(@y), 2);
     is($y[1], 130);
     $x = pack('w*', 5000000000); $y = '';
+    # Math::BigInt::Calc skipped  - perlcc issue 176
+    # https://code.google.com/p/perl-compiler/issues/detail?id=176
+    eval q/use Math::BigInt/;
     eval {
-    use Math::BigInt;
     $y = pack('w*', Math::BigInt::->new(5000000000));
     };
     is($x, $y, "5000000000 x: $x ; y: $y");
