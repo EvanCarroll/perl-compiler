@@ -13,6 +13,7 @@ plan tests => 17;
 
 watchdog(15);
 
+# perlcc issue 168 - https://code.google.com/p/perl-compiler/issues/detail?id=168
 $SIG{ALRM} = sub {
     die "Alarm!\n";
 };
@@ -102,6 +103,7 @@ SKIP: {
     # make sure the signal handler's called in an eval block *before*
     # the eval is popped
 
+    # perlcc issue 168 - https://code.google.com/p/perl-compiler/issues/detail?id=168
     $SIG{'ALRM'} = sub { die "HANDLER CALLED\n" };
 
     eval {
