@@ -20,7 +20,8 @@ plan tests => 7 * @syntax_cases + 7 * (grep { $_ !~ /^#/ } @version_cases)
             + 2 * 3;
 
 use warnings qw/syntax/;
-use version;
+# perlcc issue 177 - https://code.google.com/p/perl-compiler/issues/detail?id=177
+eval q/use version/;
 
 for my $string ( @syntax_cases ) {
     eval "$string";
