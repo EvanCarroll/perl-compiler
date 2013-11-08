@@ -245,7 +245,7 @@ TESTS=$(TESTS_OK) $(FAILURES)
 REGULAR_TESTS=$(TESTS) $(TESTS:.bin=.subtest.bin)
 ALL_TESTS=$(TAINT_TESTS) $(REGULAR_TESTS)
 
-all: $(TESTS_OK) $(TAINT_OK)
+all: $(ALL_TESTS)
 
 taint: $(TAINT_TESTS)
 
@@ -261,7 +261,7 @@ $(REGULAR_TESTS):
 	$(PERL) ../../script/cc_harness -q  $(@:.bin=.c) -o $@
 	/bin/rm $(@:.bin=.c)
 
-test:
+test: $(TESTS_OK) $(TAINT_OK)
 	$(PROVE) -j 6 `find * -name \*.bin|grep -v .subtest.bin | sort`
 
 bc:
