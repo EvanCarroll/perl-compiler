@@ -2,10 +2,9 @@ io/dup.t
 io/layers.t
 io/perlio.t
 io/perlio_fail.t
-cleland - io/print.t
-cleland - io/pvbm.t
-cleland - io/tell.t
-cleland - io/through.t
+cleland - io/pvbm.t (ok)
+cleland - io/tell.t (ok)
+cleland - io/through.t (ok)
 nico - op/assignwarn.t
 justin - op/caller.t
 justin - op/chdir.t
@@ -44,7 +43,7 @@ op/stash.t
 op/stat.t
 op/sub.t
 op/svleak.t
-op/switch.t
+cleland - op/switch.t
 op/symbolcache.t
 op/tie_fetch_count.t
 op/threads-dirh.t
@@ -82,6 +81,7 @@ op/hash.t - this is not a specific B::C issue but a more global problem:
 colliding into the same bucket keys are triggering rehash
 io/say.t - issue 150
 io/pipe.t - issue 150
+io/print.t - issue 150
 op/attrs.t - issue 170
 op/bless.t - issue 172
 op/blocks.t - issue 173
