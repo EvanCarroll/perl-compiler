@@ -230,19 +230,19 @@ is($r, 1);
 	local *foo;
 	tie %foo, 'Blah';
     }
-    ok(!tied %foo);
+    ok(!tied %foom, 'foom not tied');
 
     {
 	local *bar;
 	tie @bar, 'Blah';
     }
-    ok(!tied @bar);
+    ok(!tied @bar, 'bar not tied');
 
     {
 	local *BAZ;
 	tie *BAZ, 'Blah';
     }
-    ok(!tied *BAZ);
+    ok(!tied *BAZ, 'BAZ not tied');
 
     package Blah;
 
@@ -251,7 +251,7 @@ is($r, 1);
     sub TIEARRAY  {bless {}}
 }
 
-{
+eval q{
     # warnings should pass to the PRINT method of tied STDERR
     my @received;
 
@@ -261,14 +261,12 @@ is($r, 1);
 
     $r = warn("some", "text", "\n");
     @expect = (PRINT => $ob,"sometext\n");
-
     compare(PRINT => @received);
-
     use warnings;
     print undef;
 
-    like($received[1], qr/Use of uninitialized value/);
-}
+    like($received[1], qr/Use of uninitialized value/, 'recevied uninitialized value');
+};
 
 {
     # [ID 20020713.001] chomp($data=<tied_fh>)
