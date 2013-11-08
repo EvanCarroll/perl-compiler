@@ -14,7 +14,8 @@ my $no_signedness = $] > 5.009 ? '' :
 plan tests => 14700;
 
 use strict;
-use warnings qw(FATAL all);
+# perlcc issue - https://code.google.com/p/perl-compiler/issues/detail?id=175
+eval q/use warnings qw(FATAL all)/;
 use Config;
 
 my $Is_EBCDIC = (defined $Config{ebcdic} && $Config{ebcdic} eq 'define');
@@ -168,11 +169,11 @@ sub list_eq ($$) {
     use Math::BigInt;
     $y = pack('w*', Math::BigInt::->new(5000000000));
     };
-    is($x, $y);
+    is($x, $y, "5000000000 x: $x ; y: $y");
 
     $x = pack 'w', ~0;
     $y = pack 'w', (~0).'';
-    is($x, $y);
+    is($x, $y, '~0 int scalar');
     is(unpack ('w',$x), ~0);
     is(unpack ('w',$y), ~0);
 
@@ -368,7 +369,7 @@ SKIP: {
 # temps
 sub foo { my $a = "a"; return $a . $a++ . $a++ }
 {
-  use warnings qw(NONFATAL all);;
+  eval q/use warnings qw(NONFATAL all);/;
   my $warning;
   local $SIG{__WARN__} = sub {
       $warning = $_[0];
@@ -711,7 +712,7 @@ sub byteorder
         if is_valid_error($@);
 
       {
-        use warnings qw(NONFATAL utf8);
+        eval q/use warnings qw(NONFATAL utf8)/;
         print "# [$value][$nat][$be][$le][$@]\n";
       }
 
@@ -943,7 +944,7 @@ SKIP: {
 
     # does unpack U0U on byte data warn?
     {
-	use warnings qw(NONFATAL all);;
+	eval q/use warnings qw(NONFATAL all);/;
 
         my $bad = pack("U0C", 255);
         local $SIG{__WARN__} = sub { $@ = "@_" };
@@ -1231,7 +1232,7 @@ SKIP: {
 }
 
 { # syntax checks (W.Laun)
-  use warnings qw(NONFATAL all);;
+  eval q/use warnings qw(NONFATAL all);/;
   my @warning;
   local $SIG{__WARN__} = sub {
       push( @warning, $_[0] );
@@ -1403,7 +1404,7 @@ is(scalar unpack('A /A /A Z20', '3004bcde'), 'bcde');
   $b =~ s/(?:17000+|16999+)\d+(e-45) /17$1 /gi; # stringification is gamble
   is($b, "@a @a");
 
-  use warnings qw(NONFATAL all);;
+  eval q/use warnings qw(NONFATAL all);/;
   my $warning;
   local $SIG{__WARN__} = sub {
       $warning = $_[0];
@@ -1495,7 +1496,7 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
 }
 
 {
-    use warnings qw(NONFATAL all);;
+    eval q/use warnings qw(NONFATAL all);/;
     my $warning;
     local $SIG{__WARN__} = sub {
         $warning = $_[0];
