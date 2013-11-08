@@ -11,6 +11,8 @@ no warnings 'uninitialized';
 use Tie::Array;
 use Tie::Hash;
 
+# perlcc issue 179 - https://code.google.com/p/perl-compiler/issues/detail?id=179
+
 # Predeclare vars used in the tests:
 my @empty;
 my %empty;
