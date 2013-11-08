@@ -29,81 +29,63 @@ sub no_warnings_ok {
     @warnings = ();
 }
 
-BEGIN {
-    $SIG{'__WARN__'} = sub { push @warnings, @_ };
-    $| = 1;
-}
+$SIG{'__WARN__'} = sub { push @warnings, @_ };
+$| = 1;
 
-BEGIN { @warnings = () }
+@warnings = ();
 
-$sub = sub (x) { };
+eval q/$sub = sub (x) { }/;
+one_warning_ok();
 
-BEGIN {
-    one_warning_ok;
-}
 
-{
+eval q{
     no warnings 'syntax';
     $sub = sub (x) { };
-}
+};
 
-BEGIN {
-    no_warnings_ok;
-}
+no_warnings_ok;
 
-{
+
+eval q{
     no warnings 'illegalproto';
     $sub = sub (x) { };
-}
+};
 
-BEGIN {
-    no_warnings_ok;
-}
+no_warnings_ok;
 
-{
+eval q{
     no warnings 'syntax';
     use warnings 'illegalproto';
     $sub = sub (x) { };
-}
+};
 
-BEGIN {
-    one_warning_ok;
-}
+one_warning_ok;
 
-BEGIN {
-    $warn = q{Prototype after '@' for};
-}
+$warn = q{Prototype after '@' for};
+eval q/$sub = sub (@$) { }/;
 
-$sub = sub (@$) { };
+one_warning_ok;
 
-BEGIN {
-    one_warning_ok;
-}
-
-{
+eval q{
     no warnings 'syntax';
     $sub = sub (@$) { };
-}
+};
 
-BEGIN {
-    no_warnings_ok;
-}
+no_warnings_ok;
 
-{
+
+eval q{
     no warnings 'illegalproto';
     $sub = sub (@$) { };
-}
+};
 
-BEGIN {
-    no_warnings_ok;
-}
+no_warnings_ok;
 
-{
+eval q{
     no warnings 'syntax';
     use warnings 'illegalproto';
     $sub = sub (@$) { };
-}
+};
 
-BEGIN {
-    one_warning_ok;
-}
+one_warning_ok;
+
