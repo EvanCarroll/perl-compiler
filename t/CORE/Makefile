@@ -272,7 +272,7 @@ clean: clean-cruft
 	/bin/rm -f $(ALL_TESTS) $(ALL_TESTS:.bin=.c)
 
 clean-cruft:
-	/bin/rm -f Io_argv*.tmp* tmp*
+	/bin/rm -f Io_argv*.tmp* tmp* utf*.pl
 
 depend:
 	find * -name \*.t| sort| perl -ne 'chomp; s/\.t$$//; print "$$_.bin: $$_.t test.pl\n"' > depend.inc
