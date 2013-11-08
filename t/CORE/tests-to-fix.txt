@@ -5,7 +5,6 @@ io/perlio_fail.t
 nico - op/assignwarn.t
 justin - op/caller.t
 justin - op/chdir.t
-toddr - op/die_keeperr.t
 op/each.t
 op/each_array.t
 justin - op/exec.t
@@ -41,8 +40,8 @@ op/utftaint.t
 op/write.t
 op/yadayada.t
 op/tie_fetch_count.t
-op/sub.t
-op/filetest.t
+toddr - op/sub.t
+toddr - op/filetest.t
 
 # known problems 
 op/lc.t - utf8 perlcc issue #162
@@ -78,3 +77,4 @@ op/packagev.t - issue 177
 op/smartkve.t - issue 178
 op/smartmatch.t - issue 179
 op/switch.t - issue 180
+op/die_keeperr.t - issue 181
