@@ -2,9 +2,6 @@ io/dup.t
 io/layers.t
 io/perlio.t
 io/perlio_fail.t
-cleland - io/pvbm.t (ok)
-cleland - io/tell.t (ok)
-cleland - io/through.t (ok)
 nico - op/assignwarn.t
 justin - op/caller.t
 justin - op/chdir.t
@@ -22,6 +19,7 @@ op/magic-27839.t
 op/magic.t
 op/mkdir.t
 nico - op/override.t
+<<<<<<< HEAD
 nico - op/sort.t
 nico - op/split.t
 nico - op/split_unicode.t
@@ -32,6 +30,28 @@ nico - op/stat.t
 nico - op/sub.t
 nico - op/svleak.t
 cleland - op/switch.t
+=======
+nico - op/pack.t
+nico - op/packagev.t
+nico - op/pos.t
+nico - op/protowarn.t
+nico - op/readdir.t
+nico - op/read.t
+nico - op/readline.t
+nico - op/ref.t
+nico - op/sigdispatch.t
+nico - op/smartkve.t
+nico - op/smartmatch.t
+op/sort.t
+op/split.t
+op/split_unicode.t
+op/sprintf2.t
+op/sselect.t
+op/stash.t
+op/stat.t
+op/sub.t
+op/svleak.t
+>>>>>>> Modified tests-to-fix for op/switch.t bug
 op/symbolcache.t
 op/tie_fetch_count.t
 op/threads-dirh.t
@@ -75,9 +95,13 @@ op/bless.t - issue 172
 op/blocks.t - issue 173
 op/bop.t - issues 172 + 174
 op/attrhand.t - issue 169
+<<<<<<< HEAD
 op/sigdispatch.t - issue 168
 op/ref.t - expected error
 op/pack.t - issue 176
 op/packagev.t - issue 177
 op/smartkve.t - issue 178
 op/smartmatch.t - issue 179
+=======
+op/switch.t - issue 180
+>>>>>>> Modified tests-to-fix for op/switch.t bug
