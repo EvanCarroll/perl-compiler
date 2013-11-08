@@ -8,7 +8,6 @@ cleland - io/through.t (ok)
 nico - op/assignwarn.t
 justin - op/caller.t
 justin - op/chdir.t
-toddr - op/crypt.t
 toddr - op/die_keeperr.t
 op/each.t
 op/each_array.t
