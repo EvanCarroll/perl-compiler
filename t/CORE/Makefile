@@ -263,12 +263,15 @@ $(REGULAR_TESTS):
 
 test: $(TESTS_OK) $(TAINT_OK)
 	$(PROVE) -j 6 `find * -name \*.bin|grep -v .subtest.bin | sort`
+	${MAKE} clean-cruft
 
 bc:
 	(cd ../.. && perl Makefile.PL installdirs=vendor && make install)
 
-clean:
+clean: clean-cruft
 	/bin/rm -f $(ALL_TESTS) $(ALL_TESTS:.bin=.c)
+
+clean-cruft:
 	/bin/rm -f Io_argv*.tmp* tmp*
 
 depend:
