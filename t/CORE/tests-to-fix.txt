@@ -2,7 +2,6 @@ toddr - io/dup.t
 toddr - io/layers.t
 toddr - io/perlio.t
 toddr - io/perlio_fail.t
-toddr - io/pipe.t
 justin - op/caller.t
 justin - op/chdir.t
 cleland - op/each.t
@@ -27,6 +26,7 @@ dan - op/tie_fetch_count.t
 
 # known problems 
 op/chop.t - perlcc issue 142 ( TP task 16825 )
+io/pipe.t - issue 150
 op/taint.t - issue 151
 io/utf8.t - issue 155
 op/64bitint.t - issue 156 and 157
