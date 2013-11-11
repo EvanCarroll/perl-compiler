@@ -2,8 +2,9 @@
 
 BEGIN {
     require './test.pl';
-    plan(tests => 150);
 }
+
+plan(tests => 150);
 
 {
     # check the special casing of split /\s/ and unicode
