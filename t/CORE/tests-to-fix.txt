@@ -2,7 +2,6 @@ io/dup.t
 io/layers.t
 io/perlio.t
 io/perlio_fail.t
-nico - op/assignwarn.t
 justin - op/caller.t
 justin - op/chdir.t
 op/each.t
