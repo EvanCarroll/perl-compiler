@@ -4,12 +4,8 @@
 # various typeglob tests
 #
 
+
 BEGIN {
-    *main::ok = sub ($@) { die "undef" };
-    *main::is = sub ($$@) { die "undef" };
-    *main::like = sub ($$@) { die "undef" };
-}
-INIT {
     unshift @INC, './lib';
     require './test.pl';
 }
@@ -99,8 +95,8 @@ is(ref(\$baa), 'GLOB');
 #        (I hope.)
 
 { package Foo::Bar; no warnings 'once'; $test=1; }
-ok(exists $Foo::{'Bar::'});
-is($Foo::{'Bar::'}, '*Foo::Bar::');
+ok(exists $Foo::{'Bar::'}, '$Foo::{Bar::} exists');
+is($Foo::{'Bar::'}, '*Foo::Bar::', '$Foo::{Bar::}');
 
 
 # test undef operator clearing out entire glob
@@ -109,8 +105,8 @@ $foo = 'stuff';
 %foo = qw(even more random stuff);
 undef *foo;
 is ($foo, undef);
-is (scalar @foo, 0);
-is (scalar %foo, 0);
+is (scalar @foo, 0, 'scalar @foo');
+is (scalar %foo, 0, 'scalar %foo');
 
 {
     # test warnings from assignment of undef to glob
