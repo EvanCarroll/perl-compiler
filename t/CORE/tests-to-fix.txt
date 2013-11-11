@@ -74,5 +74,4 @@ op/packagev.t - issue 177
 op/smartmatch.t - issue 179
 op/switch.t - issue 180
 op/die_keeperr.t - issue 181
-op/hash.t - this is not a specific B::C issue but a more global problem: colliding into the same bucket keys are triggering rehash
 op/ref.t - expected error
