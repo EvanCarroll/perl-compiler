@@ -1,11 +1,11 @@
 #!./perl
 
-BEGIN {
+INIT {
     require './test.pl';
     unshift @INC, './lib';
 }
 
-plan (tests => 37);
+plan (37);
 
 print "not " unless length("")    == 0;
 print "ok 1\n";
