@@ -20,13 +20,19 @@ is(scalar(@test), 0, 'Didnt return anything');
 # return (so Foo->import() silently fails if import() doesn't exist),
 # But make sure it correctly pops the stack and mark stack before returning.
 
+# perlcc issue 183 - https://code.google.com/p/perl-compiler/issues/detail?id=183
 {
+    my @import;
+    eval q/@import = main->import(6,7)/;
+
     my @a;
-    push @a, 4, 5, main->import(6,7);
+    push @a, 4, 5, @import;
     ok(eq_array(\@a, [4,5]), "import with args");
 
     @a = ();
-    push @a, 14, 15, main->import;
+    @import = ();
+    eval q/@import = main->import/;
+    push @a, 14, 15, @import;
     ok(eq_array(\@a, [14,15]), "import without args");
 
     my $x = 1;

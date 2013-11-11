@@ -4,12 +4,8 @@
 # various typeglob tests
 #
 
+
 BEGIN {
-    *main::ok = sub ($@) { die "undef" };
-    *main::is = sub ($$@) { die "undef" };
-    *main::like = sub ($$@) { die "undef" };
-}
-INIT {
     unshift @INC, './lib';
     require './test.pl';
 }
@@ -98,9 +94,10 @@ is(ref(\$baa), 'GLOB');
 #        fact that %X::Y:: is stored in %X:: isn't documented.
 #        (I hope.)
 
+# perlcc issue 191 - https://code.google.com/p/perl-compiler/issues/detail?id=191
 { package Foo::Bar; no warnings 'once'; $test=1; }
-ok(exists $Foo::{'Bar::'});
-is($Foo::{'Bar::'}, '*Foo::Bar::');
+ok(exists $Foo::{'Bar::'}, '$Foo::{Bar::} exists');
+is($Foo::{'Bar::'}, '*Foo::Bar::', '$Foo::{Bar::}');
 
 
 # test undef operator clearing out entire glob
@@ -109,8 +106,8 @@ $foo = 'stuff';
 %foo = qw(even more random stuff);
 undef *foo;
 is ($foo, undef);
-is (scalar @foo, 0);
-is (scalar %foo, 0);
+is (scalar @foo, 0, 'scalar @foo');
+is (scalar %foo, 0, 'scalar %foo');
 
 {
     # test warnings from assignment of undef to glob
@@ -649,6 +646,7 @@ foreach my $type (qw(integer number string)) {
 ok(exists($RT72740a::{s1}), "RT72740a::s1 exists");
 ok(!exists($RT72740a::{s2}), "RT72740a::s2 does not exist");
 ok(exists($RT72740a::{s3}), "RT72740a::s3 exists");
+# perlcc issue 191 - https://code.google.com/p/perl-compiler/issues/detail?id=191
 ok(exists($RT72740a::{s4}), "RT72740a::s4 exists");
 is(RT72740a::s1(), "RT72740b::s2", "RT72740::s1 parsed correctly");
 is(RT72740a::s3(), "RT72740b::s4", "RT72740::s3 parsed correctly");
@@ -700,7 +698,8 @@ EOF
 
 # [perl #77362] various bugs related to globs as PVLVs
 {
- no warnings qw 'once void';
+ # perlcc issue 192 - https://code.google.com/p/perl-compiler/issues/detail?id=192
+ eval q/no warnings qw 'once void'/;
  my %h; # We pass a key of this hash to the subroutine to get a PVLV.
  sub { for(shift) {
   # Set up our glob-as-PVLV

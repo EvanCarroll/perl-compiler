@@ -10,15 +10,10 @@ BEGIN {
 use strict;
 use Config;
 
-BEGIN {
-    eval 'use threads; use threads::shared';
+INIT {
     plan tests => 3;
-    if ($@) {
-	fail("unable to load thread modules");
-    }
-    else {
-	pass("thread modules loaded");
-    }
+    eval 'use threads; use threads::shared';
+    skip_all("unable to load thread modules") if $@;
 }
 
 my ($pid, $ppid) = ($$, getppid());

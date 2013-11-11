@@ -8,15 +8,11 @@
 # the same. (and not ours)
 
 BEGIN {
-    unshift @INC, "./lib";
+    require './test.pl';    
 }
 
 use strict;
-
-BEGIN {
-    require './test.pl';
-    plan (8);
-}
+plan(8);
 
 sub fork_and_retrieve {
     my $which = shift;

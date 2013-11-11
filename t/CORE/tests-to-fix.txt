@@ -1,7 +1,8 @@
-io/dup.t
-io/layers.t
-io/perlio.t
-io/perlio_fail.t
+toddr - io/dup.t
+toddr - io/layers.t
+toddr - io/perlio.t
+toddr - io/perlio_fail.t
+toddr - io/pipe.t
 justin - op/caller.t
 justin - op/chdir.t
 cleland - op/each.t
@@ -9,19 +10,14 @@ op/each_array.t
 justin - op/exec.t
 justin - op/filetest.t
 op/flip.t
-op/getpid.t
-op/getppid.t
-nico - op/gv.t
 op/magic-27839.t
-op/magic.t
-op/mkdir.t
-op/ref.t
-nico - op/sub.t
-nico - op/svleak.t
-op/symbolcache.t
-op/tie_fetch_count.t
-op/threads-dirh.t
-op/threads.t
+nico - op/magic.t
+nico - op/mkdir.t
+nico - op/ref.t
+nico - op/symbolcache.t
+nico - op/tie_fetch_count.t
+nico - op/threads-dirh.t
+nico - op/threads.t
 dan - op/tr.t
 dan - op/turkish.t
 dan - op/universal.t
@@ -29,20 +25,14 @@ dan - op/utfhash.t
 dan - op/utftaint.t
 dan - op/write.t
 dan - op/tie_fetch_count.t
-toddr - op/filetest.t
 
 # known problems 
 op/chop.t - perlcc issue 142 ( TP task 16825 )
-io/read.t broken by perlcc issue 148 and 150
-io/say.t - issue 150
-io/pipe.t - issue 150
-io/print.t - issue 150
 op/taint.t - issue 151
 io/utf8.t - issue 155
 op/64bitint.t - issue 156 and 157
 op/length.t - issue 185
 op/method.t - issue #159
-op/reset.t - issue 160
 op/lc.t - utf8 perlcc issue #162
 op/index.t - utf8 perlcc issue #162
 op/ord.t - utf8 issue 162
@@ -51,7 +41,6 @@ op/goto.t - issue #165
 op/hashassign.t - issue 166
 op/alarm.t - issue 168
 op/sigdispatch.t - issue 168
-op/attrhand.t - issue 169
 op/attrhand.t - issue 169 - Attribute::Handlers are currently not supported
 op/attrs.t - issue 170
 op/bless.t - issue 172
@@ -64,5 +53,7 @@ op/switch.t - issue 180
 op/die_keeperr.t - issue 181
 op/sort.t - issue 182
 op/sub.t - issue 183
-op/stash.t - issue 186 + 187
-
+op/stash.t - issues 186 + 187
+op/reset.t - issue 188
+op/filetest.t - issue 189
+op/gv.t - issues 191 + 192
