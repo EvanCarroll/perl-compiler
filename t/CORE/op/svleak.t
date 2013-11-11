@@ -7,12 +7,11 @@
 BEGIN {
     unshift @INC, './lib';
     require './test.pl';
-
-    eval { require XS::APItest; XS::APItest->import('sv_count'); 1 }
-	or skip_all("XS::APItest not available");
 }
 
 plan tests => 19;
+eval { require XS::APItest; XS::APItest->import('sv_count'); 1 }
+    or skip_all("XS::APItest not available");
 
 # run some code N times. If the number of SVs at the end of loop N is
 # greater than (N-1)*delta at the end of loop 1, we've got a leak
