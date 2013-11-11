@@ -4,7 +4,7 @@ io/perlio.t
 io/perlio_fail.t
 justin - op/caller.t
 justin - op/chdir.t
-op/each.t
+cleland - op/each.t
 op/each_array.t
 justin - op/exec.t
 justin - op/filetest.t
@@ -12,7 +12,6 @@ op/flip.t
 op/getpid.t
 op/getppid.t
 nico - op/gv.t
-cleland - op/length.t
 op/magic-27839.t
 op/magic.t
 op/mkdir.t
@@ -45,6 +44,7 @@ io/print.t - issue 150
 op/taint.t - issue 151
 io/utf8.t - issue 155
 op/64bitint.t - issue 156 and 157
+op/length.t - issue 185
 op/method.t - issue #159
 op/reset.t - issue 160
 op/lc.t - utf8 perlcc issue #162
