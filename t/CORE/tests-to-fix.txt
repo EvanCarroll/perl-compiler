@@ -10,9 +10,6 @@ op/each_array.t
 justin - op/exec.t
 justin - op/filetest.t
 op/flip.t
-nico - op/getpid.t
-nico - op/getppid.t
-nico - op/gv.t
 op/magic-27839.t
 nico - op/magic.t
 nico - op/mkdir.t
@@ -56,6 +53,7 @@ op/switch.t - issue 180
 op/die_keeperr.t - issue 181
 op/sort.t - issue 182
 op/sub.t - issue 183
-op/stash.t - issue 186 + 187
+op/stash.t - issues 186 + 187
 op/reset.t - issue 188
 op/filetest.t - issue 189
+op/gv.t - issues 191 + 192
