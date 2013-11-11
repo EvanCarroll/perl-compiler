@@ -1,7 +1,7 @@
-io/dup.t
-io/layers.t
-io/perlio.t
-io/perlio_fail.t
+toddr - io/dup.t
+toddr - io/layers.t
+toddr - io/perlio.t
+toddr - io/perlio_fail.t
 justin - op/caller.t
 justin - op/chdir.t
 cleland - op/each.t
@@ -28,7 +28,6 @@ dan - op/utfhash.t
 dan - op/utftaint.t
 dan - op/write.t
 dan - op/tie_fetch_count.t
-toddr - op/filetest.t
 
 # known problems 
 op/chop.t - perlcc issue 142 ( TP task 16825 )
@@ -64,4 +63,4 @@ op/die_keeperr.t - issue 181
 op/sort.t - issue 182
 op/sub.t - issue 183
 op/stash.t - issue 186 + 187
-
+op/filetest.t - issue 189
