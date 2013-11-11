@@ -2,10 +2,8 @@
 
 # Tests for the source filters in coderef-in-@INC
 
-BEGIN {
-    unshift @INC, "./lib";
-    require 'test.pl';
-}
+BEGIN { require './test.pl' }
+
 use strict;
 use Config;
 use Filter::Util::Call;

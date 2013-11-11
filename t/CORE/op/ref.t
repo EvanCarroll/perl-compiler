@@ -1,9 +1,6 @@
 #!./perl
 
-BEGIN {
-    unshift @INC, "./lib";
-    require 'test.pl';
-}
+BEGIN { require './test.pl' }
 
 use strict qw(refs subs);
 

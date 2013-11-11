@@ -1,9 +1,6 @@
 #!./perl
 
-INIT {
-    unshift @INC, ('.', '../lib');
-    require 'test.pl';
-}
+BEGIN { require './test.pl' }
 
 plan (130);
 
