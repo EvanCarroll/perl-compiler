@@ -44,37 +44,35 @@ toddr - op/sub.t
 toddr - op/filetest.t
 
 # known problems 
-op/lc.t - utf8 perlcc issue #162
-op/index.t - utf8 perlcc issue #162
-io/read.t broken by perlcc issue 148 and 150
 op/chop.t - perlcc issue 142 ( TP task 16825 )
-op/method.t - issue #159
-op/goto.t - issue #165
-io/utf8.t - issue 155
-op/64bitint.t - issue 156 and 157
-op/closure.t - issue 163
-op/defins.t - issue 154
-op/hashassign.t - issue 166
-op/ord.t - utf8 issue 162
-op/reset.t - issue 160
-op/taint.t - issue 151
-op/alarm.t - issue 168
-op/attrhand.t - issue 169 - Attribute::Handlers are currently not supported
-op/hash.t - this is not a specific B::C issue but a more global problem:
-colliding into the same bucket keys are triggering rehash
+io/read.t broken by perlcc issue 148 and 150
 io/say.t - issue 150
 io/pipe.t - issue 150
 io/print.t - issue 150
+op/taint.t - issue 151
+op/defins.t - issue 154
+io/utf8.t - issue 155
+op/64bitint.t - issue 156 and 157
+op/method.t - issue #159
+op/reset.t - issue 160
+op/lc.t - utf8 perlcc issue #162
+op/index.t - utf8 perlcc issue #162
+op/ord.t - utf8 issue 162
+op/closure.t - issue 163
+op/goto.t - issue #165
+op/hashassign.t - issue 166
+op/alarm.t - issue 168
+op/sigdispatch.t - issue 168
+op/attrhand.t - issue 169
+op/attrhand.t - issue 169 - Attribute::Handlers are currently not supported
 op/attrs.t - issue 170
 op/bless.t - issue 172
 op/blocks.t - issue 173
 op/bop.t - issues 172 + 174
-op/attrhand.t - issue 169
-op/sigdispatch.t - issue 168
-op/ref.t - expected error
 op/pack.t - issue 176
 op/packagev.t - issue 177
-op/smartkve.t - issue 178
 op/smartmatch.t - issue 179
 op/switch.t - issue 180
 op/die_keeperr.t - issue 181
+op/hash.t - this is not a specific B::C issue but a more global problem: colliding into the same bucket keys are triggering rehash
+op/ref.t - expected error
