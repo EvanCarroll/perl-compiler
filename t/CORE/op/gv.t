@@ -698,7 +698,8 @@ EOF
 
 # [perl #77362] various bugs related to globs as PVLVs
 {
- no warnings qw 'once void';
+ # perlcc issue 192 - https://code.google.com/p/perl-compiler/issues/detail?id=192
+ eval q/no warnings qw 'once void'/;
  my %h; # We pass a key of this hash to the subroutine to get a PVLV.
  sub { for(shift) {
   # Set up our glob-as-PVLV
