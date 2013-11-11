@@ -17,6 +17,7 @@ cleland - op/length.t
 op/magic-27839.t
 op/magic.t
 op/mkdir.t
+op/ref.t
 nico - op/override.t
 nico - op/sort.t
 nico - op/split.t
@@ -74,4 +75,3 @@ op/packagev.t - issue 177
 op/smartmatch.t - issue 179
 op/switch.t - issue 180
 op/die_keeperr.t - issue 181
-op/ref.t - expected error
