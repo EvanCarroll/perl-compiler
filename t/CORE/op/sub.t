@@ -20,6 +20,7 @@ is(scalar(@test), 0, 'Didnt return anything');
 # return (so Foo->import() silently fails if import() doesn't exist),
 # But make sure it correctly pops the stack and mark stack before returning.
 
+# perlcc issue 183 - https://code.google.com/p/perl-compiler/issues/detail?id=183
 {
     my @a;
     push @a, 4, 5, main->import(6,7);
