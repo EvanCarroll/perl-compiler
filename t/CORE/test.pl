@@ -106,11 +106,14 @@ sub _comment {
 }
 
 sub skip_all {
-    if (@_) {
-        _print "1..0 # Skip @_\n";
-    } else {
-	_print "1..0\n";
+    my $total = $planned || 0;
+    my $reason = join ' ', @_;
+	
+    _print "1..$total # Skip $reason\n";
+    for ( 1..$total ) {
+        _print "ok $_ # skip $reason\n";
     }
+
     exit(0);
 }
 
