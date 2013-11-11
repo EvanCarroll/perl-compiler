@@ -17,8 +17,6 @@ op/magic-27839.t
 op/magic.t
 op/mkdir.t
 op/ref.t
-nico - op/split.t
-nico - op/split_unicode.t
 nico - op/sprintf2.t
 nico - op/sselect.t
 nico - op/stash.t
