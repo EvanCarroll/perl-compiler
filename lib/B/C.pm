@@ -12,7 +12,7 @@
 package B::C;
 use strict;
 
-our $VERSION = '1.42_52';
+our $VERSION = '1.42_53';
 my %debug;
 our $check;
 my $eval_pvs = '';
@@ -1533,10 +1533,11 @@ sub B::PMOP::save {
         "%s, s\\_%x, s\\_%x, %u, 0x%x, {%s}, {%s}",
         $op->_save_common, ${ $op->first },
         ${ $op->last }, ( $ITHREADS ? $op->pmoffset : 0 ),
-        $op->pmflags, $replrootfield,
-        $replstartfield
+        $op->pmflags, $replrootfield, 'NULL'
       )
     );
+    $init->add(sprintf("pmop_list[%d].op_pmstashstartu.op_pmreplstart = (OP*)$replstartfield;",
+                       $pmopsect->index));
   }
   elsif ($PERL56) {
     # pmdynflags does not exist as B method. It is only used for PMdf_UTF8 dynamically,
@@ -1854,7 +1855,7 @@ sub B::PVLV::save {
       push @static_free, $s if $len and !$in_endav;
     }
   }
-  $sv->save_magic;
+  $sv->save_magic($fullname);
   savesym( $sv, "&".$s );
 }
 
@@ -2037,7 +2038,7 @@ sub B::BM::save {
     }
   }
   # Restore possible additional magic. fbm_compile adds just 'B'.
-  $sv->save_magic;
+  $sv->save_magic($fullname);
 
   if ($PERL510) {
     return $sym;
@@ -2168,7 +2169,7 @@ sub B::REGEXP::save {
   }
   $svsect->debug( $fullname, $sv->flagspv ) if $debug{flags};
   $sym = savesym( $sv, sprintf( "&sv_list[%d]", $ix ) );
-  $sv->save_magic;
+  $sv->save_magic($fullname);
   return $sym;
 }
 
@@ -3194,7 +3195,7 @@ sub B::CV::save {
   }
   my $magic = $cv->MAGIC;
   if ($magic and $$magic) {
-    $cv->save_magic; # XXX will this work?
+    $cv->save_magic($fullname); # XXX will this work?
   }
   if (!$new_cv_fw) {
     $symsect->add(sprintf(
@@ -3369,8 +3370,6 @@ if (0) {
     $init->add("if (SvPOK($sym) && !SvPVX($sym)) SvPVX($sym) = (char*)emptystring;");
   }
 
-  # Shouldn't need to do save_magic since gv_fetchpv handles that
-  #$gv->save_magic if $PERL510;
   # Will always be > 1
   my $refcnt = $gv->REFCNT;
   $init->add( sprintf( "SvREFCNT($sym) += %u;", $refcnt ) ) if $refcnt > 0;
@@ -3605,6 +3604,8 @@ if (0) {
       $init->add("");
     }
   }
+  # Shouldn't need to do save_magic since gv_fetchpv handles that. Esp. < not
+  # $gv->save_magic($fullname) if $PERL510;
   warn "GV::save *$fullname done\n" if $debug{gv};
   return $sym;
 }
@@ -3679,7 +3680,7 @@ sub B::AV::save {
     $av_index = $xpvavsect->index;
     # protect against recursive self-references (Getopt::Long)
     $sym = savesym( $av, "(AV*)&sv_list[$sv_ix]" );
-    $magic = $av->save_magic;
+    $magic = $av->save_magic($fullname);
   }
 
   if ( $debug{av} ) {
