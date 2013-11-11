@@ -1,9 +1,8 @@
 #!perl -w
 
-BEGIN {
-    require 'test.pl';
-    plan(20);
-}
+BEGIN { require './test.pl' }
+
+plan(20);
 
 sub End::DESTROY { $_[0]->() }
 
