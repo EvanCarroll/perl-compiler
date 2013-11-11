@@ -7,16 +7,21 @@ use Running::Commentary;
 run_with -critical;
 
 my $t = shift @ARGV;
-die "Please give me the .t file you'd pass to t/testcore-c.t\n" if !defined $t || !-f $t;
+die "Please give me the .t file you'd pass to t/testcore-c.t\n" if !defined $t || !-f $t || $t !~ m/\.t$/;
 my $fyi = 0;
 $SIG{__DIE__} = sub { _fyi(); };
 
-unlink 'a.c', 'a';
-warn "a.c still exists!\n" if -e "a.c";
-warn "a still exists!\n" if -e "a";
+my $c = $t;
+my $n = $t;
+$c =~ s/\.t$/.c/;
+$n =~ s/\.t/.bin/;
+
+unlink $c, $n;
+warn "$c still exists!\n" if -e $c;
+warn "$n still exists!\n" if -e $n;
 
 run 'Building .c' => sub {
-    run 'building' => "/usr/local/cpanel/3rdparty/perl/514/bin/perl -Iblib/arch -Iblib/lib -MO=-qq,C,-O2,-fno-warnings,-fno-fold,-oa.c $t";
+    run 'building' => "/usr/local/cpanel/3rdparty/perl/514/bin/perl -Iblib/arch -Iblib/lib -MO=-qq,C,-O2,-fno-warnings,-fno-fold,-o$c $t";
     run 'checking' => sub {
         die ".c does not exist\n" if !-f "a.c";
         die ".c is empty\n" if -z _;
@@ -24,15 +29,15 @@ run 'Building .c' => sub {
 };
 
 run 'Compiling .c' => sub {
-    run 'compiling' => '/usr/local/cpanel/3rdparty/perl/514/bin/perl -Iblib/arch -Iblib/lib script/cc_harness a.c -o a';
+    run 'compiling' => "/usr/local/cpanel/3rdparty/perl/514/bin/perl -Iblib/arch -Iblib/lib /usr/local/cpanel/src/B-C/script/cc_harness $c -o $n";
     run 'checking'  => sub {
-        die "binary does not exist\n"    if !-f "a";
+        die "binary does not exist\n"    if !-f $n;
         die "binary is empty\n"          if -z _;
         die "binary is not executable\n" if !-x _;
     };
 };
 
-run 'Running binary' => './a';
+run 'Running binary' => "./$n";
 
 _fyi();    # We call it here since nothing died and we want the info in case of test failure (which does not result in the binary exiuting uncleanly).
 
