@@ -11,7 +11,6 @@ justin - op/exec.t
 justin - op/filetest.t
 op/flip.t
 op/magic-27839.t
-nico - op/magic.t
 nico - op/mkdir.t
 nico - op/ref.t
 nico - op/symbolcache.t
@@ -57,3 +56,4 @@ op/stash.t - issues 186 + 187
 op/reset.t - issue 188
 op/filetest.t - issue 189
 op/gv.t - issues 191 + 192
+op/magic.t - issues 192 + 193 + 194

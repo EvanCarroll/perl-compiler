@@ -36,10 +36,11 @@ if ($Is_MSWin32)  { like `set FOO`, qr/^(?:FOO=)?hi there$/; }
 elsif ($Is_VMS)   { is `write sys\$output f\$trnlnm("FOO")`, "hi there\n"; }
 else              { is `echo \$FOO`, "hi there\n"; }
 
+# perlcc issue 193 - https://code.google.com/p/perl-compiler/issues/detail?id=193
 unlink_all 'ajslkdfpqjsjfk';
 $! = 0;
 open(FOO,'ajslkdfpqjsjfk');
-isnt($!, 0);
+isnt($!, 0, '$! should not be 0');
 close FOO; # just mention it, squelch used-only-once
 
 SKIP: {
@@ -314,6 +315,7 @@ EOP
     chomp(my $argv0 = $maybe_ps->("ps h $$"));
     chomp(my $prctl = $maybe_ps->("ps hc $$"));
 
+    # perlcc issue 194 - https://code.google.com/p/perl-compiler/issues/detail?id=194
     like($argv0, $name, "Set process name through argv[0] ($argv0)");
     like($prctl, substr($name, 0, 15), "Set process name through prctl() ($prctl)");
   }
@@ -332,8 +334,8 @@ EOP
    no warnings 'void';
 
 # Make sure Errno hasn't been prematurely autoloaded
-
-   ok !keys %Errno::;
+   # perlcc issue 192 - https://code.google.com/p/perl-compiler/issues/detail?id=192
+   ok !keys %Errno::, '!keys %Errno::';
 
 # Test auto-loading of Errno when %! is used
 
@@ -345,13 +347,13 @@ EOP
 
 {
     # Make sure that Errno loading doesn't clobber $!
-
+    # similar to perlcc issue 193 - https://code.google.com/p/perl-compiler/issues/detail?id=193
     undef %Errno::;
     delete $INC{"Errno.pm"};
 
     open(FOO, "nonesuch"); # Generate ENOENT
     my %errs = %{"!"}; # Cause Errno.pm to be loaded at run-time
-    ok ${"!"}{ENOENT};
+    ok ${"!"}{ENOENT}, '${"!"}{ENOENT}';
 }
 
 # Check that we don't auto-load packages
