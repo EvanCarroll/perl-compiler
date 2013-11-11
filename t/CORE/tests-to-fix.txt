@@ -31,16 +31,12 @@ dan - op/tie_fetch_count.t
 
 # known problems 
 op/chop.t - perlcc issue 142 ( TP task 16825 )
-io/read.t broken by perlcc issue 148 and 150
-io/say.t - issue 150
 io/pipe.t - issue 150
-io/print.t - issue 150
 op/taint.t - issue 151
 io/utf8.t - issue 155
 op/64bitint.t - issue 156 and 157
 op/length.t - issue 185
 op/method.t - issue #159
-op/reset.t - issue 160
 op/lc.t - utf8 perlcc issue #162
 op/index.t - utf8 perlcc issue #162
 op/ord.t - utf8 issue 162
@@ -49,7 +45,6 @@ op/goto.t - issue #165
 op/hashassign.t - issue 166
 op/alarm.t - issue 168
 op/sigdispatch.t - issue 168
-op/attrhand.t - issue 169
 op/attrhand.t - issue 169 - Attribute::Handlers are currently not supported
 op/attrs.t - issue 170
 op/bless.t - issue 172
@@ -63,4 +58,5 @@ op/die_keeperr.t - issue 181
 op/sort.t - issue 182
 op/sub.t - issue 183
 op/stash.t - issue 186 + 187
+op/reset.t - issue 188
 op/filetest.t - issue 189
