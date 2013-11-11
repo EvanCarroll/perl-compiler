@@ -35,11 +35,9 @@ op/threads.t
 dan - op/tr.t
 dan - op/turkish.t
 dan - op/universal.t
-dan - op/utf8magic.t
 dan - op/utfhash.t
 dan - op/utftaint.t
 dan - op/write.t
-dan - op/yadayada.t
 dan - op/tie_fetch_count.t
 toddr - op/filetest.t
 
