@@ -6,8 +6,9 @@
 BEGIN {
     unshift @INC, './lib';
     require './test.pl';
-    plan (tests => 210);
 }
+
+plan tests => 210;
 
 use strict;
 use warnings;
