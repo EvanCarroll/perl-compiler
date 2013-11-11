@@ -10,18 +10,17 @@ op/each_array.t
 justin - op/exec.t
 justin - op/filetest.t
 op/flip.t
-op/getpid.t
-op/getppid.t
+nico - op/getpid.t
+nico - op/getppid.t
 nico - op/gv.t
 op/magic-27839.t
-op/magic.t
-op/mkdir.t
-op/ref.t
-nico - op/svleak.t
-op/symbolcache.t
-op/tie_fetch_count.t
-op/threads-dirh.t
-op/threads.t
+nico - op/magic.t
+nico - op/mkdir.t
+nico - op/ref.t
+nico - op/symbolcache.t
+nico - op/tie_fetch_count.t
+nico - op/threads-dirh.t
+nico - op/threads.t
 dan - op/tr.t
 dan - op/turkish.t
 dan - op/universal.t
