@@ -10,8 +10,8 @@ plan( tests => 54 );
 
 # Used to segfault (bug #15479)
 fresh_perl_like(
-    '%:: = ""',
-    qr/Odd number of elements in hash assignment at - line 1\./,
+    'use warnings; %:: = ""',
+    qr/Odd number of elements in hash assignment at/,
     { switches => [ '-w' ] },
     'delete $::{STDERR} and print a warning',
 );
@@ -73,11 +73,15 @@ SKIP: {
     *b = \&B::svref_2object;
     my $CVf_ANON = B::CVf_ANON();
 
-    my $sub = do {
+    # perlcc issue - https://code.google.com/p/perl-compiler/issues/detail?id=186
+    my $sub;
+    eval q/$sub = do {
         package one;
         \&{"one"};
     };
+    /;
     delete $one::{one};
+
     my $gv = b($sub)->GV;
 
     isa_ok( $gv, "B::GV", "deleted stash entry leaves CV with valid GV");
@@ -85,10 +89,10 @@ SKIP: {
     is( eval { $gv->NAME }, "__ANON__", "...and an __ANON__ name");
     is( eval { $gv->STASH->NAME }, "one", "...but leaves stash intact");
 
-    $sub = do {
+    eval q/$sub = do {
         package two;
         \&{"two"};
-    };
+    }/;
     %two:: = ();
     $gv = b($sub)->GV;
 
@@ -97,10 +101,10 @@ SKIP: {
     is( eval { $gv->NAME }, "__ANON__", "...and an __ANON__ name");
     is( eval { $gv->STASH->NAME }, "two", "...but leaves stash intact");
 
-    $sub = do {
+    eval q/$sub = do {
         package three;
         \&{"three"};
-    };
+    }/;
     undef %three::;
     $gv = b($sub)->GV;
 
@@ -109,10 +113,10 @@ SKIP: {
     is( eval { $gv->NAME }, "__ANON__", "...and an __ANON__ name");
     is( eval { $gv->STASH->NAME }, "__ANON__", "...and an __ANON__ stash");
 
-    my $sub = do {
+    eval q/$sub = do {
 	package four;
 	sub { 1 };
-    };
+    }/;
     %four:: = ();
 
     my $gv = B::svref_2object($sub)->GV;
@@ -121,10 +125,10 @@ SKIP: {
     my $st = eval { $gv->STASH->NAME };
     is($st, q/four/, "...but leaves the stash intact");
 
-    my $sub = do {
+    eval q/$sub = do {
 	package five;
 	sub { 1 };
-    };
+    }/;
     undef %five::;
 
     $gv = B::svref_2object($sub)->GV;
@@ -179,12 +183,13 @@ SKIP: {
     }
 
     # deleting __ANON__ glob shouldn't break things
-
     {
-	package FOO3;
+    my ( $anon, $named );
+	eval q/package FOO3;
 	sub named {};
-	my $anon = sub {};
-	my $named = eval q[\&named];
+	$anon = sub {};
+	$named = eval q[\&named];
+    1;/ or die $@;
 	package main;
 	delete $FOO3::{named}; # make named anonymous
 
@@ -294,6 +299,7 @@ fresh_perl_is(
 
 # Setting the name during undef %stash:: should have no effect.
 {
+    # perlcc issue 187 - https://code.google.com/p/perl-compiler/issues/detail?id=187
     my $glob = \*Phoo::glob;
     sub o::DESTROY { eval '++$Phoo::bar' }
     no strict 'refs';

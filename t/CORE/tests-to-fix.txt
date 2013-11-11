@@ -16,8 +16,6 @@ op/magic-27839.t
 op/magic.t
 op/mkdir.t
 op/ref.t
-nico - op/stash.t
-nico - op/stat.t
 nico - op/sub.t
 nico - op/svleak.t
 op/symbolcache.t
@@ -66,4 +64,5 @@ op/switch.t - issue 180
 op/die_keeperr.t - issue 181
 op/sort.t - issue 182
 op/sub.t - issue 183
+op/stash.t - issue 186 + 187
 
