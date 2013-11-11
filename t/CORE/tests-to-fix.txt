@@ -1,6 +1,4 @@
-toddr - io/layers.t
-toddr - io/perlio.t
-toddr - io/perlio_fail.t
+dan - io/layers.t
 justin - op/caller.t
 justin - op/chdir.t
 cleland - op/each.t
@@ -57,3 +55,5 @@ op/reset.t - issue 188
 op/filetest.t - issue 189
 op/gv.t - issues 191 + 192
 op/magic.t - issues 192 + 193 + 194
+io/perlio.t - issue 195
+io/perlio_fail.t - issue 195
