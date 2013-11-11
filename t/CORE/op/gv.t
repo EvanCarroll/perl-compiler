@@ -94,6 +94,7 @@ is(ref(\$baa), 'GLOB');
 #        fact that %X::Y:: is stored in %X:: isn't documented.
 #        (I hope.)
 
+# perlcc issue 191 - https://code.google.com/p/perl-compiler/issues/detail?id=191
 { package Foo::Bar; no warnings 'once'; $test=1; }
 ok(exists $Foo::{'Bar::'}, '$Foo::{Bar::} exists');
 is($Foo::{'Bar::'}, '*Foo::Bar::', '$Foo::{Bar::}');
@@ -645,6 +646,7 @@ foreach my $type (qw(integer number string)) {
 ok(exists($RT72740a::{s1}), "RT72740a::s1 exists");
 ok(!exists($RT72740a::{s2}), "RT72740a::s2 does not exist");
 ok(exists($RT72740a::{s3}), "RT72740a::s3 exists");
+# perlcc issue 191 - https://code.google.com/p/perl-compiler/issues/detail?id=191
 ok(exists($RT72740a::{s4}), "RT72740a::s4 exists");
 is(RT72740a::s1(), "RT72740b::s2", "RT72740::s1 parsed correctly");
 is(RT72740a::s3(), "RT72740b::s4", "RT72740::s3 parsed correctly");
