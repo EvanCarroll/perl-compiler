@@ -22,17 +22,12 @@ is(scalar(@test), 0, 'Didnt return anything');
 
 # perlcc issue 183 - https://code.google.com/p/perl-compiler/issues/detail?id=183
 {
-    my @import;
-    eval q/@import = main->import(6,7)/;
-
     my @a;
-    push @a, 4, 5, @import;
+    push @a, 4, 5, main->import(6,7);
     ok(eq_array(\@a, [4,5]), "import with args");
 
     @a = ();
-    @import = ();
-    eval q/@import = main->import/;
-    push @a, 14, 15, @import;
+    push @a, 14, 15, main->import;
     ok(eq_array(\@a, [14,15]), "import without args");
 
     my $x = 1;
