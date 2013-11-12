@@ -1,6 +1,5 @@
 io/layers.t - dan
 op/chdir.t - toddr
-op/filetest.t
 op/blocks.t - issue 173
 
 # known problems 
@@ -38,4 +37,4 @@ op/magic-27839.t - issue 199
 op/length.t - issue 185
 io/perlio.t - issue 195
 op/packagev.t - issue 177
-
+op/filetest.t - issue 172
