@@ -35,10 +35,10 @@ op/sub.t - issue 183
 op/sort.t - issue 184
 op/magic-27839.t - issue 199
 op/length.t - issue 185
+io/perlio.t - issue 195
 
 #fixed?
 op/hashassign.t - issue 166
 op/packagev.t - issue 177
-io/perlio.t - issue 195
 op/blocks.t - issue 173
 
