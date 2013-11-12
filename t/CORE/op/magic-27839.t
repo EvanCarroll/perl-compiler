@@ -3,14 +3,17 @@
 BEGIN {
     $SIG{__WARN__} = sub { die "Dying on warning: ", @_ };
     require './test.pl';
-    plan(tests => 2);
 }
+
+plan(tests => 2);
+
 
 use strict;
 
 # Test for bug [perl #27839]
 {
     my $x;
+    # perlcc issue 199 - https://code.google.com/p/perl-compiler/issues/detail?id=199
     sub f {
 	"abc" =~ /(.)./;
 	$x = "@+";
