@@ -116,20 +116,20 @@ cmp_ok("@b",'eq','1 2 3 4','map then sort');
 cmp_ok("@b",'eq','1 2 3 4','reverse then sort');
 
 
-# perlcc issue 184 - https://code.google.com/p/perl-compiler/issues/detail?id=184
-sub twoface { eval q/no warnings 'redefine'/; *twoface = sub { $a <=> $b }; &twoface }
+
+sub twoface { no warnings 'redefine'; *twoface = sub { $a <=> $b }; &twoface }
 eval { @b = sort twoface 4,1,3,2 };
 cmp_ok("@b",'eq','1 2 3 4','redefine sort sub inside the sort sub');
 
 
-eval { eval q/no warnings 'redefine'/; *twoface = sub { &Backwards } };
+eval { no warnings 'redefine'; *twoface = sub { &Backwards } };
 ok(!$@,"redefining sort subs outside the sort \$@=[$@]");
 
 eval { @b = sort twoface 4,1,3,2 };
 cmp_ok("@b",'eq','4 3 2 1','twoface redefinition');
 
 {
-  eval q/no warnings 'redefine'/;
+  no warnings 'redefine';
   *twoface = sub { *twoface = *Backwards_other; $a <=> $b };
 }
 
@@ -137,7 +137,7 @@ eval { @b = sort twoface 4,1,9,5 };
 ok(($@ eq "" && "@b" eq "1 4 5 9"),'redefinition should not take effect during the sort');
 
 {
-  eval q/no warnings 'redefine'/;
+  no warnings 'redefine';
   *twoface = sub {
                  eval 'sub twoface { $a <=> $b }';
 		 die($@ eq "" ? "good\n" : "bad\n");
@@ -381,7 +381,7 @@ cmp_ok($x,'eq','123',q(optimized-away comparison block doesn't take any other ar
     is "@a", "c b a x", "un-inplace sort with function of lexical 2";
 
     # RT#54758. Git 62b40d2474e7487e6909e1872b6bccdf812c6818
-    eval q/no warnings 'void'/;
+    no warnings 'void';
     my @m; push @m, 0 for 1 .. 1024; $#m; @m = sort @m;
     ::pass("in-place sorting segfault");
 }
