@@ -34,9 +34,9 @@ op/gv.t - issues 191 + 192
 op/sub.t - issue 183
 op/sort.t - issue 184
 op/magic-27839.t - issue 199
+op/length.t - issue 185
 
 #fixed?
-op/length.t - issue 185
 op/hashassign.t - issue 166
 op/packagev.t - issue 177
 io/perlio.t - issue 195

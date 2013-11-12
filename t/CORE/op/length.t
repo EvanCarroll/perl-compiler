@@ -1,10 +1,10 @@
 #!./perl
 
-INIT {
+BEGIN {
     require './test.pl';
     unshift @INC, './lib';
 }
-
+ 
 plan (37);
 
 print "not " unless length("")    == 0;
