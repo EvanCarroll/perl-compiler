@@ -2,7 +2,6 @@ dan - io/layers.t
 justin - op/caller.t
 justin - op/chdir.t
 cleland - op/each.t
-toddr - op/each_array.t
 justin - op/exec.t
 justin - op/filetest.t
 op/flip.t
