@@ -3,45 +3,44 @@ toddr - op/chdir.t
 toddr - op/filetest.t
 
 # known problems 
-op/universal.t - issue 202
-op/write.t - action at a distance from elsewhere in the test? (failure itself perlcc's just fine): perlcc -r -e '{local $~ ="NOSUCHFORMAT";eval { write };print "-$@-\n";}' - looks like issue 149
-op/utftaint.t - issue 200
-op/utfhash.t - issue 200
-op/chop.t - perlcc issue 142 ( TP task 16825 )
+
 io/pipe.t - issue 150
-io/dup.t - issue 150
 op/each.t - issue 200
 op/taint.t - issue 151
 io/utf8.t - issue 155
-op/64bitint.t - issue 156 and 157
-op/length.t - issue 185
 op/method.t - issue #159
-op/lc.t - utf8 perlcc issue #162
 op/index.t - utf8 perlcc issue #162
 op/ord.t - utf8 issue 162
 op/closure.t - issue 163
 op/goto.t - issue #165
-op/hashassign.t - issue 166
 op/alarm.t - issue 168
 op/sigdispatch.t - issue 168
 op/attrhand.t - issue 169 - Attribute::Handlers are currently not supported
 op/attrs.t - issue 170
 op/bless.t - issue 172
-op/blocks.t - issue 173
 op/bop.t - issues 172 + 174
-op/pack.t - issue 176
-op/packagev.t - issue 177
 op/smartmatch.t - issue 179
 op/switch.t - issue 180
 op/die_keeperr.t - issue 181
-op/sort.t - issue 182
-op/sub.t - issue 183
 op/stash.t - issues 186 + 187
 op/reset.t - issue 188
 op/filetest.t - issue 189
-op/gv.t - issues 191 + 192
 op/magic.t - issues 192 + 193 + 194
-io/perlio.t - issue 195
 io/perlio_fail.t - issue 195
 op/ref.t - issues 196 + 197
+
+#fixed?
+op/chop.t - perlcc issue 142 ( TP task 16825 )
+io/dup.t - issue 150
+op/64bitint.t - issue 156 and 157
+op/length.t - issue 185
+op/lc.t - utf8 perlcc issue #162
+op/hashassign.t - issue 166
+op/pack.t - issue 176
+op/packagev.t - issue 177
+op/gv.t - issues 191 + 192
+io/perlio.t - issue 195
 op/magic-27839.t - issue 199
+op/sort.t - issue 182
+op/blocks.t - issue 173
+op/sub.t - issue 183
