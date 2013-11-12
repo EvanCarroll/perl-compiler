@@ -1,6 +1,7 @@
-dan - io/layers.t
-toddr - op/chdir.t
-toddr - op/filetest.t
+io/layers.t - dan
+op/chdir.t - toddr
+op/filetest.t
+op/blocks.t - issue 173
 
 # known problems 
 io/pipe.t - issue 150
