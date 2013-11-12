@@ -2,10 +2,10 @@ dan - io/layers.t
 toddr - op/chdir.t
 toddr - op/filetest.t
 dan - op/universal.t
-dan - op/utftaint.t
 dan - op/write.t
 
 # known problems 
+op/utftaint.t - issue 200
 op/utfhash.t - issue 200
 op/chop.t - perlcc issue 142 ( TP task 16825 )
 io/pipe.t - issue 150
