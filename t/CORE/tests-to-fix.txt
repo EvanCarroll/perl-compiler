@@ -36,7 +36,6 @@ op/sub.t - issue 183
 #fixed?
 io/dup.t - issue 150
 op/length.t - issue 185
-op/lc.t - utf8 perlcc issue #162
 op/hashassign.t - issue 166
 op/packagev.t - issue 177
 io/perlio.t - issue 195
