@@ -31,7 +31,6 @@ io/perlio_fail.t - issue 195
 op/ref.t - issues 196 + 197
 
 #fixed?
-op/chop.t - perlcc issue 142 ( TP task 16825 )
 io/dup.t - issue 150
 op/length.t - issue 185
 op/lc.t - utf8 perlcc issue #162
