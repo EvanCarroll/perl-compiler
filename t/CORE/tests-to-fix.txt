@@ -32,6 +32,7 @@ op/ref.t - issues 196 + 197
 op/pack.t - issue 176
 op/gv.t - issues 191 + 192
 op/sub.t - issue 183
+op/magic-27839.t - issue 199
 
 #fixed?
 io/dup.t - issue 150
@@ -39,6 +40,5 @@ op/length.t - issue 185
 op/hashassign.t - issue 166
 op/packagev.t - issue 177
 io/perlio.t - issue 195
-op/magic-27839.t - issue 199
 op/blocks.t - issue 173
 
