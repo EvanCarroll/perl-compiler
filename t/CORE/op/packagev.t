@@ -3,7 +3,7 @@
 BEGIN {
     unshift @INC, './lib';
     require './test.pl';
-}
+} 
 
 # XXX remove this later -- dagolden, 2010-01-13
 # local *STDERR = *STDOUT;
@@ -21,7 +21,7 @@ plan tests => 7 * @syntax_cases + 7 * (grep { $_ !~ /^#/ } @version_cases)
 
 use warnings qw/syntax/;
 # perlcc issue 177 - https://code.google.com/p/perl-compiler/issues/detail?id=177
-eval q/use version/;
+use version;
 
 for my $string ( @syntax_cases ) {
     eval "$string";
