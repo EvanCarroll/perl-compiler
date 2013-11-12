@@ -40,6 +40,5 @@ op/hashassign.t - issue 166
 op/packagev.t - issue 177
 io/perlio.t - issue 195
 op/magic-27839.t - issue 199
-op/sort.t - issue 182
 op/blocks.t - issue 173
 

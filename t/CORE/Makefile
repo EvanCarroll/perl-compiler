@@ -252,12 +252,12 @@ taint: $(TAINT_TESTS)
 failures: $(TAINT_FAILURES) $(FAILURES)
 
 $(TAINT_TESTS):
-	$(PERL) -T -MO=-qq,C,-O2,-fno-warnings,-fno-fold,-o$(@:.bin=.c) $(@:.bin=.t)
+	$(PERL) -T -MO=-qq,C,-O2,-fno-fold,-o$(@:.bin=.c) $(@:.bin=.t)
 	$(PERL) ../../script/cc_harness -q  $(@:.bin=.c) -o $@
 	/bin/rm $(@:.bin=.c)
 
 $(REGULAR_TESTS):
-	$(PERL) -MO=-qq,C,-O2,-fno-warnings,-fno-fold,-o$(@:.bin=.c) $(@:.bin=.t)
+	$(PERL) -MO=-qq,C,-O2,-fno-fold,-o$(@:.bin=.c) $(@:.bin=.t)
 	$(PERL) ../../script/cc_harness -q  $(@:.bin=.c) -o $@
 	/bin/rm $(@:.bin=.c)
 
