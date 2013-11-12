@@ -12,12 +12,10 @@ nico - op/symbolcache.t
 nico - op/tie_fetch_count.t
 nico - op/threads-dirh.t
 nico - op/threads.t
-dan - op/turkish.t
 dan - op/universal.t
 dan - op/utfhash.t
 dan - op/utftaint.t
 dan - op/write.t
-dan - op/tie_fetch_count.t
 
 # known problems 
 op/chop.t - perlcc issue 142 ( TP task 16825 )
