@@ -29,6 +29,8 @@ op/filetest.t - issue 189
 op/magic.t - issues 192 + 193 + 194
 io/perlio_fail.t - issue 195
 op/ref.t - issues 196 + 197
+op/pack.t - issue 176
+op/gv.t - issues 191 + 192
 
 #fixed?
 io/dup.t - issue 150
@@ -36,7 +38,6 @@ op/length.t - issue 185
 op/lc.t - utf8 perlcc issue #162
 op/hashassign.t - issue 166
 op/packagev.t - issue 177
-op/gv.t - issues 191 + 192
 io/perlio.t - issue 195
 op/magic-27839.t - issue 199
 op/sort.t - issue 182
