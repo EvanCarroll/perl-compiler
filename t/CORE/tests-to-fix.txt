@@ -38,6 +38,3 @@ op/length.t - issue 185
 io/perlio.t - issue 195
 op/packagev.t - issue 177
 
-#fixed?
-op/blocks.t - issue 173
-
