@@ -265,7 +265,7 @@ test: $(TESTS_OK) $(TAINT_OK)
 	$(PROVE) -j 6 `find * -name \*.bin|grep -v .subtest.bin | sort`
 	${MAKE} clean-cruft
 
-bc:
+bc: clean
 	(cd ../.. && perl Makefile.PL installdirs=vendor && make install)
 
 clean: clean-cruft
