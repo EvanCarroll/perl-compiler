@@ -1,24 +1,17 @@
-toddr - io/dup.t
-toddr - io/layers.t
-toddr - io/perlio.t
-toddr - io/perlio_fail.t
-toddr - io/pipe.t
-justin - op/caller.t
-justin - op/chdir.t
+dan - io/layers.t
 cleland - op/each.t
-op/each_array.t
-justin - op/exec.t
-justin - op/filetest.t
+toddr - op/caller.t
+toddr - op/chdir.t
+toddr - op/exec.t
+toddr - op/filetest.t
 op/flip.t
 op/magic-27839.t
-nico - op/magic.t
 nico - op/mkdir.t
 nico - op/ref.t
 nico - op/symbolcache.t
 nico - op/tie_fetch_count.t
 nico - op/threads-dirh.t
 nico - op/threads.t
-dan - op/tr.t
 dan - op/turkish.t
 dan - op/universal.t
 dan - op/utfhash.t
@@ -28,6 +21,8 @@ dan - op/tie_fetch_count.t
 
 # known problems 
 op/chop.t - perlcc issue 142 ( TP task 16825 )
+io/pipe.t - issue 150
+io/dup.t - issue 150
 op/taint.t - issue 151
 io/utf8.t - issue 155
 op/64bitint.t - issue 156 and 157
@@ -57,3 +52,6 @@ op/stash.t - issues 186 + 187
 op/reset.t - issue 188
 op/filetest.t - issue 189
 op/gv.t - issues 191 + 192
+op/magic.t - issues 192 + 193 + 194
+io/perlio.t - issue 195
+io/perlio_fail.t - issue 195
