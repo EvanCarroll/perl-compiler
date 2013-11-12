@@ -3,7 +3,7 @@
 BEGIN {
         unshift @INC, './lib';
         require './test.pl';
-}
+} 
 
 plan tests => 5;
  
@@ -76,7 +76,7 @@ qw( init main bar myfoo foo ),
 # END
 qw( end foo myfoo bar main  ));
 
-if ( $is_binary ) {
+if ( $m  ) {
     # BEGIN, UNITCHECK and CHECK blocks are run at compilation time
     @expect = (
         qw( init main bar myfoo foo ),
@@ -134,5 +134,5 @@ SCRIPT70614
 # perlcc issue 173 - https://code.google.com/p/perl-compiler/issues/detail?id=173
 # [perl #78634] Make sure block names can be used as constants.
 # use an eval block, can be removed when issue 173 is solved
-eval 'use constant INIT => 5';
-eval "::is INIT, 5, 'constant named after a special block'";
+use constant INIT => 5;
+::is INIT, 5, 'constant named after a special block';
