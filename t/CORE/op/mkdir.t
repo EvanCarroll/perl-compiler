@@ -21,9 +21,9 @@ unless (eval {
 $ENV{'LC_ALL'} = 'C';
 $ENV{LANGUAGE} = 'C'; # GNU locale extension
 
-ok(mkdir('blurfl',0777));
-ok(!mkdir('blurfl',0777));
-ok($!{EEXIST} || $! =~ /cannot move|exist|denied|unknown/i);
+ok(mkdir('blurfl',0777), 'mkdir blurfl');
+ok(!mkdir('blurfl',0777), 'mkdir blurfl a second time');
+ok($!{EEXIST} || $! =~ /cannot move|exist|denied|unknown/i, '$!{EEXIST} or $!');
 ok(-d 'blurfl');
 ok(rmdir('blurfl'));
 ok(!rmdir('blurfl'));
@@ -32,10 +32,10 @@ ok(mkdir('blurfl'));
 ok(rmdir('blurfl'));
 
 # trailing slashes will be removed before the system call to mkdir
-ok(mkdir('blurfl///'));
-ok(-d 'blurfl');
-ok(rmdir('blurfl///'));
-ok(!-d 'blurfl');
+ok(mkdir('blurfl///'), 'mkdir blurfl///');
+ok(-d 'blurfl', '-d blurfl');
+ok(rmdir('blurfl///'), 'rmdir blurfl///');
+ok(!-d 'blurfl', '!-d blurfl');
 
 # test default argument
 

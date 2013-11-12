@@ -4,13 +4,7 @@ toddr - op/caller.t
 toddr - op/chdir.t
 toddr - op/exec.t
 toddr - op/filetest.t
-op/magic-27839.t
-nico - op/mkdir.t
-nico - op/ref.t
-nico - op/symbolcache.t
-nico - op/tie_fetch_count.t
-nico - op/threads-dirh.t
-nico - op/threads.t
+nico - op/magic-27839.t
 dan - op/universal.t
 dan - op/utfhash.t
 dan - op/utftaint.t
@@ -52,3 +46,4 @@ op/gv.t - issues 191 + 192
 op/magic.t - issues 192 + 193 + 194
 io/perlio.t - issue 195
 io/perlio_fail.t - issue 195
+op/ref.t - issues 196 + 197

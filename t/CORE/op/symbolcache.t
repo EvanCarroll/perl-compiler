@@ -1,10 +1,10 @@
-#!./perl -w
+#!./perl
 
 BEGIN {
-    unshift @INC, './lib';
     require './test.pl';
-    plan( tests => 8 );
 }
+
+plan( tests => 8 );
 
 use strict;
 
@@ -17,11 +17,13 @@ is( bound(), 23, 'function still bound' );
 ok( !main->can('removed'), 'function not available as method' );
 
 # replacement
+eval q/
 sub replaced { 'func' }
 is( replaced(), 'func', 'original function still bound' );
 is( main->replaced, 'meth', 'method is replaced function' );
 BEGIN { delete $main::{replaced} }
 sub replaced { 'meth' }
+/;
 
 # and now with undef
 # simple removal
@@ -34,8 +36,10 @@ like( $@, qr/Undefined subroutine &main::removed2 called/,
 ok( !main->can('removed2'), 'function not available as method' );
 
 # replacement
+eval q/
 sub replaced2 { 'func' }
 is( replaced2(), 'meth', 'original function not bound, was replaced' );
 ok( main->replaced2 eq 'meth', 'method is replaced function' );
 BEGIN { undef $main::{replaced2} }
 sub replaced2 { 'meth' }
+/;

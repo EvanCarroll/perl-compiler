@@ -354,22 +354,24 @@ curr_test($test + 2);
 {
     my $test = curr_test();
     my $i = 0;
+    # perlcc issue 196 - https://code.google.com/p/perl-compiler/issues/detail?id=196
+    # eval block solve that
     local $SIG{'__DIE__'} = sub {
 	my $m = shift;
 	if ($i++ > 4) {
 	    print "# infinite recursion, bailing\nnot ok $test\n";
 	    exit 1;
-        }
-	like ($m, qr/^Modification of a read-only/);
+        }	
+        like ($m, qr{^Modification of a read-only});
     };
-    package C;
+    package C2;
     sub new { bless {}, shift }
     DESTROY { $_[0] = 'foo' }
     {
 	print "# should generate an error...\n";
-	my $c = C->new;
-    }
-    print "# good, didn't recurse\n";
+	my $c = C2->new;
+    }    
+    print "# good, didn't recurse\n";    
 }
 
 # test that DESTROY is called on all objects during global destruction,
@@ -748,16 +750,19 @@ curr_test($test + 3);
 my $test1 = $test + 1;
 my $test2 = $test + 2;
 
+{
 package FINALE;
 
 {
-    $ref3 = bless ["ok $test2\n"];	# package destruction
-    my $ref2 = bless ["ok $test1\n"];	# lexical destruction
-    local $ref1 = bless ["ok $test\n"];	# dynamic destruction
+    # perlcc issue 197 - https://code.google.com/p/perl-compiler/issues/detail?id=197
+    $ref3 = bless ["ok $test2 - package destruction\n"];	# package destruction
+    my $ref2 = bless ["ok $test1 - lexical destruction\n"];	# lexical destruction
+    local $ref1 = bless ["ok $test - dynamic destruction\n"];	# dynamic destruction
     1;					# flush any temp values on stack
 }
 
 DESTROY {
     print $_[0][0];
+}
 }
 
