@@ -125,9 +125,9 @@ sub INIT {print ":init"}
 sub END {print ":end"}
 SCRIPT3
 
-my $str = $is_binary ? 'still here' : '';
+my $str = $is_binary ? '' : 'still here';
 
-fresh_perl_is(<<'SCRIPT70614', $str, {switches => [''], stdin => '', stderr => 1 },'eval-UNITCHECK-eval (bug 70614)');
+fresh_perl_is(<<'SCRIPT70614', 'still here', {switches => [''], stdin => '', stderr => 1 },'eval-UNITCHECK-eval (bug 70614)');
 eval "UNITCHECK { eval 0 }"; print "still here";
 SCRIPT70614
 
