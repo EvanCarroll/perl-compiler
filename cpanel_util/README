@@ -1,5 +1,0 @@
-Things in here are not meant to go out in the release.
-
-As such, there is no need to add any deps in here to the dist.
-
-It is likley you'll need to install some modules outside of the RPM realm.
