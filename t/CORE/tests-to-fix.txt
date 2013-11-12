@@ -31,6 +31,7 @@ io/perlio_fail.t - issue 195
 op/ref.t - issues 196 + 197
 op/pack.t - issue 176
 op/gv.t - issues 191 + 192
+op/sub.t - issue 183
 
 #fixed?
 io/dup.t - issue 150
@@ -42,4 +43,4 @@ io/perlio.t - issue 195
 op/magic-27839.t - issue 199
 op/sort.t - issue 182
 op/blocks.t - issue 173
-op/sub.t - issue 183
+
