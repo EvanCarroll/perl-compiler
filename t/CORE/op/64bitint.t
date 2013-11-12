@@ -1,11 +1,12 @@
 #!./perl
 
-INIT {
+BEGIN {
     unshift @INC, './lib';
     require './test.pl';
-    eval { my $q = pack "q", 0 };
-    skip_all('no 64-bit types') if $@;
 }
+
+eval { my $q = pack "q", 0 };
+skip_all('no 64-bit types') if $@;
 
 # perlcc issues reported upstream at https://code.google.com/p/perl-compiler/issues/detail?id=157
 
@@ -13,16 +14,15 @@ INIT {
 
 # so that using > 0xfffffff constants and
 # 32+ bit integers don't cause noise
-# required for perlcc bug #156 https://code.google.com/p/perl-compiler/issues/detail?id=156
-INIT {
-    use warnings;
-    no warnings qw(overflow portable);
-}
+# perlcc bug #156 https://code.google.com/p/perl-compiler/issues/detail?id=156
+
+use warnings;
+no warnings qw(overflow portable);
+
 use Config;
 
-# required for perlcc bug #156 https://code.google.com/p/perl-compiler/issues/detail?id=156
-use XSLoader;
-XSLoader::load() if $ENV{force_xsloader}; # trick for perlcc
+# perlcc bug #156 https://code.google.com/p/perl-compiler/issues/detail?id=156
+# XSLoader is not loaded
 
 # as 6 * 6 = 36, the last digit of 6**n will always be six. Hence the last
 # digit of 16**n will always be six. Hence 16**n - 1 will always end in 5.
