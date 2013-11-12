@@ -5,7 +5,6 @@ toddr - op/chdir.t
 toddr - op/exec.t
 toddr - op/filetest.t
 op/magic-27839.t
-nico - op/mkdir.t
 nico - op/ref.t
 nico - op/symbolcache.t
 nico - op/tie_fetch_count.t
