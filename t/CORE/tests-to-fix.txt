@@ -1,5 +1,4 @@
 dan - io/layers.t
-toddr - op/caller.t
 toddr - op/chdir.t
 toddr - op/filetest.t
 dan - op/universal.t
