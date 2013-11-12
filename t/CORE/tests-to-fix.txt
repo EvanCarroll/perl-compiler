@@ -3,8 +3,8 @@ toddr - op/chdir.t
 toddr - op/filetest.t
 
 # known problems 
-
 io/pipe.t - issue 150
+op/64bitint.t - issue 156 and 157
 op/each.t - issue 200
 op/taint.t - issue 151
 io/utf8.t - issue 155
@@ -33,7 +33,6 @@ op/ref.t - issues 196 + 197
 #fixed?
 op/chop.t - perlcc issue 142 ( TP task 16825 )
 io/dup.t - issue 150
-op/64bitint.t - issue 156 and 157
 op/length.t - issue 185
 op/lc.t - utf8 perlcc issue #162
 op/hashassign.t - issue 166
