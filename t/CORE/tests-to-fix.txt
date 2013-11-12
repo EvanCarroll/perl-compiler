@@ -39,6 +39,5 @@ io/perlio.t - issue 195
 op/packagev.t - issue 177
 
 #fixed?
-op/hashassign.t - issue 166
 op/blocks.t - issue 173
 
