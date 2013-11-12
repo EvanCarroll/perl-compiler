@@ -12,7 +12,6 @@ nico - op/symbolcache.t
 nico - op/tie_fetch_count.t
 nico - op/threads-dirh.t
 nico - op/threads.t
-dan - op/tr.t
 dan - op/turkish.t
 dan - op/universal.t
 dan - op/utfhash.t
