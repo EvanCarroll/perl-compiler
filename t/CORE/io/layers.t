@@ -205,6 +205,7 @@ __EOH__
 	open F, '<', $afile;
 	open G, '>', $afile;
 
+	# issue 203 - https://code.google.com/p/perl-compiler/issues/detail?id=203
 	check([ PerlIO::get_layers(F, input  => 1) ],
 	      [ qw(stdio crlf) ],
 	      "use open IN");

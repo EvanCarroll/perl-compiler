@@ -1,4 +1,3 @@
-io/layers.t - dan
 op/chdir.t - toddr
 
 # known problems 
@@ -38,3 +37,4 @@ io/perlio.t - issue 195
 op/packagev.t - issue 177
 op/filetest.t - issue 172
 op/blocks.t - issue 173
+io/layers.t - issue 203 + 204
