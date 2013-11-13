@@ -1,7 +1,6 @@
-op/chdir.t - Nicolas
-comp/package.t
-comp/retainedlines.t
-comp/uproto.t
+nico = comp/package.t
+nico - comp/retainedlines.t
+nico - comp/uproto.t
 io/argv.t
 io/crlf_through.t
 io/open.t
@@ -12,23 +11,18 @@ op/concat.t
 op/dbm.t
 op/die_except.t
 op/die_unwind.t
-op/magic.t
-op/do.t
-op/eval.t
+nico - op/do.t
+nico - op/eval.t
 op/inc.t
 op/index_thr.t
 op/magic_phase.t
 op/mydef.t
-op/recurse.bin
-op/ref.bin
-op/sub_lval.t
+op/recurse.t
 op/sub_lval.t
 op/utftaint.t
 op/warn.t
 op/write.t
-op/bop.t
 op/override.t
-op/reset.t
 
 # known problems 
 io/pipe.t - issue 150
@@ -65,3 +59,6 @@ op/packagev.t - issue 177
 op/filetest.t - issue 172
 op/blocks.t - issue 173
 io/layers.t - issue 203 + 204
+op/chdir.t - issue 207
+op/bop.t - issues 172 + 174
+op/reset.t - issue 160
