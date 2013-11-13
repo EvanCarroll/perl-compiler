@@ -27,6 +27,9 @@ op/utfhash.t
 op/utftaint.t
 op/warn.t
 op/write.t
+op/bop.t
+op/override.t
+op/reset.t
 
 # known problems 
 io/pipe.t - issue 150
