@@ -1,6 +1,5 @@
 io/argv.t
 io/crlf_through.t
-cleland - io/open.t
 cleland - io/through.t
 op/anonsub.t - toddr
 op/array.t - toddr

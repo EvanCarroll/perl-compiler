@@ -793,19 +793,20 @@ sub runperl_binary {
     my ( $test, $opts ) = @_;
     
     $opts ||= {};
-
+	my $error = $opts->{'stderr'} ? '2>&1' : '';
     my $bin = $test;
     $bin =~ s/\.t$/\.bin/;
     unlink $bin if -e $bin;
     print STDERR "# running: make $bin ===\n";
-    map { print STDERR "# $_\n" } split /\n/, `make $bin`;
-
+	my $make = `make $bin $error`;
+    map { print STDERR "# $_\n" } split /\n/,$make;
+	return $make if $?;
 
     # now execute the binary
     my $foo = $opts->{'stdin'} || '';
     print STDERR "# running: ./$bin $foo\n";
-    return `echo "$foo" | ./$bin` if $foo;
-    return `./$bin 2>&1`;
+	return `echo "$foo" | ./$bin $error` if $foo;
+    return `./$bin $error`;
 }
 
 #

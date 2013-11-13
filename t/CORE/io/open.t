@@ -294,7 +294,7 @@ SKIP: {
 
 # [perl #28986] "open m" crashes Perl
 
-fresh_perl_like('open m', qr/^Search pattern not terminated at/,
+fresh_perl_like('open m', qr/Search pattern not terminated at/,
 	{ stderr => 1 }, 'open m test');
 
 fresh_perl_is(
