@@ -1,4 +1,3 @@
-nico = comp/package.t
 nico - comp/retainedlines.t
 nico - comp/uproto.t
 io/argv.t
@@ -62,3 +61,4 @@ io/layers.t - issue 203 + 204
 op/chdir.t - issue 207
 op/bop.t - issues 172 + 174
 op/reset.t - issue 160
+comp/package.t - issues 209 + 210 + 212
