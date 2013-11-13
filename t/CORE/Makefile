@@ -1,10 +1,11 @@
-TAINT_FAILURES = op/taint.bin
+BUILD_FAILURES_TAINT = op/taint.bin
 
-FAILURES = op/bop.bin op/override.bin op/reset.bin io/perlio.bin op/magic-27839.bin
+BUILD_FAILURES = io/perlio.bin op/magic-27839.bin
 
-TAINT_OK = op/utftaint.bin comp/opsubs.bin
+TAINT_BUILDABLE = op/utftaint.bin comp/opsubs.bin
 
-TESTS_OK = base/cond.bin \
+TESTS_BUILDABLE = op/bop.bin op/override.bin op/reset.bin \
+	base/cond.bin \
 	base/if.bin \
 	base/lex.bin \
 	base/num.bin \
@@ -236,40 +237,38 @@ TESTS_OK = base/cond.bin \
 	op/write.bin \
 	op/yadayada.bin
 
-PERL=/usr/local/cpanel/3rdparty/perl/514/bin/perl
-PROVE=/usr/local/cpanel/3rdparty/perl/514/bin/prove
+PERL  = /usr/local/cpanel/3rdparty/perl/514/bin/perl
+PROVE = /usr/local/cpanel/3rdparty/perl/514/bin/prove
 
-TAINT_TESTS=$(TAINT_OK) $(TAINT_FAILURES)
+TAINT_FORMULA_LIST = $(TAINT_BUILDABLE) $(BUILD_FAILURES_TAINT)
+TEST_FORMULA_LIST  = $(TESTS_BUILDABLE) $(TESTS_BUILDABLE:.bin=.subtest.bin) $(BUILD_FAILURES)
 
-TESTS=$(TESTS_OK) $(FAILURES)
-REGULAR_TESTS=$(TESTS) $(TESTS:.bin=.subtest.bin)
-ALL_TESTS=$(TAINT_TESTS) $(REGULAR_TESTS)
+TESTABLE = $(TAINT_BUILDABLE) $(TESTS_BUILDABLE)
+TESTS_TO_CLEAN = $(TESTABLE) $(TESTABLE:.bin=.subtest.bin) $(TESTABLE:.bin=.c) $(BUILD_FAILURES) $(BUILD_FAILURES:.bin=.c) $(BUILD_FAILURES_TAINT) $(BUILD_FAILURES_TAINT:.bin=.c)
 
-all: $(ALL_TESTS)
+all: $(TESTABLE)
 
-taint: $(TAINT_TESTS)
+failures: $(BUILD_FAILURES_TAINT) $(BUILD_FAILURES)
 
-failures: $(TAINT_FAILURES) $(FAILURES)
-
-$(TAINT_TESTS):
+$(TAINT_FORMULA_LIST):
 	$(PERL) -T -MO=-qq,C,-O2,-fno-fold,-o$(@:.bin=.c) $(@:.bin=.t)
 	$(PERL) ../../script/cc_harness -q  $(@:.bin=.c) -o $@
 	/bin/rm $(@:.bin=.c)
 
-$(REGULAR_TESTS):
+$(TEST_FORMULA_LIST):
 	$(PERL) -MO=-qq,C,-O2,-fno-fold,-o$(@:.bin=.c) $(@:.bin=.t)
 	$(PERL) ../../script/cc_harness -q  $(@:.bin=.c) -o $@
 	/bin/rm $(@:.bin=.c)
 
-test: $(TESTS_OK) $(TAINT_OK)
-	$(PROVE) -j 6 `find * -name \*.bin|grep -v .subtest.bin | sort`
+test: all
+	$(PROVE) -j 10 $(TESTABLE)
 	${MAKE} clean-cruft
 
 bc: clean
 	(cd ../.. && perl Makefile.PL installdirs=vendor && make install)
 
 clean: clean-cruft
-	/bin/rm -f $(ALL_TESTS) $(ALL_TESTS:.bin=.c)
+	/bin/rm -f $(TESTS_TO_CLEAN)
 
 clean-cruft:
 	/bin/rm -f Io_argv*.tmp* tmp* utf*.pl a.out
