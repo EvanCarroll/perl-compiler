@@ -6,7 +6,7 @@ BEGIN {
     # possibilities into @INC.
     require "./test.pl";
     # Really want to know if chdir is working, as the build process will all go
-    # wrong if it is not.    
+    # wrong if it is not.
 }
 
 plan(tests => 48);
@@ -100,6 +100,7 @@ SKIP: {
     {
 	no warnings qw<io deprecated>;
 	ok(opendir(H, "op"), "opendir op") or diag $!;
+    # perlcc issue 207 - https://code.google.com/p/perl-compiler/issues/detail?id=207
 	ok(open(H, "<", "base"), "open base") or diag $!;
     }
     if ($has_dirfd) {
