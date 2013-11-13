@@ -5,3 +5,4 @@
 *.tmp_bak
 tmp*
 a.out
+/utf*.pl

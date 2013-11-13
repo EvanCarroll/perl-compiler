@@ -1,4 +1,4 @@
-op/chdir.t - toddr
+op/chdir.t - Nicolas
 comp/package.t
 comp/retainedlines.t
 comp/uproto.t
@@ -6,8 +6,8 @@ io/argv.t
 io/crlf_through.t
 io/open.t
 io/through.t
-op/anonsub.t
-op/array.t
+op/anonsub.t - toddr
+op/array.t - toddr
 op/concat.t
 op/dbm.t
 op/die_except.t
