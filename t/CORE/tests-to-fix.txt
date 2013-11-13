@@ -15,7 +15,6 @@ nico - op/do.t
 nico - op/eval.t
 op/inc.t
 op/index_thr.t
-dan - op/magic_phase.t
 dan - op/mydef.t
 dan - op/recurse.t
 dan - op/sub_lval.t
@@ -25,6 +24,7 @@ dan - op/write.t
 op/override.t
 
 # known problems 
+op/magic_phase.t - issue 208
 io/pipe.t - issue 150
 op/64bitint.t - issue 156 and 157
 op/taint.t - issue 151
