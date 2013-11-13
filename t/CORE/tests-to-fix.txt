@@ -10,7 +10,6 @@ op/dbm.t
 nico - op/do.t
 nico - op/inc.t
 op/index_thr.t
-dan - op/mydef.t
 dan - op/sub_lval.t
 dan - op/utftaint.t
 dan - op/warn.t
