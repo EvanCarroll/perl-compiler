@@ -12,7 +12,7 @@
 package B::C;
 use strict;
 
-our $VERSION = '1.42_53';
+our $VERSION = '1.42_54';
 my %debug;
 our $check;
 my $eval_pvs = '';
@@ -3340,11 +3340,11 @@ if (0) {
     $init->add( sprintf( "SvREFCNT($sym) = %u;", $gv->REFCNT ) );
     return $sym;
   }
-  #if ($fullname =~ /^main::std(in|out|err)$/) { # stdio already initialized
-  #  $init->add(qq[$sym = gv_fetchpv($name, FALSE, SVt_PVGV);]);
-  #  $init->add( sprintf( "SvREFCNT($sym) = %u;", $gv->REFCNT ) );
-  #  return $sym;
-  #}
+  if ($fullname =~ /^main::std(in|out|err)$/ or /^main::STD(IN|OUT|ERR)$/) { # stdio already initialized
+    $init->add(qq[$sym = gv_fetchpv($name, FALSE, SVt_PVGV);]);
+    $init->add( sprintf( "SvREFCNT($sym) = %u;", $gv->REFCNT ) );
+    return $sym;
+  }
   # defer to the end because we remove compiler-internal and skipped stuff
   #if ($fullname eq 'main::INC' and !$_[2]) {
   #  return $sym;
@@ -3974,7 +3974,8 @@ sub B::HV::save {
   my $sv_list_index = $svsect->index;
   warn sprintf( "saving HV $fullname &sv_list[$sv_list_index] 0x%x MAX=%d\n",
                 $$hv, $hv->MAX ) if $debug{hv};
-  my @contents = $hv->ARRAY;
+  # XXX B does not keep the UTF8 flag [RT 120535] #200
+  my @contents = $hv->can('ARRAY_utf8') ? $hv->ARRAY_utf8 : $hv->ARRAY; # our fixed C.xs variant
   # protect against recursive self-reference
   # i.e. with use Moose at stash Class::MOP::Class::Immutable::Trait
   # value => rv => cv => ... => rv => same hash
@@ -4016,8 +4017,8 @@ sub B::HV::save {
           $value = "(SV*)$value" unless $value =~ /^&sv_list/;
           my $cur = length( pack "a*", $key );
           if (!$PERL56) {
-            my $pv = $key;
-            if (utf8::is_utf8($pv)) { #FIXME: B does not keep the UTF8 flag here (#200)
+            if (utf8::is_utf8($key)) {
+              my $pv = $key;
               utf8::encode($pv);
               $cur = 0 - length($pv);
             }
@@ -4863,7 +4864,8 @@ _EOT9
     my $incpack = inc_packname($stashname);
     unless (exists $INC{$incpack}) { # skip deleted packages
       warn "XXX skip dl_init for $stashname !\$INC{$incpack}\n" if $debug{pkg};
-    #  delete $xsub{$stashname};
+      delete $xsub{$stashname};
+      @dl_modules = grep { $_ ne $stashname } @dl_modules;
     }
     if ( exists( $xsub{$stashname} ) && $xsub{$stashname} =~ m/^Dynamic/ ) {
       # XSLoader.pm: $modlibname = (caller())[1]; needs a path at caller[1] to find auto,
