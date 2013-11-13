@@ -6,9 +6,10 @@ BEGIN {
     # possibilities into @INC.
     require "./test.pl";
     # Really want to know if chdir is working, as the build process will all go
-    # wrong if it is not.
-    plan(tests => 48);
+    # wrong if it is not.    
 }
+
+plan(tests => 48);
 
 use Config;
 
@@ -48,7 +49,7 @@ my $Cwd = abs_path;
 # Let's get to a known position
 SKIP: {
     my ($vol,$dir) = splitpath(abs_path,1);
-    my $test_dir = 'op';
+    my $test_dir = -d 't/CORE' ? 't/CORE' : '.';
     my $compare_dir = (splitdir($dir))[-1];
 
     # VMS is case insensitive but will preserve case in EFS mode.
@@ -156,7 +157,6 @@ sub check_env {
         is( $warning, <<WARNING,   '  got uninit & deprecation warning' );
 Use of uninitialized value in chdir at $0 line 64.
 Use of chdir('') or chdir(undef) as chdir() is deprecated at $0 line 64.
-Insecure dependency in chdir while running with -t switch at op/chdir.t line 64.
 WARNING
 
         chdir($Cwd);
@@ -168,7 +168,6 @@ WARNING
         is( abs_path, $ENV{$key},   '  abs_path() agrees' );
 	is( $warning, <<WARNING,   '  got deprecation warning' );
 Use of chdir('') or chdir(undef) as chdir() is deprecated at $0 line 76.
-Insecure dependency in chdir while running with -t switch at op/chdir.t line 76.
 WARNING
 
         chdir($Cwd);
