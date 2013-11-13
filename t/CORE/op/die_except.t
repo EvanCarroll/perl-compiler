@@ -31,6 +31,7 @@ $val = eval {
 	1;
 }; $err = $@;
 is($val, undef);
+# perlcc issue 215 - https://code.google.com/p/perl-compiler/issues/detail?id=215
 is($err, "t3\n");
 
 $@ = "t0\n";
@@ -52,6 +53,7 @@ $val = eval {
 	1;
 }; $err = $@;
 is($val, undef);
+# perlcc issue 215 - https://code.google.com/p/perl-compiler/issues/detail?id=215
 is($err, "t3\n");
 
 $@ = "t0\n";
@@ -73,6 +75,7 @@ $val = eval {
 	1;
 }; $err = $@;
 is($val, undef);
+# perlcc issue 215 - https://code.google.com/p/perl-compiler/issues/detail?id=215
 is($err, "t3\n");
 
 done_testing();

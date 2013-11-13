@@ -6,7 +6,6 @@ op/anonsub.t - toddr
 op/array.t - toddr
 op/concat.t
 op/dbm.t
-nico - op/die_except.t
 nico - op/die_unwind.t
 nico - op/do.t
 nico - op/eval.t
@@ -62,3 +61,4 @@ op/reset.t - issue 160
 comp/package.t - issues 209 + 210 + 212
 comp/retainedlines.t - issue 209
 comp/uproto.t - issue 214
+op/die_except.t - issue 215
