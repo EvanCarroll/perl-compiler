@@ -515,6 +515,7 @@ END_EVAL_TEST
     is(Internals::SvREFCNT($x), 1, "execution eval doesn't create new references");
 }
 
+# perlcc issue 216 - https://code.google.com/p/perl-compiler/issues/detail?id=216
 fresh_perl_is(<<'EOP', "ok\n", undef, 'RT #70862');
 $::{'@'}='';
 eval {};

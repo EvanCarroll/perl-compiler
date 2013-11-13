@@ -6,8 +6,8 @@ op/anonsub.t - toddr
 op/array.t - toddr
 op/concat.t
 op/dbm.t
+
 nico - op/do.t
-nico - op/eval.t
 nico - op/inc.t
 op/index_thr.t
 dan - op/mydef.t
@@ -62,3 +62,4 @@ comp/retainedlines.t - issue 209
 comp/uproto.t - issue 214
 op/die_except.t - issue 215
 op/die_unwind.t - issue 215
+op/eval.t - issue 216
