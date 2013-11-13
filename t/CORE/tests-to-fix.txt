@@ -17,12 +17,10 @@ io/through.t - issue 213
 op/recurse.t - issue 213
 op/magic_phase.t - issue 208
 io/pipe.t - issue 150
-op/64bitint.t - issue 156 and 157
 op/taint.t - issue 151
 io/utf8.t - issue 155
 op/method.t - issue #159
 op/index.t - utf8 perlcc issue #162
-op/ord.t - utf8 issue 162
 op/closure.t - issue 163
 op/goto.t - issue #165
 op/alarm.t - issue 168
