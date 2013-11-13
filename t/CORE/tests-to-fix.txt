@@ -34,7 +34,6 @@ op/reset.t
 # known problems 
 io/pipe.t - issue 150
 op/64bitint.t - issue 156 and 157
-op/each.t - issue 200
 op/taint.t - issue 151
 io/utf8.t - issue 155
 op/method.t - issue #159
