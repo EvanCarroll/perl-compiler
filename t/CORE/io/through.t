@@ -7,6 +7,8 @@ INIT {
 	if $^O eq 'VMS';
 }
 
+plan(942);
+
 use strict;
 
 my $Perl = which_perl();

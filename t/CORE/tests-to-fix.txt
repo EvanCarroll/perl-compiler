@@ -1,11 +1,9 @@
 io/argv.t
 io/crlf_through.t
-cleland - io/through.t
 op/anonsub.t - toddr
 op/array.t - toddr
 op/concat.t
 op/dbm.t
-
 nico - op/do.t
 nico - op/inc.t
 op/index_thr.t
@@ -15,7 +13,8 @@ dan - op/warn.t
 dan - op/write.t
 op/override.t
 
-# known problems 
+# known problems
+io/through.t - issue 213
 op/recurse.t - issue 213
 op/magic_phase.t - issue 208
 io/pipe.t - issue 150
