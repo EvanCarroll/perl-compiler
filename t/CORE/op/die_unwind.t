@@ -1,6 +1,6 @@
 #!./perl -w
 
-require './test.pl';
+require './test.pl'; 
 use strict;
 
 #
@@ -64,8 +64,10 @@ $val = eval {
 	};
 	1;
 }; $err = $@;
+# perlcc issue 215 - https://code.google.com/p/perl-compiler/issues/detail?id=215
 is($uerr, "t3\n");
 is($val, undef);
+# perlcc issue 215 - https://code.google.com/p/perl-compiler/issues/detail?id=215
 is($err, "t3\n");
 
 done_testing();
