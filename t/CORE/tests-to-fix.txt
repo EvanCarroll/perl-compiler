@@ -15,13 +15,13 @@ nico - op/do.t
 nico - op/eval.t
 op/inc.t
 op/index_thr.t
-op/magic_phase.t
-op/mydef.t
-op/recurse.t
-op/sub_lval.t
-op/utftaint.t
-op/warn.t
-op/write.t
+dan - op/magic_phase.t
+dan - op/mydef.t
+dan - op/recurse.t
+dan - op/sub_lval.t
+dan - op/utftaint.t
+dan - op/warn.t
+dan - op/write.t
 op/override.t
 
 # known problems 
