@@ -23,7 +23,6 @@ op/recurse.bin
 op/ref.bin
 op/sub_lval.t
 op/sub_lval.t
-op/utfhash.t
 op/utftaint.t
 op/warn.t
 op/write.t

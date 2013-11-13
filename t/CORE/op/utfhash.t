@@ -1,12 +1,9 @@
 #!./perl -w
 
 BEGIN {
-    unshift @INC, './lib';
     require './test.pl';
-
-    plan(tests => 99);
 }
-
+plan(tests => 99);
 use strict;
 
 # Two hashes one will all keys 8-bit possible (initially), other
