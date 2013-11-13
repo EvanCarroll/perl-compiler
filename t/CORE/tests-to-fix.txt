@@ -2,8 +2,8 @@ nico - comp/retainedlines.t
 nico - comp/uproto.t
 io/argv.t
 io/crlf_through.t
-io/open.t
-io/through.t
+cleland - io/open.t
+cleland - io/through.t
 op/anonsub.t - toddr
 op/array.t - toddr
 op/concat.t
