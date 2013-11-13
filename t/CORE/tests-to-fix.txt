@@ -6,7 +6,7 @@ op/concat.t
 op/dbm.t
 nico - op/do.t
 nico - op/inc.t
-op/index_thr.t
+dan - op/index_thr.t ??? do we care: prove on the .t "fails" because: This Perl not built to support threads. we could leave it, skip when no thread support, or persue thread support (but prolly not so much)
 dan - op/sub_lval.t
 dan - op/utftaint.t
 dan - op/warn.t
