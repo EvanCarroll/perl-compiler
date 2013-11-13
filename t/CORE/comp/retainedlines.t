@@ -44,6 +44,7 @@ sub is {
 
 $^P = 0xA;
 
+# perlcc issue 209 - https://code.google.com/p/perl-compiler/issues/detail?id=209
 my @before = grep { /eval/ } keys %::;
 
 is ((scalar @before), 0, "No evals");
