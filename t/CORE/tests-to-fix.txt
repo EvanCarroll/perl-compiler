@@ -1,4 +1,32 @@
 op/chdir.t - toddr
+comp/package.t
+comp/retainedlines.t
+comp/uproto.t
+io/argv.t
+io/crlf_through.t
+io/open.t
+io/through.t
+op/anonsub.t
+op/array.t
+op/concat.t
+op/dbm.t
+op/die_except.t
+op/die_unwind.t
+op/magic.t
+op/do.t
+op/eval.t
+op/inc.t
+op/index_thr.t
+op/magic_phase.t
+op/mydef.t
+op/recurse.bin
+op/ref.bin
+op/sub_lval.t
+op/sub_lval.t
+op/utfhash.t
+op/utftaint.t
+op/warn.t
+op/write.t
 
 # known problems 
 io/pipe.t - issue 150
@@ -16,13 +44,11 @@ op/sigdispatch.t - issue 168
 op/attrhand.t - issue 169 - Attribute::Handlers are currently not supported
 op/attrs.t - issue 170
 op/bless.t - issue 172
-op/bop.t - issues 172 + 174
 op/pack.t - issue 176
 op/smartmatch.t - issue 179
 op/switch.t - issue 180
 op/die_keeperr.t - issue 181
 op/stash.t - issues 186 + 187
-op/reset.t - issue 188
 op/filetest.t - issue 189
 op/magic.t - issues 192 + 193 + 194
 io/perlio_fail.t - issue 195
