@@ -137,7 +137,6 @@ TESTS_BUILDABLE = op/bop.bin op/override.bin op/reset.bin \
 	op/incfilter.bin \
 	op/inc.bin \
 	op/index.bin \
-	op/index_thr.bin \
 	op/int.bin \
 	op/join.bin \
 	op/kill0.bin \
