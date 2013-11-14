@@ -117,6 +117,8 @@ ok( eof(),      'eof() true after closing ARGV' );
     close $fh or die "Could not close: $!";
 }
 
+# perlcc issue 227 - https://code.google.com/p/perl-compiler/issues/detail?id=227
+
 # This used to dump core
 fresh_perl_is( <<'**PROG**', "foobar", {}, "ARGV aliasing and eof()" ); 
 open OUT, ">Io_argv3.tmp" or die "Can't open temp file: $!";

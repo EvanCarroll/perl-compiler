@@ -1,4 +1,3 @@
-io/argv.t
 io/crlf_through.t
 op/anonsub.t - toddr
 dan - op/sub_lval.t
@@ -55,3 +54,4 @@ op/inc.t - issue 192
 op/concat.t - issues 224 + 225
 op/do.t - issue 192
 op/dbm.t - issues 208 + 226
+io/argv.t - issue 227
