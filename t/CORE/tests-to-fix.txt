@@ -1,7 +1,8 @@
 io/argv.t
 io/crlf_through.t
-toddr - op/concat.t
-toddr - op/dbm.t
+op/anonsub.t - toddr
+nico - op/concat.t
+op/dbm.t
 nico - op/do.t
 dan - op/sub_lval.t
 dan - op/utftaint.t
@@ -54,4 +55,3 @@ op/die_except.t - issue 215
 op/die_unwind.t - issue 215
 op/eval.t - issue 216
 op/inc.t - issue 192
-op/anonsub.t - issue 223 - Fix with my $x if Reini marks WontFix
