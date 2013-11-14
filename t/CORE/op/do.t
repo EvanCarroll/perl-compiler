@@ -106,6 +106,7 @@ isnt($!, 0, 'and should set $!');
 # [perl #19545]
 my ($u, @t);
 {
+    # perlcc issue 192 - https://code.google.com/p/perl-compiler/issues/detail?id=192
     no warnings 'uninitialized';
     push @t, ($u = (do {} . "This should be pushed."));
 }
