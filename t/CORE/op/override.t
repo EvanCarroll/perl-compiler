@@ -14,34 +14,35 @@ plan tests => 26;
 #
 my $dirsep = "/";
 
-BEGIN { package Foo; *main::getlogin = sub { "kilroy"; } }
+INIT { package Foo; *main::getlogin = sub { "kilroy"; } }
 
-is( getlogin, "kilroy" );
+eval q/is( getlogin, "kilroy" )/;
 
 my $t = 42;
-BEGIN { *CORE::GLOBAL::time = sub () { $t; } }
+INIT { *CORE::GLOBAL::time = sub () { $t; } }
 
-is( 45, time + 3 );
+eval q/is( 45, time + 3 )/;
 
 #
 # require has special behaviour
 #
 my $r;
-BEGIN { *CORE::GLOBAL::require = sub { $r = shift; 1; } }
+INIT { *CORE::GLOBAL::require = sub { $r = shift; 1; } }
 
-require Foo;
-is( $r, "Foo.pm" );
+eval q/require Foo/;
+is( $r, "Foo.pm", 'Foo.pm' );
 
-require Foo::Bar;
+
+eval q/require Foo::Bar/;
 is( $r, join($dirsep, "Foo", "Bar.pm") );
 
-require 'Foo';
-is( $r, "Foo" );
+eval q/require 'Foo'/;
+is( $r, "Foo", 'Foo' );
 
-require 5.006;
-is( $r, "5.006" );
+eval q/require 5.006/;
+is( $r, "5.006", q/5.006/ );
 
-require v5.6;
+eval q/require v5.6/;
 ok( abs($r - 5.006) < 0.001 && $r eq "\x05\x06" );
 
 eval "use Foo";
@@ -51,7 +52,7 @@ eval "use Foo::Bar";
 is( $r, join($dirsep, "Foo", "Bar.pm") );
 
 eval "use 5.006";
-is( $r, "5.006" );
+is( $r, "5.006", q/5.006/ );
 
 # localizing *CORE::GLOBAL::foo should revert to finding CORE::foo
 {
@@ -66,52 +67,60 @@ is( $r, "5.006" );
 #
 
 $r = 11;
-BEGIN { *CORE::GLOBAL::readline = sub (;*) { ++$r }; }
-is( <FH>	, 12 );
-is( <$fh>	, 13 );
+INIT { *CORE::GLOBAL::readline = sub (;*) { ++$r }; }
+eval q/
+is( <FH>	, 12, 12 );
+is( <$fh>	, 13, 13 );
 my $pad_fh;
-is( <$pad_fh>	, 14 );
+is( <$pad_fh>	, 14, 14 );
+/;
 
 # Non-global readline() override
-BEGIN { *Rgs::readline = sub (;*) { --$r }; }
-{
+INIT { *Rgs::readline = sub (;*) { --$r }; }
+eval q/{
     package Rgs;
-    ::is( <FH>	, 13 );
-    ::is( <$fh>	, 12 );
-    ::is( <$pad_fh>	, 11 );
-}
+    ::is( <FH>	, 13, 13 );
+    ::is( <$fh>	, 12, 12 );
+    ::is( <$pad_fh>	, 11, 11 );
+}/;
 
 # Global readpipe() override
-BEGIN { *CORE::GLOBAL::readpipe = sub ($) { "$_[0] " . --$r }; }
+INIT { *CORE::GLOBAL::readpipe = sub ($) { "$_[0] " . --$r }; }
+eval q|
 is( `rm`,	    "rm 10", '``' );
 is( qx/cp/,	    "cp 9", 'qx' );
+|;
 
 # Non-global readpipe() override
-BEGIN { *Rgs::readpipe = sub ($) { ++$r . " $_[0]" }; }
-{
+INIT { *Rgs::readpipe = sub ($) { ++$r . " $_[0]" }; }
+eval q|{
     package Rgs;
     ::is( `rm`,		  "10 rm", '``' );
     ::is( qx/cp/,	  "11 cp", 'qx' );
-}
+}|;
 
 # Verify that the parsing of overridden keywords isn't messed up
 # by the indirect object notation
 {
     local $SIG{__WARN__} = sub {
-	::like( $_[0], qr/^ok overriden at/ );
+	::like( $_[0], qr/^ok overriden at/, "like" );
     };
-    BEGIN { *OverridenWarn::warn = sub { CORE::warn "@_ overriden"; }; }
+    INIT { *OverridenWarn::warn = sub { CORE::warn "@_ overriden"; }; }
     package OverridenWarn;
     sub foo { "ok" }
+    eval q|
     warn( OverridenWarn->foo() );
     warn OverridenWarn->foo();
+    |;
 }
-BEGIN { *OverridenPop::pop = sub { ::is( $_[0][0], "ok" ) }; }
+INIT { *OverridenPop::pop = sub { ::is( $_[0][0], "ok" ) }; }
 {
     package OverridenPop;
     sub foo { [ "ok" ] }
+    eval q|
     pop( OverridenPop->foo() );
     pop OverridenPop->foo();
+    |;
 }
 
 {
@@ -122,5 +131,5 @@ BEGIN { *OverridenPop::pop = sub { ::is( $_[0][0], "ok" ) }; }
         require 5;
         require Text::ParseWords;
     };
-    is $@, '';
+    is $@, '', '$@ empty';
 }
