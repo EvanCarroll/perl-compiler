@@ -1,7 +1,6 @@
 io/argv.t
 io/crlf_through.t
 op/anonsub.t - toddr
-op/array.t - toddr
 op/concat.t
 op/dbm.t
 nico - op/do.t

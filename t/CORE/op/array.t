@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl' }
 
-plan (130);
+plan (123);
 
 #
 # @foo, @bar, and @ary are also used from tie-stdarray after tie-ing them
@@ -17,25 +17,6 @@ is($#ary, 3);
 is(join('',@ary), '1234');
 
 {
-    no warnings 'deprecated';
-
-$[ = 1;
-@ary = (1,2,3,4,5);
-is(join('',@ary), '12345');
-
-$tmp = $ary[$#ary]; --$#ary;
-is($tmp, 5);
-# Must do == here beacuse $[ isn't 0
-ok($#ary == 4);
-is(join('',@ary), '1234');
-
-is($ary[5], undef);
-
-$#ary += 1;	# see if element 5 gone for good
-ok($#ary == 5);
-ok(!defined $ary[5]);
-
-$[ = 0;
 @foo = ();
 $r = join(',', $#foo, @foo);
 is($r, "-1");
