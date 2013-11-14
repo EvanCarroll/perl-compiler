@@ -1,6 +1,8 @@
-#!./perl -w
+#!./perl
+
 
 require './test.pl';
+use warnings;
 use strict;
 
 # Verify that addition/subtraction properly upgrade to doubles.
@@ -137,6 +139,7 @@ foreach (keys %postdec) {
 check_same (\%orig, \%postdec);
 
 {
+  # perlcc issue 192 - https://code.google.com/p/perl-compiler/issues/detail?id=192
     no warnings 'uninitialized';
     my ($x, $y);
     eval {
