@@ -8,7 +8,7 @@ dan - op/sub_lval.t
 dan - op/utftaint.t
 dan - op/warn.t
 dan - op/write.t
-op/override.t
+nico - op/override.t
 
 # known problems
 io/through.t - issue 213
