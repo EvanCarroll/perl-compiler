@@ -1,7 +1,7 @@
 io/argv.t
 io/crlf_through.t
-op/concat.t
-op/dbm.t
+toddr - op/concat.t
+toddr - op/dbm.t
 nico - op/do.t
 dan - op/sub_lval.t
 dan - op/utftaint.t
