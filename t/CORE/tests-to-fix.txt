@@ -1,7 +1,6 @@
 io/argv.t
 io/crlf_through.t
 op/anonsub.t - toddr
-op/dbm.t
 dan - op/sub_lval.t
 dan - op/utftaint.t
 dan - op/warn.t
@@ -53,5 +52,6 @@ op/die_except.t - issue 215
 op/die_unwind.t - issue 215
 op/eval.t - issue 216
 op/inc.t - issue 192
-op/concat.t - issue 224 + 225
+op/concat.t - issues 224 + 225
 op/do.t - issue 192
+op/dbm.t - issues 208 + 226
