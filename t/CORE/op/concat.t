@@ -36,6 +36,7 @@ ok("$c$a$c" eq "foo",    "concatenate undef, fore and aft");
         ok($_ eq  "$dx$dx","bug id 20000819.004, back");
     }
 
+    # perlcc issue 225 - https://code.google.com/p/perl-compiler/issues/detail?id=225
     $_ = $dx = "\x{10f2}";
     s/($dx)/$1$dx/;
     {
@@ -131,6 +132,7 @@ sub beq { use bytes; $_[0] eq $_[1]; }
     use bytes;
     ok(beq($p.$u, $p.$b), "perl #26905, left eq bytes");
     ok(beq($u.$p, $b.$p), "perl #26905, right eq bytes");
+    # perlcc issue 224 - https://code.google.com/p/perl-compiler/issues/detail?id=224
     ok(!beq($p.$u, $pu),  "perl #26905, left ne unicode");
     ok(!beq($u.$p, $up),  "perl #26905, right ne unicode");
 
