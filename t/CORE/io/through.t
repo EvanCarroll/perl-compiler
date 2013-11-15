@@ -1,11 +1,12 @@
 #!./perl
 
-INIT {
+BEGIN {
     unshift @INC, './lib';
     require './test.pl';
-    skip_all("VMS too picky about line endings for record-oriented pipes")
-	if $^O eq 'VMS';
 }
+
+skip_all("VMS too picky about line endings for record-oriented pipes")
+	if $^O eq 'VMS';
 
 plan(942);
 
@@ -34,7 +35,7 @@ $c *= 3*2*2;	# $how_w, file/pipe, 2 reports
 
 $c += 6;	# Tests with sleep()...
 
-print "1..$c\n";
+#print "1..$c\n";
 
 my $set_out = '';
 $set_out = "binmode STDOUT, ':crlf'"

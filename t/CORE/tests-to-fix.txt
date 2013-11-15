@@ -1,4 +1,3 @@
-io/crlf_through.t
 op/anonsub.t - toddr
 dan - op/sub_lval.t
 dan - op/utftaint.t
