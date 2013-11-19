@@ -553,8 +553,24 @@ tests[141]='@x=(0..1);print "ok" if $#x == "1"'
 result[141]='ok'
 tests[142]='$_ = "abc\x{1234}";chop;print "ok" if $_ eq "abc"'
 result[142]='ok'
-tests[143]='use Net::IDN::Encode (); Net::IDN::Encode::domain_to_ascii(42);'
+tests[143]='BEGIN {
+  package Net::IDN::Encode;
+  our $DOT = qr/[\.]/; #works with my!
+  my $RE  = qr/xx/;
+  sub domain_to_ascii {
+    my $x = shift || "";
+    $x =~ m/$RE/o;
+    return split( qr/($DOT)/o, $x);
+  }
+}
+package main;
+Net::IDN::Encode::domain_to_ascii(42);
+print "ok\n";'
 result[143]='ok'
+tests[1431]='BEGIN{package Foo;our $DOT=qr/[.]/;};package main;print "ok\n" if "dot.dot" =~ m/($Foo::DOT)/'
+result[1431]='ok'
+tests[1432]='BEGIN{$DOT=qr/[.]/}print "ok\n" if "dot.dot" =~ m/($DOT)/'
+result[1432]='ok'
 tests[144]='print index("long message\0xx","\0")'
 result[144]='12'
 tests[145]='my $bits = 0; for (my $i = ~0; $i; $i >>= 1) { ++$bits; }; print $bits'
