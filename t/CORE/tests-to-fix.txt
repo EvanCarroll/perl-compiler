@@ -1,7 +1,7 @@
-op/sub_lval.t - dan
+op/sub_lval.t - cleland
 op/utftaint.t - dan
 op/warn.t - dan
-op/write.t - dan
+op/write.t - cleland
 
 # known problems
 op/magic_phase.t - issue 208
