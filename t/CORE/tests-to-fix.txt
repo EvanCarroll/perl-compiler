@@ -1,12 +1,9 @@
-op/anonsub.t - toddr
-dan - op/sub_lval.t
-dan - op/utftaint.t
-dan - op/warn.t
-dan - op/write.t
+op/sub_lval.t - dan
+op/utftaint.t - dan
+op/warn.t - dan
+op/write.t - dan
 
 # known problems
-io/through.t - issue 213
-op/recurse.t - issue 213
 op/magic_phase.t - issue 208
 io/pipe.t - issue 150
 op/taint.t - issue 151
@@ -16,14 +13,12 @@ op/index.t - utf8 perlcc issue #162
 op/closure.t - issue 163
 op/goto.t - issue #165
 op/alarm.t - issue 168
-op/sigdispatch.t - issue 168
 op/attrhand.t - issue 169 - Attribute::Handlers are currently not supported
 op/attrs.t - issue 170
 op/bless.t - issue 172
 op/pack.t - issue 176
 op/smartmatch.t - issue 179
 op/switch.t - issue 180
-op/die_keeperr.t - issue 181
 op/stash.t - issues 186 + 187
 op/filetest.t - issue 189
 op/magic.t - issues 192 + 193 + 194
@@ -36,7 +31,6 @@ op/sort.t - issue 184
 op/magic-27839.t - issue 199
 op/length.t - issue 185
 io/perlio.t - issue 195
-op/packagev.t - issue 177
 op/filetest.t - issue 172
 op/blocks.t - issue 173
 io/layers.t - issue 203 + 204
@@ -45,12 +39,7 @@ op/bop.t - issues 172 + 174
 op/reset.t - issue 160
 comp/package.t - issues 209 + 210 + 212
 comp/retainedlines.t - issue 209
-comp/uproto.t - issue 214
-op/die_except.t - issue 215
-op/die_unwind.t - issue 215
-op/eval.t - issue 216
 op/inc.t - issue 192
 op/concat.t - issues 224 + 225
 op/do.t - issue 192
 op/dbm.t - issues 208 + 226
-io/argv.t - issue 227
