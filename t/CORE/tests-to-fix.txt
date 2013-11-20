@@ -12,7 +12,6 @@ op/method.t - issue #159
 op/index.t - utf8 perlcc issue #162
 op/closure.t - issue 163
 op/goto.t - issue #165
-op/alarm.t - issue 168
 op/attrhand.t - issue 169 - Attribute::Handlers are currently not supported
 op/attrs.t - issue 170
 op/bless.t - issue 172
