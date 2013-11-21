@@ -299,7 +299,7 @@ eval <<'EOE' or $_ = $@;
   1;
 EOE
 
-like($_, qr/Can\'t modify constant item in lvalue subroutine return/);
+like($_, qr/Can\'t modify (.+) in lvalue subroutine return/);
 
 $_ = undef;
 eval <<'EOE' or $_ = $@;
@@ -556,6 +556,7 @@ TODO: {
     is ($result, 'bar', "RT #41550");
 }
 
+$@ = '';
 fresh_perl_is(<<'----', <<'====', "lvalue can not be set after definition. [perl #68758]");
 use warnings;
 our $x;

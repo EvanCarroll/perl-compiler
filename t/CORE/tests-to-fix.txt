@@ -1,5 +1,6 @@
-op/sub_lval.t - cleland
+op/sub_lval.t (test 37 fixed, test 38-->issue 229, test 72 not sure)
 op/warn.t
+
 
 # known problems
 op/magic_phase.t - issue 208
