@@ -2,7 +2,7 @@ BUILD_FAILURES_TAINT = op/taint.bin
 
 BUILD_FAILURES = io/perlio.bin op/magic-27839.bin
 
-TAINT_BUILDABLE = op/utftaint.bin comp/opsubs.bin
+TAINT_BUILDABLE = op/utftaint.bin comp/opsubs.bin op/utftaint.subtest.bin
 
 TESTS_BUILDABLE = op/bop.bin op/override.bin op/reset.bin \
 	base/cond.bin \
