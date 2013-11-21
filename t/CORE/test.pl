@@ -705,6 +705,7 @@ sub _fresh_perl {
         $is_binary = 1;
         # let makefile do the job
         $tmpfile = $0;
+        ($tmpfile) = $tmpfile =~ m/(.*)/;
         $tmpfile =~ s/\.bin$/.subtest.t/;
         unlink $tmpfile if -e $tmpfile;
     }
@@ -721,7 +722,7 @@ sub _fresh_perl {
     $runperl_args->{stderr} = 1;
 
 
-
+    # ($tmpfile) = $tmpfile =~ m/(.*)/;
     open(my $TEST, '>', $tmpfile) or die "Cannot open $tmpfile: $!";
 
     # VMS adjustments
@@ -798,6 +799,8 @@ sub runperl_binary {
     $bin =~ s/\.t$/\.bin/;
     unlink $bin if -e $bin;
     print STDERR "# running: make $bin ===\n";
+
+    ($ENV{PATH}) = $ENV{PATH} =~ m/(.*)/;
 	my $make = `make $bin $error`;
     map { print STDERR "# $_\n" } split /\n/,$make;
 	return $make if $?;
