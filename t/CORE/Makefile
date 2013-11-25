@@ -250,17 +250,17 @@ all: $(TESTABLE)
 failures: $(BUILD_FAILURES_TAINT) $(BUILD_FAILURES)
 
 $(TAINT_FORMULA_LIST):
-	$(PERL) -T -MO=-qq,C,-O1,-fno-fold,-o$(@:.bin=.c) $(@:.bin=.t)
+	$(PERL) -T -MO=-qq,C,-O3,-fno-fold,-o$(@:.bin=.c) $(@:.bin=.t)
 	$(PERL) ../../script/cc_harness -q  $(@:.bin=.c) -o $@
 	/bin/rm $(@:.bin=.c)
 
 $(TEST_FORMULA_LIST):
-	$(PERL) -MO=-qq,C,-O1,-fno-fold,-o$(@:.bin=.c) $(@:.bin=.t)
+	$(PERL) -MO=-qq,C,-O3,-fno-fold,-o$(@:.bin=.c) $(@:.bin=.t)
 	$(PERL) ../../script/cc_harness -q  $(@:.bin=.c) -o $@
 	/bin/rm $(@:.bin=.c)
 
 test: all
-	$(PROVE) -j 10 $(TESTABLE) 2>/dev/null
+	MALLOC_CHECK_=0 $(PROVE) -j 10 $(TESTABLE)
 	${MAKE} clean-cruft
 
 bc: clean
