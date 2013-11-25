@@ -2,7 +2,7 @@ BEGIN {
     unshift @INC, './lib';
     require './test.pl';
 }
-plan tests=>76;
+plan( tests=>75 );
 
 sub a : lvalue { my $a = 34; ${\(bless \$a)} }  # Return a temporary
 sub b : lvalue { ${\shift} }
@@ -196,7 +196,7 @@ eval <<'EOE' or $_ = $@;
   1;
 EOE
 
-ok(!defined $_) or diag "'$_', '$x0', '$x1'";
+ok(!defined $_) or diag("'$_', '$x0', '$x1'");
 
 $x0 = $x1 = $_ = undef;
 $nolv = \&nolv;
@@ -207,7 +207,7 @@ eval <<'EOE' or $_ = $@;
 EOE
 
 like($_, qr/Can\'t modify non-lvalue subroutine call/)
-  or diag "'$_', '$x0', '$x1'";
+  or diag("'$_', '$x0', '$x1'");
 
 sub lv0 : lvalue { }		# Converted to lv10 in scalar context
 
@@ -556,18 +556,19 @@ TODO: {
     is ($result, 'bar', "RT #41550");
 }
 
-$@ = '';
-fresh_perl_is(<<'----', <<'====', "lvalue can not be set after definition. [perl #68758]");
-use warnings;
-our $x;
-sub foo { $x }
-sub foo : lvalue;
-foo = 3;
-----
-lvalue attribute ignored after the subroutine has been defined at - line 4.
-Can't modify non-lvalue subroutine call in scalar assignment at - line 5, near "3;"
-Execution of - aborted due to compilation errors.
-====
+# This is a test of BEGIN / compile time behavior which can't be tested in B::C
+#$@ = '';
+#fresh_perl_is(<<'----', <<'====', "lvalue can not be set after definition. [perl #68758]", stderr => 0);
+#use warnings;
+#our $x;
+#sub foo { $x }
+#sub foo : lvalue;
+#foo = 3;
+#----
+#lvalue attribute ignored after the subroutine has been defined at - line 4.
+#Can't modify non-lvalue subroutine call in scalar assignment at - line 5, near "3;"
+#Execution of - aborted due to compilation errors.
+#====
 
 {
     my $x;
@@ -579,8 +580,8 @@ Execution of - aborted due to compilation errors.
 
 sub fleen : lvalue { $pnare }
 $pnare = __PACKAGE__;
-ok eval { fleen = 1 }, "lvalues can return COWs (CATTLE?) [perl #75656]";\
-is $pnare, 1, 'and returning CATTLE actually works';
+ok(eval { fleen = 1 }, "lvalues can return COWs (CATTLE?) [perl #75656]");
+is($pnare, 1, 'and returning CATTLE actually works');
 
 {
     my $result_3363;

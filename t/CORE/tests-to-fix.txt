@@ -1,7 +1,5 @@
-cleland - op/sub_lval.t (test 37 fixed, test 38-->issue 229, test 72 not sure)
 dan - op/dbm.t -- binary removed .gitignore (probably due to $filename being empty when the subtest unlink glob "$filename.*")
 
-# known problems
 op/warn.t - issue 231
 op/magic_phase.t - issue 208
 io/pipe.t - issue 150
@@ -42,3 +40,4 @@ op/concat.t - issues 224 + 225
 op/do.t - issue 192
 op/dbm.t - issues 208 + 226
 op/write.t - issue 149
+op/sub_lval.t (test 37 fixed, test 38-->issue 229, test 72 not sure)
