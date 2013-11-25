@@ -2,7 +2,7 @@ BUILD_FAILURES_TAINT = op/taint.bin
 
 BUILD_FAILURES = io/perlio.bin op/magic-27839.bin
 
-TAINT_BUILDABLE = op/utftaint.bin comp/opsubs.bin op/utftaint.subtest.bin
+TAINT_BUILDABLE = op/utftaint.bin comp/opsubs.bin
 
 TESTS_BUILDABLE = op/bop.bin op/override.bin op/reset.bin \
 	base/cond.bin \
@@ -250,17 +250,17 @@ all: $(TESTABLE)
 failures: $(BUILD_FAILURES_TAINT) $(BUILD_FAILURES)
 
 $(TAINT_FORMULA_LIST):
-	$(PERL) -T -MO=-qq,C,-O2,-fno-fold,-o$(@:.bin=.c) $(@:.bin=.t)
+	$(PERL) -T -MO=-qq,C,-O1,-fno-fold,-o$(@:.bin=.c) $(@:.bin=.t)
 	$(PERL) ../../script/cc_harness -q  $(@:.bin=.c) -o $@
 	/bin/rm $(@:.bin=.c)
 
 $(TEST_FORMULA_LIST):
-	$(PERL) -MO=-qq,C,-O2,-fno-fold,-o$(@:.bin=.c) $(@:.bin=.t)
+	$(PERL) -MO=-qq,C,-O1,-fno-fold,-o$(@:.bin=.c) $(@:.bin=.t)
 	$(PERL) ../../script/cc_harness -q  $(@:.bin=.c) -o $@
 	/bin/rm $(@:.bin=.c)
 
 test: all
-	$(PROVE) -j 10 $(TESTABLE)
+	$(PROVE) -j 10 $(TESTABLE) 2>/dev/null
 	${MAKE} clean-cruft
 
 bc: clean
