@@ -25,7 +25,7 @@ ok @warnings==1 && $warnings[0] eq "foobar\n";
 @warnings = ();
 $@ = "";
 warn "foo";
-ok @warnings==1 && $warnings[0] eq "foo at warn.t line 28.\n";
+ok @warnings==1 && $warnings[0] eq "foo at warn.t line 27.\n";
 
 @warnings = ();
 $@ = "";
@@ -36,13 +36,13 @@ ok @warnings==1 && ref($warnings[0]) eq "ARRAY" && $warnings[0] == $wa;
 $@ = "";
 warn "";
 ok @warnings==1 &&
-    $warnings[0] eq "Warning: something's wrong at warn.t line 38.\n";
+    $warnings[0] eq "Warning: something's wrong at warn.t line 37.\n";
 
 @warnings = ();
 $@ = "";
 warn;
 ok @warnings==1 &&
-    $warnings[0] eq "Warning: something's wrong at warn.t line 44.\n";
+    $warnings[0] eq "Warning: something's wrong at warn.t line 43.\n";
 
 @warnings = ();
 $@ = "ERR\n";
@@ -57,7 +57,7 @@ ok @warnings==1 && $warnings[0] eq "foobar\n";
 @warnings = ();
 $@ = "ERR\n";
 warn "foo";
-ok @warnings==1 && $warnings[0] eq "foo at warn.t line 60.\n";
+ok @warnings==1 && $warnings[0] eq "foo at warn.t line 59.\n";
 
 @warnings = ();
 $@ = "ERR\n";
@@ -68,13 +68,13 @@ ok @warnings==1 && ref($warnings[0]) eq "ARRAY" && $warnings[0] == $wa;
 $@ = "ERR\n";
 warn "";
 ok @warnings==1 &&
-    $warnings[0] eq "ERR\n\t...caught at warn.t line 70.\n";
+    $warnings[0] eq "ERR\n\t...caught at warn.t line 69.\n";
 
 @warnings = ();
 $@ = "ERR\n";
 warn;
 ok @warnings==1 &&
-    $warnings[0] eq "ERR\n\t...caught at warn.t line 76.\n";
+    $warnings[0] eq "ERR\n\t...caught at warn.t line 75.\n";
 
 @warnings = ();
 $@ = $ea;
@@ -89,7 +89,7 @@ ok @warnings==1 && $warnings[0] eq "foobar\n";
 @warnings = ();
 $@ = $ea;
 warn "foo";
-ok @warnings==1 && $warnings[0] eq "foo at warn.t line 92.\n";
+ok @warnings==1 && $warnings[0] eq "foo at warn.t line 91.\n";
 
 @warnings = ();
 $@ = $ea;
