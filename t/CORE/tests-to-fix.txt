@@ -1,5 +1,3 @@
-dan - op/dbm.t -- binary removed .gitignore (probably due to $filename being empty when the subtest unlink glob "$filename.*")
-
 op/warn.t - issue 231
 op/magic_phase.t - issue 208
 io/pipe.t - issue 150
