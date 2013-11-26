@@ -47,12 +47,15 @@ fresh_perl_is("require AnyDBM_File;\n$prog", 'ok', {}, 'explicit require');
 fresh_perl_is($prog, 'ok', {}, 'implicit require');
 
 $prog = <<'EOC';
+$filename = '@@@@';
 @INC = ();
 dbmopen(%LT, $filename, 0666);
 1 while unlink $filename;
 1 while unlink glob "$filename.*";
 die "Failed to fail!";
 EOC
+
+$prog =~ s/\@\@\@\@/$filename/;
 
 # perlcc issue 226 - https://code.google.com/p/perl-compiler/issues/detail?id=226
 fresh_perl_like($prog, qr/No dbm on this machine/, {},
