@@ -19,6 +19,7 @@ if ( $file_to_test =~ s{==(.*)\.t$}{.t} ) {
     $todo = "Compiled binary segfaults. Issues: $1"             if ( $options =~ /SEGV-([\d-]+)/ );
     $todo = "Fails to compile with perlcc. Issues: $1"          if ( $options =~ /NOCOMPILE-([\d-]+)/ );
     $todo = "Fails tests when compiled with perlcc. Issues: $1" if ( $options =~ /BADTEST-([\d-]+)/ );
+    $todo = "Test crashes before completion. Issues: $1" if ( $options =~ /BADPLAN-([\d-]+)/ );
 }
 
 $file_to_test =~ s{--}{/}g;
@@ -28,7 +29,7 @@ if ( $] != '5.014004' && $file_to_test =~ m{^t/CORE/} ) {
     plan skip_all => "Perl CORE tests only supported in 5.14.4 right now.";
 }
 else {
-    plan tests => 3 + 8 * scalar @optimizations;
+    plan tests => 3 + 9 * scalar @optimizations;
 }
 
 ok( !-z $file_to_test, "$file_to_test exists" );
@@ -64,7 +65,7 @@ foreach my $optimization (@optimizations) {
 
         if ( -z $c_file ) {
             unlink $c_file;
-            skip( "Can't test further due to failure to create a c file.", 7 );
+            skip( "Can't test further due to failure to create a c file.", 8 );
         }
 
         # gcc the c code.
@@ -76,7 +77,7 @@ foreach my $optimization (@optimizations) {
 
         if ( !-x $bin_file ) {
             unlink $c_file, $bin_file;
-            skip( "Can't test further due to failure to create a binary file.", 6 );
+            skip( "Can't test further due to failure to create a binary file.", 7 );
         }
 
         # Parse through TAP::Harness
@@ -93,22 +94,30 @@ foreach my $optimization (@optimizations) {
         my $res     = $harness->runtests($bin_file);
         close $out_fh;
 
-        local $TODO = "Tests don't pass at the moment - $todo" if ( $todo =~ /Compiled binary segfaults/ );
-
         my $parser = $res->{parser_for}->{$bin_file};
         ok( $parser,                 "Output parsed by TAP::Harness" );
-        ok( $parser->{is_good_plan}, "Plan was valid" );
+        ok( !scalar @{ $parser->{todo_passed} }, "No TODO tests passed" )
+          or diag( "TODO Passed: " . join( ", ", @{ $parser->{todo_passed} } ) );
+
+        local $TODO = "Tests don't pass at the moment - $todo" if ( $todo =~ /Compiled binary segfaults/ );
+        
+        ok( $res->{wait} == 0,           "Wait status is $res->{wait}" . ($res->{wait} ? ' (segfault?)': '') );
+        skip("Test failures irrelevant if segfaulting", 4) if ( $todo =~ /Compiled binary segfaults/ );
+
+        TODO: {
+              local $TODO = $todo if($todo =~ m/Test crashes before completion/);
+            ok( $parser->{is_good_plan}, "Plan was valid" );
+        }
+        ok( $parser->{exit} == 0,           "Exit code is $parser->{exit}" );
 
         local $TODO = "Tests don't pass at the moment - $todo" if ( $todo =~ /Fails tests when compiled with perlcc/ );
-        ok( $parser->{exit} == 0,           "Exit code is $parser->{exit}" );
         ok( !scalar @{ $parser->{failed} }, "Test results:" );
         foreach my $line ( split( "\n", $out ) ) {
             print "    $line\n";
         }
+
         ok( !scalar @{ $parser->{failed} }, "No test failures" )
           or diag( "Failed tests: " . join( ", ", @{ $parser->{failed} } ) );
-        ok( !scalar @{ $parser->{todo_passed} }, "No TODO tests passed" )
-          or diag( "TODO Passed: " . join( ", ", @{ $parser->{todo_passed} } ) );
 
         unlink $bin_file, $c_file;
     }
