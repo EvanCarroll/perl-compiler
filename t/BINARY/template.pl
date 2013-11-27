@@ -5,12 +5,19 @@ use warnings;
 
 use TAP::Harness ();
 
-#use Time::HiRes qw/sleep gettimeofday tv_interval/;
-use Test::More tests => 11;
+use Test::More;
 
+# Setup file_to_test to be the file we actually want to test.
 my $file_to_test = $0;
 $file_to_test =~ s{BINARY/}{}g;    # Strip the BINARY dir off to look for this test elsewhere.
 $file_to_test =~ s{--}{/}g;
+
+if ( $] != '5.014004' && $file_to_test =~ m{^t/CORE/} ) {
+    plan skip_all => "Perl CORE tests only supported in 5.14.4 right now.";
+}
+else {
+    plan tests => 12;
+}
 
 ok( !-z $file_to_test, "$file_to_test exists" );
 
@@ -25,6 +32,9 @@ pass( $taint ? "Taint mode!" : "Not in taint mode" );
 unlink $bin_file, $c_file;
 
 my $PERL = $^X;
+
+my $check = `$PERL -c '$file_to_test' 2>&1`;
+like( $check, qr/syntax OK/, "Test file compiles" );
 
 my $cmd = "$PERL $taint -MO=-qq,C,-O3,-fno-fold,-o$c_file $file_to_test 2>&1";
 
