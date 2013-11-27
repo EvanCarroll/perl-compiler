@@ -1,8 +1,7 @@
 #!./perl -w
 
 INIT {
-    chdir "t" if -d "t";
-    unshift @INC, "./lib";
+    unshift @INC, "t/CORE/lib";
 }
 
 # Test srand.
