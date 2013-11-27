@@ -103,14 +103,15 @@ foreach my $optimization (@optimizations) {
         ok( !scalar @{ $parser->{todo_passed} }, "No TODO tests passed" )
           or diag( "TODO Passed: " . join( ", ", @{ $parser->{todo_passed} } ) );
 
+        my $signal = $res->{wait} % 256;
         if ( $todo =~ /Compiled binary exits with signal/ ) {
             local $TODO = "Tests don't pass at the moment - $todo";
-            my $sig_name = $SIGNALS{ $res->{wait} };
-            ok( $res->{wait} == 0, "Wait status is $res->{wait} ($sig_name)" );
+            my $sig_name = $SIGNALS{$signal};
+            ok( $signal == 0, "Exit signal is $signal ($sig_name)" );
             skip( "Test failures irrelevant if exits premature with $sig_name", 5 );
         }
         else {
-            ok( $res->{wait} == 0, "Wait status is $res->{wait}" );
+            ok( $signal == 0, "Exit signal is $signal" );
         }
 
         if($todo =~ m/Test crashes before completion/ ) {
