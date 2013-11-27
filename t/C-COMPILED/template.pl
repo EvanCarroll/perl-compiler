@@ -9,17 +9,17 @@ use IO::Scalar;
 use Test::More;
 
 #my @optimizations = ( '-O3,-fno-fold', '-O1' );
-my @optimizations = ( '-O3,-fno-fold');
-my $todo = '';
+my @optimizations = ('-O3,-fno-fold');
+my $todo          = '';
 
 # Setup file_to_test to be the file we actually want to test.
 my $file_to_test = $0;
 if ( $file_to_test =~ s{==(.*)\.t$}{.t} ) {
     my $options = $1;
-    $todo = "Compiled binary segfaults. Issues: $1"             if ( $options =~ /SEGV-([\d-]+)/ );
+    $todo = "Compiled binary exits with signal. Issues: $1"     if ( $options =~ /SIG-([\d-]+)/ );
     $todo = "Fails to compile with perlcc. Issues: $1"          if ( $options =~ /NOCOMPILE-([\d-]+)/ );
     $todo = "Fails tests when compiled with perlcc. Issues: $1" if ( $options =~ /BADTEST-([\d-]+)/ );
-    $todo = "Test crashes before completion. Issues: $1" if ( $options =~ /BADPLAN-([\d-]+)/ );
+    $todo = "Test crashes before completion. Issues: $1"        if ( $options =~ /BADPLAN-([\d-]+)/ );
 }
 
 $file_to_test =~ s{--}{/}g;
@@ -50,6 +50,9 @@ my $check = `$PERL -c $taint '$file_to_test' 2>&1`;
 like( $check, qr/syntax OK/, "$PERL -c $taint $file_to_test" );
 
 $ENV{HARNESS_NOTTY} = 1;
+
+my %SIGNALS = qw( 11 SEGV 6 SIGABRT 1 SIGHUP 13 SIGPIPE);
+$SIGNALS{0} = '';
 
 foreach my $optimization (@optimizations) {
   TODO: SKIP: {
@@ -95,20 +98,25 @@ foreach my $optimization (@optimizations) {
         close $out_fh;
 
         my $parser = $res->{parser_for}->{$bin_file};
-        ok( $parser,                 "Output parsed by TAP::Harness" );
+        ok( $parser,                             "Output parsed by TAP::Harness" );
         ok( !scalar @{ $parser->{todo_passed} }, "No TODO tests passed" )
           or diag( "TODO Passed: " . join( ", ", @{ $parser->{todo_passed} } ) );
 
-        local $TODO = "Tests don't pass at the moment - $todo" if ( $todo =~ /Compiled binary segfaults/ );
-        
-        ok( $res->{wait} == 0,           "Wait status is $res->{wait}" . ($res->{wait} ? ' (segfault?)': '') );
-        skip("Test failures irrelevant if segfaulting", 4) if ( $todo =~ /Compiled binary segfaults/ );
+        if ( $todo =~ /Compiled binary exits with signal/ ) {
+            local $TODO = "Tests don't pass at the moment - $todo";
+            my $sig_name = $SIGNALS{ $res->{wait} };
+            ok( $res->{wait} == 0, "Wait status is $res->{wait} ($sig_name)" );
+            skip( "Test failures irrelevant if exits premature with $sig_name", 4 );
+        }
+        else {
+            ok( $res->{wait} == 0, "Wait status is $res->{wait}" );
+        }
 
-        TODO: {
-              local $TODO = $todo if($todo =~ m/Test crashes before completion/);
+      TODO: {
+            local $TODO = $todo if ( $todo =~ m/Test crashes before completion/ );
             ok( $parser->{is_good_plan}, "Plan was valid" );
         }
-        ok( $parser->{exit} == 0,           "Exit code is $parser->{exit}" );
+        ok( $parser->{exit} == 0, "Exit code is $parser->{exit}" );
 
         local $TODO = "Tests don't pass at the moment - $todo" if ( $todo =~ /Fails tests when compiled with perlcc/ );
         ok( !scalar @{ $parser->{failed} }, "Test results:" );
