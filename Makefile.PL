@@ -107,7 +107,7 @@ WriteMakefile(
         "    Opcodes:   0.10\n".
         "    IPC::Run:  0\n",
        ) : ()),
-    test => { TESTS => 't/BINARY/*.t t/*.t' },
+    test => { TESTS => 't/C-COMPILED/*.t t/*.t C/*.t CC/*.t Bytecode/*.t' },
     ($ExtUtils::MakeMaker::VERSION gt '6.46' ?
     ('META_MERGE'  => {"recommends" =>
                        {
