@@ -54,6 +54,7 @@ print OUT <<'!NO!SUBS!';
 # Version 2.13, Reini Urban, 2012-01-10 13:03:00
 # Version 2.14, Reini Urban, 2012-02-28 09:04:07
 # Version 2.15, Reini Urban, 2013-02-01 10:41:54
+# Version 2.16, Reini Urban, 2013-11-27 11:36:13
 
 use strict;
 use warnings;
@@ -68,7 +69,7 @@ use File::Basename qw(basename dirname);
 use Pod::Usage;
 # Time::HiRes does not work with 5.6
 # use Time::HiRes qw(gettimeofday tv_interval);
-our $VERSION = 2.15;
+our $VERSION = 2.16;
 $| = 1;
 eval { require B::C::Flags; };
 
@@ -323,7 +324,9 @@ sub parse_argv {
             $Output = basename($Input) . "c";
         }
     } else {
-        $Output = ( is_win32() or $^O eq 'cygwin' ) ? 'a.exe' : 'a.out';
+        $Output = opt('e') ? 'a.out' : $Input;
+        $Output =~ s/\.(p[lm]|t)$//;
+        $Output .= 'exe' if is_win32() or $^O eq 'cygwin';
     }
     $Output = relativize($Output) unless is_win32();
     sanity_check();
@@ -430,9 +433,16 @@ sub compile_cstyle {
     }
     if (opt('o')) {
         $cfile = opt('o').".c";
+        if ((is_win32() or $^O eq 'cygwin') and $Output =~ /\.exe.c$/) {
+          $cfile =~ s/\.exe\.c$/.c/,
+        }
     } elsif (opt('S') || opt('c')) { # We need to keep it
         if (opt('e')) {
-            $cfile = opt('o') ? opt('o').".c" : "a.out.c";
+            $cfile = $Output;
+            if ((is_win32() or $^O eq 'cygwin') and $Output =~ /\.exe$/) {
+                $cfile =~ s/\.exe$//,
+            }
+            $cfile .= '.c';
         } else {
             $cfile = basename($Input);
             # File off extension if present
@@ -751,9 +761,10 @@ sub sanity_check {
             _die("Compiling a.out is probably not what you want to do.\n");
             # You fully deserve what you get now. No you *don't*. typos happen.
         } else {
+            my $suffix = (is_win32() or $^O eq 'cygwin') ? '.exe' : '';
+            (undef, $Output) = tempfile("plcXXXXX", SUFFIX => $suffix);
             warn "$0: Will not write output on top of input file, ",
-                "compiling to a.out instead\n";
-            $Output = (is_win32 or $^O eq 'cygwin') ? 'a.exe' : 'a.out';
+                "compiling to $Output instead\n";
         }
     }
 }
@@ -852,7 +863,7 @@ sub helpme {
 sub relativize {
     my ($args) = @_;
 
-    return() if ($args =~ m"^[/\\]");
+    return("./".basename($args)) if ($args =~ m"^[/\\]");
     return("./$args");
 }
 
@@ -918,7 +929,7 @@ sub interruptrun {
     return($text);
 }
 
-sub is_win32() { $^O =~ m/^MSWin/ }
+sub is_win32() { $^O =~ m/^(MSWin32|msys)/ }
 sub is_msvc() { is_win32 && $Config{cc} =~ m/^cl/i }
 
 END {
@@ -1007,6 +1018,12 @@ given directories to Perl's include path.
 =item -o I<output file name>
 
 Specifies the file name for the final compiled executable.
+
+Without given output file name we use the base of the input file,
+or with C<-e> F<a.out> resp. F<a.exe> and a randomized intermediate
+C filename.
+If the input file is an absolute path on a non-windows system use
+the basename.
 
 =item -c I<C file name>
 
