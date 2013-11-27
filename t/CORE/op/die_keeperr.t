@@ -1,6 +1,6 @@
 #!perl -w
 
-BEGIN { require './test.pl' }
+BEGIN { require 't/CORE/test.pl' }
 
 plan(20);
 

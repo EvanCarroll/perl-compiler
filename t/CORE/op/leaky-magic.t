@@ -12,7 +12,7 @@ BEGIN {
 }
 
 INIT {
-  require './test.pl';
+  require 't/CORE/test.pl';
   unshift @INC, './lib';
 }
 

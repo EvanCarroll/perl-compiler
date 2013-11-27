@@ -2,7 +2,7 @@
 
 BEGIN {
     unshift @INC, './lib';
-    require './test.pl';
+    require 't/CORE/test.pl';
 }
 
 # This is truth in an if statement, and could be a skip message

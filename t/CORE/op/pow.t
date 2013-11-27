@@ -3,7 +3,7 @@
 
 BEGIN {
     unshift @INC, './lib';
-    require './test.pl';
+    require 't/CORE/test.pl';
 }
 
 # This calculation ought to be within 0.001 of the right answer.

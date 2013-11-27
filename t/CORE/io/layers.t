@@ -4,7 +4,7 @@ my $PERLIO;
 
 BEGIN {
     unshift @INC, './lib';
-    require './test.pl';
+    require 't/CORE/test.pl';
 
     # Makes testing easier.
     $ENV{PERLIO} = 'stdio' if exists $ENV{PERLIO} && $ENV{PERLIO} eq '';

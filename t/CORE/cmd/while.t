@@ -1,7 +1,7 @@
 #!./perl
 
 
-require "./test.pl";
+require 't/CORE/test.pl';
 
 plan(25);
 

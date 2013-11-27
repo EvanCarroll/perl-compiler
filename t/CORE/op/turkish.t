@@ -4,7 +4,7 @@ use Config;
 
 BEGIN {
     unshift @INC, './lib';
-    require './test.pl';
+    require 't/CORE/test.pl';
 }
 
 use subs qw(lc lcfirst uc ucfirst);

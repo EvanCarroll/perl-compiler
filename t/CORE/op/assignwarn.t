@@ -9,7 +9,7 @@
 
 BEGIN {
     unshift @INC, './lib';
-    require './test.pl';
+    require 't/CORE/test.pl';
 }
 
 use strict;

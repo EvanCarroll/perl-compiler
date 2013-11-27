@@ -2,7 +2,7 @@
 
 BEGIN {
     unshift @INC, './lib';
-    require './test.pl';
+    require 't/CORE/test.pl';
 }
 
 # perlcc issue #166 https://code.google.com/p/perl-compiler/issues/detail?id=166

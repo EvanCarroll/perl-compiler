@@ -4,7 +4,7 @@
 
 BEGIN {
 	unshift @INC, './lib';
-	require './test.pl';
+	require 't/CORE/test.pl';
 	require Config;
 	# Don't bother if there are no quad offsets.
 	skip_all('no 64-bit file offsets')

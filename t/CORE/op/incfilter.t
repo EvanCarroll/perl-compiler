@@ -2,7 +2,7 @@
 
 # Tests for the source filters in coderef-in-@INC
 
-BEGIN { require './test.pl' }
+BEGIN { require 't/CORE/test.pl' }
 
 use strict;
 use Config;

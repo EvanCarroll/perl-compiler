@@ -2,7 +2,7 @@
 
 BEGIN {
     unshift @INC, './lib';
-    require './test.pl';
+    require 't/CORE/test.pl';
 } 
 
 # XXX remove this later -- dagolden, 2010-01-13

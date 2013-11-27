@@ -3,7 +3,7 @@
 INIT {
     unshift @INC, './lib';
     require Config; import Config;
-    require './test.pl';
+    require 't/CORE/test.pl';
 
     if (!$Config{'d_fork'}) {
         skip_all("fork required to pipe");

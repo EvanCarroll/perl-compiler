@@ -2,7 +2,7 @@
 
 BEGIN {
     unshift @INC, './lib';
-    require './test.pl';
+    require 't/CORE/test.pl';
 }
 
 eval q{ require AnyDBM_File }; # not all places have dbm* functions

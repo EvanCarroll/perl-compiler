@@ -2,7 +2,7 @@
 
 BEGIN {
     unshift @INC, './lib';
-    require './test.pl';
+    require 't/CORE/test.pl';
 }
 
 skip_all("VMS too picky about line endings for record-oriented pipes")

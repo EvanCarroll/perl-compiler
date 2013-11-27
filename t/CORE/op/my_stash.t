@@ -4,7 +4,7 @@ package Foo;
 
 BEGIN {
     unshift @INC, './lib';
-    require './test.pl';
+    require 't/CORE/test.pl';
 }
 
 plan 7;

@@ -2,7 +2,7 @@
 
 INIT { # https://code.google.com/p/perl-compiler/issues/detail?id=155
     unshift @INC, './lib';
-    require './test.pl';
+    require 't/CORE/test.pl';
 }
 
 no utf8; # needed for use utf8 not griping about the raw octets

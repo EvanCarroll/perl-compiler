@@ -2,7 +2,7 @@
 
 BEGIN {
     unshift @INC, './lib';
-    require './test.pl';	# for which_perl() etc
+    require 't/CORE/test.pl';	# for which_perl() etc
 }
 
 use Config;

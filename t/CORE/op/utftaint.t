@@ -16,7 +16,7 @@ sub tainted ($) {
     any_tainted @_;
 }
 
-require './test.pl';
+require 't/CORE/test.pl';
 plan(tests => 3*10 + 3*8 + 2*16 + 2);
 
 my $arg = $ENV{PATH}; # a tainted value

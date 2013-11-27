@@ -6,7 +6,7 @@
 BEGIN {
     unshift @INC, './lib';
     $| = 1;
-    require "./test.pl";
+    require 't/CORE/test.pl';
 }
 
 plan tests => 125;

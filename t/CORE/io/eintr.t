@@ -14,7 +14,7 @@ use warnings;
 use strict;
 use Config;
 
-require './test.pl';
+require 't/CORE/test.pl';
 
 my $piped;
 eval {

@@ -11,7 +11,7 @@ INIT {
     $ENV{LANGUAGE} = 'C'; # GNU locale extension
 
     unshift @INC, './lib';
-    require './test.pl';
+    require 't/CORE/test.pl';
 }
 use 5.010;
 use strict;

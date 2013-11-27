@@ -1,6 +1,6 @@
 #!./perl
 
-BEGIN { require './test.pl' }
+BEGIN { require 't/CORE/test.pl' }
 
 use strict;
 use warnings;

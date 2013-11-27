@@ -5,7 +5,7 @@ BEGIN {
     unshift @INC, './lib';
     $ENV{PATH} = '/bin' if ${^TAINT};
     $SIG{__WARN__} = sub { die "Dying on warning: ", @_ };
-    require './test.pl';
+    require 't/CORE/test.pl';
 }
 
 use warnings;
