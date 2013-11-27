@@ -9,7 +9,7 @@ INIT {
 
 use strict;
 
-require "test.pl";
+require 't/CORE/test.pl';
 plan(tests => 9);
 
 # Generate a load of random numbers.

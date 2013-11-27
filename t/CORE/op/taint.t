@@ -1864,7 +1864,7 @@ SKIP:
     like ($@, qr/^Insecure dependency in eval/);
 
     # Rather nice code to get a tainted undef by from Rick Delaney
-    open my $fh, "test.pl" or die $!;
+    open my $fh, 't/CORE/test.pl' or die $!;
     seek $fh, 0, 2 or die $!;
     $tainted = <$fh>;
 

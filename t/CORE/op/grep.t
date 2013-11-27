@@ -6,7 +6,7 @@
 
 INIT {
     unshift @INC, "./lib";
-    require "test.pl";
+    require 't/CORE/test.pl';
 }
 
 plan( tests => 61 );
