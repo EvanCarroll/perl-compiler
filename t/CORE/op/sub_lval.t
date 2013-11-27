@@ -2,7 +2,7 @@ BEGIN {
     unshift @INC, 't/CORE/lib';
     require 't/CORE/test.pl';
 }
-plan( tests=>75 );
+plan( tests=>76 );
 
 sub a : lvalue { my $a = 34; ${\(bless \$a)} }  # Return a temporary
 sub b : lvalue { ${\shift} }
@@ -556,19 +556,18 @@ TODO: {
     is ($result, 'bar', "RT #41550");
 }
 
-# This is a test of BEGIN / compile time behavior which can't be tested in B::C
-#$@ = '';
-#fresh_perl_is(<<'----', <<'====', "lvalue can not be set after definition. [perl #68758]", stderr => 0);
-#use warnings;
-#our $x;
-#sub foo { $x }
-#sub foo : lvalue;
-#foo = 3;
-#----
-#lvalue attribute ignored after the subroutine has been defined at - line 4.
-#Can't modify non-lvalue subroutine call in scalar assignment at - line 5, near "3;"
-#Execution of - aborted due to compilation errors.
-#====
+$@ = '';
+fresh_perl_is(<<'----', <<'====', "lvalue can not be set after definition. [perl #68758]", stderr => 0);
+use warnings;
+our $x;
+sub foo { $x }
+sub foo : lvalue;
+foo = 3;
+----
+lvalue attribute ignored after the subroutine has been defined at - line 4.
+Can't modify non-lvalue subroutine call in scalar assignment at - line 5, near "3;"
+Execution of - aborted due to compilation errors.
+====
 
 {
     my $x;
