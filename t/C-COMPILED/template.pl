@@ -17,7 +17,8 @@ my $file_to_test = $0;
 if ( $file_to_test =~ s{==(.*)\.t$}{.t} ) {
     my $options = $1;
     $todo = "Compiled binary exits with signal. Issues: $1"     if ( $options =~ /SIG-([\d-]+)/ );
-    $todo = "Fails to compile with perlcc. Issues: $1"          if ( $options =~ /NOCOMPILE-([\d-]+)/ );
+    $todo = "B::C Fails to generate c code. Issues: $1"         if ( $options =~ /BC-([\d-]+)/ );
+    $todo = "gcc cannot compile generated c code. Issues: $1"   if ( $options =~ /GCC-([\d-]+)/ );
     $todo = "Fails tests when compiled with perlcc. Issues: $1" if ( $options =~ /BADTEST-([\d-]+)/ );
     $todo = "Test crashes before completion. Issues: $1"        if ( $options =~ /BADPLAN-([\d-]+)/ );
     $todo = "Tests out of sequence. Issues: $1"                 if ( $options =~ /SEQ-([\d-]+)/ );
@@ -57,7 +58,7 @@ $SIGNALS{0} = '';
 
 foreach my $optimization (@optimizations) {
   TODO: SKIP: {
-        local $TODO = "Tests don't pass at the moment - $todo" if ( $todo =~ /Fails to compile/ );
+        local $TODO = $todo if ( $todo =~ /B::C Fails to generate c code/ );
 
         # Generate the C code at $optimization level
         my $cmd = "$PERL $taint -MO=-qq,C,$optimization,-o$c_file $file_to_test 2>&1";
@@ -73,6 +74,8 @@ foreach my $optimization (@optimizations) {
         }
 
         # gcc the c code.
+        local $TODO = $todo if ( $todo =~ /gcc cannot compile generated c code/ );
+
         my $compile_output = `$PERL script/cc_harness -q $c_file -o $bin_file 2>&1`;
         diag $compile_output if ($compile_output);
 
@@ -114,11 +117,11 @@ foreach my $optimization (@optimizations) {
             ok( $signal == 0, "Exit signal is $signal" );
         }
 
-        if($todo =~ m/Test crashes before completion/ ) {
+        if ( $todo =~ m/Test crashes before completion/ ) {
             local $TODO = $todo;
             ok( $parser->{is_good_plan}, "Plan was valid" );
             diag $out;
-            skip("TAP parse is unpredictable when plan is invalid", 4);
+            skip( "TAP parse is unpredictable when plan is invalid", 4 );
         }
         else {
             ok( $parser->{is_good_plan}, "Plan was valid" );
@@ -135,7 +138,7 @@ foreach my $optimization (@optimizations) {
         ok( !scalar @{ $parser->{failed} }, "No test failures" )
           or diag( "Failed tests: " . join( ", ", @{ $parser->{failed} } ) );
 
-        local $TODO = $todo if($todo =~ m/Tests out of sequence/);
+        local $TODO = $todo if ( $todo =~ m/Tests out of sequence/ );
         ok( !scalar @{ $parser->{parse_errors} }, "Tests are in sequence" )
           or diag explain $parser->{parse_errors};
 
