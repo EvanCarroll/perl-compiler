@@ -1,0 +1,53 @@
+t/C-COMPILED/CORE--op--attrhand==BADTEST-169.t         (Wstat: 256 Tests: 12 Failed: 1)
+  Failed test:  9
+  TODO passed:   11-12
+  Non-zero exit status: 1
+t/C-COMPILED/CORE--io--perlio_fail==BADTEST-195.t      (Wstat: 768 Tests: 12 Failed: 3)
+  Failed tests:  8-10
+  TODO passed:   11-12
+  Non-zero exit status: 3
+t/C-COMPILED/CORE--op--blocks==BADTEST-173.t           (Wstat: 768 Tests: 12 Failed: 3)
+  Failed tests:  8-10
+  TODO passed:   11-12
+  Non-zero exit status: 3
+t/C-COMPILED/CORE--io--perlio==NOCOMPILE-195.t         (Wstat: 0 Tests: 12 Failed: 0)
+  TODO passed:   4
+t/C-COMPILED/CORE--io--pipe==BADTEST-150.t             (Wstat: 0 Tests: 12 Failed: 0)
+  TODO passed:   11-12
+t/C-COMPILED/CORE--op--do==BADTEST-192.t               (Wstat: 768 Tests: 12 Failed: 3)
+  Failed tests:  8-10
+  TODO passed:   11-12
+  Non-zero exit status: 3
+t/C-COMPILED/CORE--op--goto==BADTEST-165.t             (Wstat: 768 Tests: 12 Failed: 3)
+  Failed tests:  8-10
+  TODO passed:   11-12
+  Non-zero exit status: 3
+t/C-COMPILED/CORE--op--magic_phase==BADTEST-208.t      (Wstat: 256 Tests: 12 Failed: 1)
+  Failed test:  9
+  TODO passed:   11-12
+  Non-zero exit status: 1
+t/C-COMPILED/CORE--op--gv==BADTEST-191-192.t           (Wstat: 512 Tests: 12 Failed: 2)
+  Failed tests:  8-9
+  Non-zero exit status: 2
+t/C-COMPILED/CORE--op--reset==BADTEST-160.t            (Wstat: 512 Tests: 12 Failed: 2)
+  Failed tests:  8-9
+  TODO passed:   11-12
+  Non-zero exit status: 2
+t/C-COMPILED/CORE--op--taint==BADTEST-151.t            (Wstat: 256 Tests: 12 Failed: 1)
+  Failed test:  4
+  Non-zero exit status: 1
+t/C-COMPILED/CORE--op--sub==BADTEST-183.t              (Wstat: 768 Tests: 12 Failed: 3)
+  Failed tests:  8-10
+  TODO passed:   11-12
+  Non-zero exit status: 3
+t/C-COMPILED/CORE--op--stash==BADTEST-186-187.t        (Wstat: 512 Tests: 12 Failed: 2)
+  Failed tests:  8-9
+  TODO passed:   11-12
+  Non-zero exit status: 2
+t/C-COMPILED/CORE--op--pack==BADTEST-176.t             (Wstat: 768 Tests: 12 Failed: 3)
+  Failed tests:  8-10
+  Non-zero exit status: 3
+t/C-COMPILED/CORE--op--ref==BADTEST-196-197.t          (Wstat: 256 Tests: 12 Failed: 1)
+  Failed test:  9
+  Non-zero exit status: 1
+

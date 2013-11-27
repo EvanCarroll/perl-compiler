@@ -113,10 +113,16 @@ foreach my $optimization (@optimizations) {
             ok( $res->{wait} == 0, "Wait status is $res->{wait}" );
         }
 
-      TODO: {
-            local $TODO = $todo if ( $todo =~ m/Test crashes before completion/ );
+        if($todo =~ m/Test crashes before completion/ ) {
+            local $TODO = $todo;
+            ok( $parser->{is_good_plan}, "Plan was valid" );
+            diag $out;
+            skip("TAP parse is unpredictable when plan is invalid", 4);
+        }
+        else {
             ok( $parser->{is_good_plan}, "Plan was valid" );
         }
+
         ok( $parser->{exit} == 0, "Exit code is $parser->{exit}" );
 
         local $TODO = "Tests don't pass at the moment - $todo" if ( $todo =~ /Fails tests when compiled with perlcc/ );
