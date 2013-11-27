@@ -8,7 +8,8 @@ use IO::Scalar;
 
 use Test::More;
 
-my @optimizations = ( '-O3,-fno-fold', '-O1' );
+#my @optimizations = ( '-O3,-fno-fold', '-O1' );
+my @optimizations = ( '-O3,-fno-fold');
 my $todo = '';
 
 # Setup file_to_test to be the file we actually want to test.
