@@ -20,6 +20,7 @@ if ( $file_to_test =~ s{==(.*)\.t$}{.t} ) {
     $todo = "Fails to compile with perlcc. Issues: $1"          if ( $options =~ /NOCOMPILE-([\d-]+)/ );
     $todo = "Fails tests when compiled with perlcc. Issues: $1" if ( $options =~ /BADTEST-([\d-]+)/ );
     $todo = "Test crashes before completion. Issues: $1"        if ( $options =~ /BADPLAN-([\d-]+)/ );
+    $todo = "Tests out of sequence. Issues: $1"                 if ( $options =~ /SEQ-([\d-]+)/ );
 }
 
 $file_to_test =~ s{--}{/}g;
@@ -29,7 +30,7 @@ if ( $] != '5.014004' && $file_to_test =~ m{^t/CORE/} ) {
     plan skip_all => "Perl CORE tests only supported in 5.14.4 right now.";
 }
 else {
-    plan tests => 3 + 9 * scalar @optimizations;
+    plan tests => 3 + 10 * scalar @optimizations;
 }
 
 ok( !-z $file_to_test, "$file_to_test exists" );
@@ -68,7 +69,7 @@ foreach my $optimization (@optimizations) {
 
         if ( -z $c_file ) {
             unlink $c_file;
-            skip( "Can't test further due to failure to create a c file.", 8 );
+            skip( "Can't test further due to failure to create a c file.", 9 );
         }
 
         # gcc the c code.
@@ -80,7 +81,7 @@ foreach my $optimization (@optimizations) {
 
         if ( !-x $bin_file ) {
             unlink $c_file, $bin_file;
-            skip( "Can't test further due to failure to create a binary file.", 7 );
+            skip( "Can't test further due to failure to create a binary file.", 8 );
         }
 
         # Parse through TAP::Harness
@@ -106,7 +107,7 @@ foreach my $optimization (@optimizations) {
             local $TODO = "Tests don't pass at the moment - $todo";
             my $sig_name = $SIGNALS{ $res->{wait} };
             ok( $res->{wait} == 0, "Wait status is $res->{wait} ($sig_name)" );
-            skip( "Test failures irrelevant if exits premature with $sig_name", 4 );
+            skip( "Test failures irrelevant if exits premature with $sig_name", 5 );
         }
         else {
             ok( $res->{wait} == 0, "Wait status is $res->{wait}" );
@@ -126,6 +127,10 @@ foreach my $optimization (@optimizations) {
 
         ok( !scalar @{ $parser->{failed} }, "No test failures" )
           or diag( "Failed tests: " . join( ", ", @{ $parser->{failed} } ) );
+
+        local $TODO = $todo if($todo =~ m/Tests out of sequence/);
+        ok( !scalar @{ $parser->{parse_errors} }, "Tests are in sequence" )
+          or diag explain $parser->{parse_errors};
 
         unlink $bin_file, $c_file;
     }
