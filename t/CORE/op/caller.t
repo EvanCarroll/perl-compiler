@@ -232,4 +232,9 @@ EOP
 
 $::testing_caller = 1;
 
-do './op/caller.pl' or die $@;
+my $caller_file = './op/caller.pl';
+if ( !-e $caller_file ) {
+    $caller_file = './t/CORE/'.$caller_file;
+}
+
+do "$caller_file" or die $@;
