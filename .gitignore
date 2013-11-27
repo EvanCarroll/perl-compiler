@@ -52,3 +52,13 @@ t/CORE/perl
 t/perl
 locks/*.t
 fails
+
+t/CORE/base/*.bin
+t/CORE/cmd/*.bin
+t/CORE/comp/*.bin
+t/CORE/io/*.bin
+t/CORE/op/*.bin
+*.tmp
+*.tmp_bak
+tmp*
+/utf*.pl

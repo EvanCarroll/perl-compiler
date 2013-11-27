@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    unshift @INC,  qw(../lib lib);
+    unshift @INC,  qw(t/CORE/lib lib);
     $INC{"feature.pm"} = 1; # so we don't attempt to load feature.pm
 }
 
