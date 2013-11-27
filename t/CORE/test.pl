@@ -746,7 +746,7 @@ sub _fresh_perl {
         # let makefile do the job
         $tmpfile = $0;
         ($tmpfile) = $tmpfile =~ m/(.*)/;
-        $tmpfile =~ s/\.bin$/subtest.$test.t/;
+        $tmpfile =~ s/\.bin$/.subtest.$test.t/;
         $tmpfiles{$tmpfile} = 1;
         unlink $tmpfile if -e $tmpfile;
     }
