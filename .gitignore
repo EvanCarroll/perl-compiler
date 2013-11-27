@@ -58,6 +58,7 @@ t/CORE/cmd/*.bin
 t/CORE/comp/*.bin
 t/CORE/io/*.bin
 t/CORE/op/*.bin
+*.subtest.*.t
 *.tmp
 *.tmp_bak
 tmp*
