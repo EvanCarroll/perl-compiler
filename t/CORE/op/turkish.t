@@ -49,7 +49,7 @@ sub lcfirst($) {
 
 plan tests => 22;
 
-my $map_directory = "./lib/unicore/To";
+my $map_directory = "./t/CORE/lib/unicore/To";
 my $upper = "$map_directory/Upper.pl";
 my $lower = "$map_directory/Lower.pl";
 my $title = "$map_directory/Title.pl";
