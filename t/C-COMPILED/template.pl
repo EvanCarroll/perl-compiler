@@ -111,6 +111,7 @@ foreach my $optimization (@optimizations) {
             local $TODO = "Tests don't pass at the moment - $todo";
             my $sig_name = $SIGNALS{$signal};
             ok( $signal == 0, "Exit signal is $signal ($sig_name)" );
+            diag $out if ($out);
             skip( "Test failures irrelevant if exits premature with $sig_name", 5 );
         }
         else {
