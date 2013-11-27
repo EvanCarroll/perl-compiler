@@ -2,7 +2,7 @@
 # tests whether tainting works with UTF-8
 
 BEGIN {
-    unshift @INC, "./lib";
+    unshift @INC, ".";
 }
 
 use strict;

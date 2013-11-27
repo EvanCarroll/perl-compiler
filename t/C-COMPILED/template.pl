@@ -44,8 +44,8 @@ unlink $bin_file, $c_file;
 
 my $PERL = $^X;
 
-my $check = `$PERL -c '$file_to_test' 2>&1`;
-like( $check, qr/syntax OK/, "perl -c $file_to_test" );
+my $check = `$PERL -c $taint '$file_to_test' 2>&1`;
+like( $check, qr/syntax OK/, "$PERL -c $taint $file_to_test" );
 
 $ENV{HARNESS_NOTTY} = 1;
 
@@ -63,7 +63,7 @@ foreach my $optimization (@optimizations) {
 
         if ( -z $c_file ) {
             unlink $c_file;
-            skip( "Can't test further due to failure to create a c file.", 6 );
+            skip( "Can't test further due to failure to create a c file.", 7 );
         }
 
         # gcc the c code.
@@ -75,7 +75,7 @@ foreach my $optimization (@optimizations) {
 
         if ( !-x $bin_file ) {
             unlink $c_file, $bin_file;
-            skip( "Can't test further due to failure to create a binary file.", 5 );
+            skip( "Can't test further due to failure to create a binary file.", 6 );
         }
 
         # Parse through TAP::Harness
