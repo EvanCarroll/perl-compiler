@@ -10,7 +10,7 @@ INIT {
 
 plan(tests => 48);
 
-open(I, 'op/sysio.t') || die "sysio.t: cannot find myself: $!";
+open(I, 't/CORE/op/sysio.t') || die "sysio.t: cannot find myself: $!";
 
 $reopen = ($^O eq 'VMS' ||
            $^O eq 'os2' ||
