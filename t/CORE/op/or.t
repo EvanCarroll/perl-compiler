@@ -3,7 +3,7 @@
 # Test || in weird situations.
 
 INIT {
-    unshift @INC, './lib';
+    unshift @INC, 't/CORE/lib';
     require 't/CORE/test.pl';
 }
 

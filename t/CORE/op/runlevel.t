@@ -6,7 +6,7 @@
 ## Adapted and expanded by Gurusamy Sarathy <gsar@activestate.com>
 ##
 
-unshift @INC, './lib';
+unshift @INC, 't/CORE/lib';
 require 't/CORE/test.pl';
 
 $|=1;

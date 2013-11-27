@@ -4,7 +4,7 @@
 #
 
 BEGIN {
-    unshift @INC, './lib';
+    unshift @INC, 't/CORE/lib';
 }
 
 print "1..10\n";

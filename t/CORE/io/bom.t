@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    unshift @INC, './lib';
+    unshift @INC, 't/CORE/lib';
 }
 
 BEGIN { require 't/CORE/test.pl'; }

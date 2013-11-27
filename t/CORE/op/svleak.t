@@ -5,7 +5,7 @@
 # see if the count increases.
 
 BEGIN {
-    unshift @INC, './lib';
+    unshift @INC, 't/CORE/lib';
     require 't/CORE/test.pl';
 }
 

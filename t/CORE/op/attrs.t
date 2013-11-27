@@ -3,7 +3,7 @@
 # Regression tests for attributes.pm and the C< : attrs> syntax.
 
 BEGIN {
-    unshift @INC, './lib';
+    unshift @INC, 't/CORE/lib';
     require 't/CORE/test.pl';
 }
 

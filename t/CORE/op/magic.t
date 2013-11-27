@@ -2,7 +2,7 @@
 
 BEGIN {
     $| = 1;
-    unshift @INC, './lib';
+    unshift @INC, 't/CORE/lib';
     $ENV{PATH} = '/bin' if ${^TAINT};
     $SIG{__WARN__} = sub { die "Dying on warning: ", @_ };
     require 't/CORE/test.pl';

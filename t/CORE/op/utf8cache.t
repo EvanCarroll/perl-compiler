@@ -2,7 +2,7 @@
 # Test for malfunctions of utf8 cache
 
 BEGIN {
-    unshift @INC, './lib';
+    unshift @INC, 't/CORE/lib';
     require 't/CORE/test.pl';
 }
 

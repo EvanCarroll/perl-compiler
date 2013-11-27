@@ -9,7 +9,7 @@
 # Warn or die msgs (if any) at - line 1234
 #
 
-unshift @INC, './lib';
+unshift @INC, 't/CORE/lib';
 require 't/CORE/test.pl';
 
 $|=1;

@@ -7,7 +7,7 @@
 # principally, don't segfault).
 
 INIT {
-    unshift @INC, './lib';
+    unshift @INC, 't/CORE/lib';
 }
 
 use warnings;

@@ -13,7 +13,7 @@ BEGIN {
 
 INIT {
   require 't/CORE/test.pl';
-  unshift @INC, './lib';
+  unshift @INC, 't/CORE/lib';
 }
 
 # Hack to allow test counts to be specified piecemeal

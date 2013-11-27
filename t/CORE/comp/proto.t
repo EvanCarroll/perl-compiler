@@ -10,7 +10,7 @@
 #
 
 BEGIN {
-    unshift @INC, './lib';
+    unshift @INC, 't/CORE/lib';
 }
 
 # We need this, as in places we're testing the interaction of prototypes with

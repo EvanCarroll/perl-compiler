@@ -4,7 +4,7 @@
 #
 
 BEGIN {
-    unshift @INC, './lib';
+    unshift @INC, 't/CORE/lib';
     $| = 1;
     require 't/CORE/test.pl';
 }

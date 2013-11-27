@@ -5,7 +5,7 @@ BEGIN {
 }
 
 INIT {
-  unshift @INC, './lib';
+  unshift @INC, 't/CORE/lib';
 }
 
 plan(tests => 48);

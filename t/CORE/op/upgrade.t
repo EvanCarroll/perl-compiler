@@ -5,7 +5,7 @@
 # build or testsuite that upgraded an NV to an RV
 
 BEGIN {
-    unshift @INC, './lib';
+    unshift @INC, 't/CORE/lib';
     require 't/CORE/test.pl';
 }
 

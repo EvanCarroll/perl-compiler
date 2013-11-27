@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    unshift @INC, './lib';
+    unshift @INC, 't/CORE/lib';
 }
 
 print "1..9\n";

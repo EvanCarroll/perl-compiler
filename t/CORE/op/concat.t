@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    unshift @INC, './lib';
+    unshift @INC, 't/CORE/lib';
 }
 
 # This ok() function is specially written to avoid any concatenation.

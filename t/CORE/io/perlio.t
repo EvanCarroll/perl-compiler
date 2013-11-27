@@ -1,5 +1,5 @@
 BEGIN {
-	unshift @INC, './lib';
+	unshift @INC, 't/CORE/lib';
 	require Config; import Config;
 	require 't/CORE/test.pl';
 }

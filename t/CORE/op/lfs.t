@@ -3,7 +3,7 @@
 # If you modify/add tests here, remember to update also ext/Fcntl/t/syslfs.t.
 
 BEGIN {
-	unshift @INC, './lib';
+	unshift @INC, 't/CORE/lib';
 	require 't/CORE/test.pl';
 	require Config;
 	# Don't bother if there are no quad offsets.

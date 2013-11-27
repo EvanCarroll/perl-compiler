@@ -1,7 +1,7 @@
 #!./perl
 
 INIT { # https://code.google.com/p/perl-compiler/issues/detail?id=155
-    unshift @INC, './lib';
+    unshift @INC, 't/CORE/lib';
     require 't/CORE/test.pl';
 }
 

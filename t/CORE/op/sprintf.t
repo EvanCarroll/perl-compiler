@@ -7,7 +7,7 @@
 # specific to multi-byte characters (under the utf8 pragma and such).
 
 BEGIN {
-    unshift @INC, './lib';
+    unshift @INC, 't/CORE/lib';
 }
 use warnings;
 use version;

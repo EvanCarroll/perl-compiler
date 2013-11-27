@@ -2,7 +2,7 @@
 
 BEGIN {
     require 't/CORE/test.pl';
-    unshift @INC, './lib';
+    unshift @INC, 't/CORE/lib';
 }
  
 plan (37);

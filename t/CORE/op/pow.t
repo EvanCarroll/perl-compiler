@@ -2,7 +2,7 @@
 # Now they'll be wanting biff! and zap! tests too.
 
 BEGIN {
-    unshift @INC, './lib';
+    unshift @INC, 't/CORE/lib';
     require 't/CORE/test.pl';
 }
 
