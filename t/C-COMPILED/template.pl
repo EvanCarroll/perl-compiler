@@ -132,17 +132,16 @@ foreach my $optimization (@optimizations) {
 
         local $TODO = "Tests don't pass at the moment - $todo" if ( $todo =~ /Fails tests when compiled with perlcc/ );
         ok( !scalar @{ $parser->{failed} }, "Test results:" );
-        foreach my $line ( split( "\n", $out ) ) {
-            print "    $line\n";
-        }
+        print "    $_\n" foreach ( split( "\n", $out ) );
 
         ok( !scalar @{ $parser->{failed} }, "No test failures" )
           or diag( "Failed tests: " . join( ", ", @{ $parser->{failed} } ) );
 
+        skip( "Don't care about TODO if tests are failing", 1 ) if ( $todo =~ /Fails tests when compiled with perlcc/ );
+
         local $TODO = $todo if ( $todo =~ m/Tests out of sequence/ );
         ok( !scalar @{ $parser->{parse_errors} }, "Tests are in sequence" )
           or diag explain $parser->{parse_errors};
-
-        unlink $bin_file, $c_file;
     }
 }
+unlink $bin_file, $c_file;
