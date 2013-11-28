@@ -16,11 +16,11 @@ my $todo          = '';
 my $file_to_test = $0;
 if ( $file_to_test =~ s{==(.*)\.t$}{.t} ) {
     my $options = $1;
-    $todo = "Compiled binary exits with signal. Issues: $1"     if ( $options =~ /SIG-([\d-]+)/ );
     $todo = "B::C Fails to generate c code. Issues: $1"         if ( $options =~ /BC-([\d-]+)/ );
     $todo = "gcc cannot compile generated c code. Issues: $1"   if ( $options =~ /GCC-([\d-]+)/ );
-    $todo = "Fails tests when compiled with perlcc. Issues: $1" if ( $options =~ /BADTEST-([\d-]+)/ );
+    $todo = "Compiled binary exits with signal. Issues: $1"     if ( $options =~ /SIG-([\d-]+)/ );
     $todo = "Test crashes before completion. Issues: $1"        if ( $options =~ /BADPLAN-([\d-]+)/ );
+    $todo = "Fails tests when compiled with perlcc. Issues: $1" if ( $options =~ /BADTEST-([\d-]+)/ );
     $todo = "Tests out of sequence. Issues: $1"                 if ( $options =~ /SEQ-([\d-]+)/ );
 }
 
@@ -137,7 +137,7 @@ foreach my $optimization (@optimizations) {
         ok( !scalar @{ $parser->{failed} }, "No test failures" )
           or diag( "Failed tests: " . join( ", ", @{ $parser->{failed} } ) );
 
-        skip( "Don't care about TODO if tests are failing", 1 ) if ( $todo =~ /Fails tests when compiled with perlcc/ );
+        skip( "Don't care about test sequence if tests are failing", 1 ) if ( $todo =~ /Fails tests when compiled with perlcc/ );
 
         local $TODO = $todo if ( $todo =~ m/Tests out of sequence/ );
         ok( !scalar @{ $parser->{parse_errors} }, "Tests are in sequence" )
