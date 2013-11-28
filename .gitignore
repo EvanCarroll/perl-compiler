@@ -63,3 +63,4 @@ t/CORE/op/*.bin
 *.tmp_bak
 tmp*
 /utf*.pl
+a.out
