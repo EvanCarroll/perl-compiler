@@ -1,10 +1,12 @@
 #!./perl
 
-INIT {
+BEGIN {
     unshift @INC, 't/CORE/lib';
-    require Config; import Config;
     require 't/CORE/test.pl';
+}
 
+INIT {
+    require Config; import Config;
     if (!$Config{'d_fork'}) {
         skip_all("fork required to pipe");
     }
@@ -46,12 +48,12 @@ SKIP: {
 	exec $Perl, '-le', "print q{not ok $tnum -     again}";
     }
 	
-	print("checkpoint 1\n");
+	print("# checkpoint 1\n");
 
     # This has to be *outside* the fork
     next_test() for 1..2;
 	
-	print("checkpoint 2\n");
+	print("# checkpoint 2\n");
 
     my $raw = "abc\nrst\rxyz\r\nfoo\n";
     if (open($PIPE, "-|")) {
@@ -72,7 +74,7 @@ SKIP: {
         exec $Perl, '-e0';	# Do not run END()...
     }
 
-	print "checkpoint 3\n";
+	print "# checkpoint 3\n";
 	
     # This has to be *outside* the fork
     next_test();
@@ -200,10 +202,10 @@ SKIP: {
             $SIG{ALRM} = sub { return };
             alarm(1);
             is( close FH, '',   'close failure for... umm, something' );
-			print "checkpoint 4\n";
+			print "# checkpoint 4\n";
             is( $?, 13*256,     '       status' );
             is( $!, '',         '       errno');
-			print "checkpoint 5\n";
+			print "# checkpoint 5\n";
             my $wait = wait;
             is( $?, 37*256,     'status correct after wait' );
             is( $wait, $zombie, '       wait pid' );
