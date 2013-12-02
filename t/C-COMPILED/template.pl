@@ -22,6 +22,7 @@ if ( $file_to_test =~ s{==(.*)\.t$}{.t} ) {
     $todo = "Test crashes before completion. Issues: $1"        if ( $options =~ /BADPLAN-([\d-]+)/ );
     $todo = "Fails tests when compiled with perlcc. Issues: $1" if ( $options =~ /BADTEST-([\d-]+)/ );
     $todo = "Tests out of sequence. Issues: $1"                 if ( $options =~ /SEQ-([\d-]+)/ );
+    $todo = "TODO test unexpectedly failing. Issues: $1"        if ( $options =~ /TODO-([\d-]+)/ );
 }
 
 $file_to_test =~ s{--}{/}g;
@@ -102,9 +103,7 @@ foreach my $optimization (@optimizations) {
         close $out_fh;
 
         my $parser = $res->{parser_for}->{$bin_file};
-        ok( $parser,                             "Output parsed by TAP::Harness" );
-        ok( !scalar @{ $parser->{todo_passed} }, "No TODO tests passed" )
-          or diag( "TODO Passed: " . join( ", ", @{ $parser->{todo_passed} } ) );
+        ok( $parser, "Output parsed by TAP::Harness" );
 
         my $signal = $res->{wait} % 256;
         if ( $todo =~ /Compiled binary exits with signal/ ) {
@@ -112,7 +111,7 @@ foreach my $optimization (@optimizations) {
             my $sig_name = $SIGNALS{$signal};
             ok( $signal == 0, "Exit signal is $signal ($sig_name)" );
             diag $out if ($out);
-            skip( "Test failures irrelevant if exits premature with $sig_name", 5 );
+            skip( "Test failures irrelevant if exits premature with $sig_name", 6 );
         }
         else {
             ok( $signal == 0, "Exit signal is $signal" );
@@ -122,7 +121,7 @@ foreach my $optimization (@optimizations) {
             local $TODO = $todo;
             ok( $parser->{is_good_plan}, "Plan was valid" );
             diag $out;
-            skip( "TAP parse is unpredictable when plan is invalid", 4 );
+            skip( "TAP parse is unpredictable when plan is invalid", 5 );
         }
         else {
             ok( $parser->{is_good_plan}, "Plan was valid" );
@@ -137,11 +136,15 @@ foreach my $optimization (@optimizations) {
         ok( !scalar @{ $parser->{failed} }, "No test failures" )
           or diag( "Failed tests: " . join( ", ", @{ $parser->{failed} } ) );
 
-        skip( "Don't care about test sequence if tests are failing", 1 ) if ( $todo =~ /Fails tests when compiled with perlcc/ );
+        skip( "Don't care about test sequence if tests are failing", 2 ) if ( $todo =~ /Fails tests when compiled with perlcc/ );
 
         local $TODO = $todo if ( $todo =~ m/Tests out of sequence/ );
         ok( !scalar @{ $parser->{parse_errors} }, "Tests are in sequence" )
           or diag explain $parser->{parse_errors};
+
+        local $TODO = $todo if ( $todo =~ m/TODO test unexpectedly failing/ );
+        ok( !scalar @{ $parser->{todo_passed} }, "No TODO tests passed" )
+          or diag( "TODO Passed: " . join( ", ", @{ $parser->{todo_passed} } ) );
     }
 }
 unlink $bin_file, $c_file;
