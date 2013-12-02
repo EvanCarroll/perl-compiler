@@ -159,7 +159,7 @@ function ctest {
     fi
 }
 
-ntests=200
+ntests=250
 declare -a tests[$ntests]
 declare -a result[$ntests]
 ncctests=23
@@ -633,6 +633,36 @@ result[229]='ok'
 #issue 30
 tests[230]='sub f1 { my($self) = @_; $self->f2;} sub f2 {} sub new {} print "@ARGV\n";'
 result[230]=''
+tests[234]='$c = 0; for ("-3" .. "0") { $c++ } ; print "$c"'
+result[234]='4'
+# t/testc.sh -O3 -Dp,-UCarp,-v 235
+tests[235]='BEGIN{$INC{Carp.pm}++} $d = pack("U*", 0xe3, 0x81, 0xAF); { use bytes; $ol = bytes::length($d) } print $ol'
+result[235]='6'
+tests[238]='sub f ($);
+sub f ($) {
+  my $test = $_[0];
+  write;
+  format STDOUT =
+  ok @<<<<<<<
+  $test
+  .
+}
+f("");
+'
+result[238]='ok'
+tests[239]='my $x="1";
+format STDOUT =
+ok @<<<<<<<
+$x
+.
+write;print "\n";'
+result[239]='ok 1'
+tests[242]='$xyz = ucfirst("\x{3C2}"); # no problem without that line
+$a = "\x{3c3}foo.bar";
+($c = $a) =~ s/(\p{IsWord}+)/ucfirst($1)/ge;
+print "ok\n" if $c eq "\x{3a3}foo.Bar";
+__END__'
+result[242]='ok'
 
 tests[300]='sub PVBM () { 'foo' } { my $dummy = index 'foo', PVBM } print PVBM'
 result[300]='foo'

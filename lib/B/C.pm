@@ -12,7 +12,7 @@
 package B::C;
 use strict;
 
-our $VERSION = '1.42_59';
+our $VERSION = '1.42_61';
 my %debug;
 our $check;
 my $eval_pvs = '';
@@ -708,7 +708,7 @@ sub save_pv_or_rv {
     # this returns us a SV*. 5.8 expects a char* in xpvmg.xpv_pv
     warn "save_pv_or_rv: save_rv(",$sv,")\n" if $debug{sv};
     $savesym = ($PERL510 ? "" : "(char*)") . save_rv($sv, $fullname);
-    if ($savesym =~ /^get_cv\("/) { # Moose::Util::TypeConstraints::Builtins::_RegexpRef
+    if ($savesym =~ /(\(char\*\))?get_cv\("/) { # Moose::Util::TypeConstraints::Builtins::_RegexpRef
       $static = 0;
       $pv = $savesym;
       $savesym = 'NULL';
@@ -716,8 +716,8 @@ sub save_pv_or_rv {
   }
   else {
     if ($pok) {
-      $pv = pack "a*", $gmg ? $sv->PV : $sv->PVX;
-      $cur = ($sv and $sv->can('CUR') and ref($sv) ne 'B::GV') ? $sv->CUR : length(pack "a*", $pv);
+      $pv = pack "a*", $sv->PV;
+      $cur = ($sv and $sv->can('CUR') and ref($sv) ne 'B::GV') ? $sv->CUR : length($pv);
     } else {
       if ($gmg && $fullname) {
 	no strict 'refs';
@@ -747,7 +747,7 @@ sub save_pv_or_rv {
       }
       if ($static) {
 	$savesym = IsCOW($sv) ? savepv($pv) : constpv($pv);
-        if ($savesym =~ /^get_cv\("/) { # Moose::Util::TypeConstraints::Builtins::_RegexpRef
+        if ($savesym =~ /^(\(char\*\))?get_cv\("/) { # Moose::Util::TypeConstraints::Builtins::_RegexpRef
           $static = 0;
           $pv = $savesym;
           $savesym = 'NULL';
@@ -2153,8 +2153,8 @@ sub B::LEXWARN::save {
   my ($sv, $fullname) = @_;
   my $sym = objsym($sv);
   return $sym if defined $sym;
-  my $iv = $] >= 5.008009 ? length($sv->PVX) : $sv->IV;
-  if ($] < 5.009004 and $] >= 5.009) { $iv = length($sv->PVX); }
+  my $iv = $] >= 5.008009 ? length($sv->PV) : $sv->IV;
+  if ($] < 5.009004 and $] >= 5.009) { $iv = length($sv->PV); }
   my $ivsym = lexwarnsym($iv); # look for shared const int's
   return savesym($sv, $ivsym);
 }
@@ -2494,7 +2494,7 @@ sub B::RV::save {
         sprintf( "xrv_list[%d].xrv_rv = (SV*)%s;", $xrvsect->index, $rv ) );
     }
     # one more: bootstrapped XS CVs (test Class::MOP, no simple testcase yet)
-    elsif ( $rv =~ /get_cv\(/ ) {
+    elsif ( $rv =~ /(\(char\*\))?get_cv\(/ ) {
       $xrvsect->add("(SV*)Nullsv");
       $init->add(
         sprintf( "xrv_list[%d].xrv_rv = (SV*)%s;", $xrvsect->index, $rv ) );
@@ -2653,12 +2653,13 @@ sub B::CV::save {
   }
   my $gv = $cv->GV;
   my ( $cvname, $cvstashname, $fullname );
+  my $CvFLAGS = $cv->CvFLAGS;
   if ($gv and $$gv) {
     $cvstashname = $gv->STASH->NAME;
     $cvname      = $gv->NAME;
     $fullname    = $cvstashname.'::'.$cvname;
     warn sprintf( "CV 0x%x as PVGV 0x%x %s CvFLAGS=0x%x\n",
-                  $$cv, $$gv, $fullname, $cv->CvFLAGS )
+                  $$cv, $$gv, $fullname, $CvFLAGS )
       if $debug{cv};
     # XXX not needed, we already loaded utf8_heavy
     #return if $fullname eq 'utf8::AUTOLOAD';
@@ -2674,7 +2675,7 @@ sub B::CV::save {
   my $cvxsub  = $cv->XSUB;
   my $isconst;
   { no strict 'subs';
-    $isconst = $PERL56 ? 0 : $cv->CvFLAGS & CVf_CONST;
+    $isconst = $PERL56 ? 0 : $CvFLAGS & CVf_CONST;
   }
 
   if ( !$isconst && $cvxsub && ( $cvname ne "INIT" ) ) {
@@ -2798,7 +2799,7 @@ sub B::CV::save {
     return svref_2object( \&Dummy_initxs )->save;
   }
 
-  if ($isconst and !($cv->CvFLAGS & CVf_ANON)) {
+  if ($isconst and !($CvFLAGS & CVf_ANON)) {
     my $stash = $gv->STASH;
     warn sprintf( "CV CONST 0x%x %s::%s\n", $$gv, $cvstashname, $cvname )
       if $debug{cv};
@@ -2905,7 +2906,7 @@ sub B::CV::save {
     }
     $init->add( "/* CV $fullname not found */" ) if $verbose or $debug{sub};
     # This block broke test 15, disabled
-    if (0 and $sv_ix == $svsect->index and !$new_cv_fw) { # can delete, is the last SV
+    if ($sv_ix == $svsect->index and !$new_cv_fw) { # can delete, is the last SV
       warn "No definition for sub $fullname (unable to autoload), skip CV[$sv_ix]\n"
 	if $debug{cv};
       $svsect->remove;
@@ -2985,11 +2986,19 @@ sub B::CV::save {
     warn "No definition for sub $fullname (unable to autoload)\n"
       if $debug{cv};
     $init->add( "/* $fullname not found */" ) if $verbose or $debug{sub};
-    # XXX empty CV should not be saved
+    # XXX empty CV should not be saved. #159, #235
     # $svsect->remove( $sv_ix );
     # $xpvcvsect->remove( $xpvcv_ix );
     # delsym( $cv );
-    # return '0';
+    if (!$new_cv_fw) {
+      $symsect->add("XPVCVIX$xpvcv_ix\t0");
+    }
+    $CvFLAGS &= ~0x1000 if $PERL514; # CVf_DYNFILE
+    $CvFLAGS &= ~0x400 if $gv and $$gv and $PERL514; #CVf_CVGV_RC
+    $symsect->add(sprintf(
+      "CVIX%d\t(XPVCV*)&xpvcv_list[%u], %lu, 0x%x".($PERL510?", {0}":''),
+      $sv_ix, $xpvcv_ix, $cv->REFCNT + ($PERL510 ? 1 : 0), $CvFLAGS));
+    return qq/get_cv("$fullname", TRUE)/;
   }
 
   # Now it is time to record the CV
@@ -3012,7 +3021,6 @@ sub B::CV::save {
   my $len = $cur + 1;
   $len++ if IsCOW($cv);
   $len = 0 if $B::C::const_strings;
-  my $CvFLAGS = $cv->CvFLAGS;
   # GV cannot be initialized statically
   my $xcv_outside = ${ $cv->OUTSIDE };
   if ($xcv_outside == ${ main_cv() } and !$MULTI) {
@@ -3033,7 +3041,7 @@ sub B::CV::save {
     if ($PERL514) {
       # cv_undef wants to free it when CvDYNFILE(cv) is true.
       # E.g. DateTime: boot_POSIX. newXS reuses cv if autoloaded. So turn it off globally.
-      my $CvFLAGS = $cv->CvFLAGS & ~0x1000; # CVf_DYNFILE
+      $CvFLAGS = $cv->CvFLAGS & ~0x1000; # CVf_DYNFILE
       my $xpvc = sprintf
 	# stash magic cur len cvstash start root cvgv cvfile cvpadlist     outside outside_seq cvflags cvdepth
 	("Nullhv, {0}, %u, %u, %s, {%s}, {s\\_%x}, %s, %s, %s, (CV*)%s, %s, 0x%x, %d",
@@ -3327,7 +3335,7 @@ if (0) {
       return $sym;
     }
   }
-  if ($fullname =~ /^main::std(in|out|err)$/ or $fullname eq 'main::STDOUT') {
+  if ($fullname =~ /^main::std(in|out|err)$/) {
     $init->add(qq[$sym = gv_fetchpv($name, $notqual, SVt_PVGV);]);
     $init->add( sprintf( "SvREFCNT($sym) = %u;", $gv->REFCNT ) );
     return $sym;
@@ -3584,7 +3592,7 @@ if (0) {
 	warn "GV::save &$fullname...\n" if $debug{gv};
         my $cvsym = $gvcv->save($fullname);
         # backpatch "$sym = gv_fetchpv($name, TRUE, SVt_PV)" to FALSE and SVt_PVCV
-        if ($cvsym =~ /get_cv\("/) {
+        if ($cvsym =~ /(\(char\*\))?get_cv\("/) {
 	  if (!$xsub{$package} and in_static_core($package, $gvname)) {
 	    my $in_gv;
 	    for (@{ $init->[-1]{current} }) {
@@ -3757,7 +3765,7 @@ sub B::AV::save {
 	# if SvIOK print iv, POK pv
 	if ($el->can('FLAGS')) {
 	  $val = $el->IVX if $el->FLAGS & SVf_IOK;
-	  $val = '"'.$el->PVX.'"' if $el->FLAGS & SVf_POK;
+	  $val = cstring($el->PV) if $el->FLAGS & SVf_POK;
 	}
         warn sprintf( "AV 0x%x[%d] = %s 0x%x $val\n", $$av, $i++, class($el), $$el );
       }
