@@ -633,6 +633,8 @@ result[229]='ok'
 #issue 30
 tests[230]='sub f1 { my($self) = @_; $self->f2;} sub f2 {} sub new {} print "@ARGV\n";'
 result[230]=''
+tests[232]='use Carp (); exit unless Carp::longmess(); print qq{ok\n}'
+result[232]='ok'
 tests[234]='$c = 0; for ("-3" .. "0") { $c++ } ; print "$c"'
 result[234]='4'
 # t/testc.sh -O3 -Dp,-UCarp,-v 235
@@ -663,6 +665,17 @@ $a = "\x{3c3}foo.bar";
 print "ok\n" if $c eq "\x{3a3}foo.Bar";
 __END__'
 result[242]='ok'
+# fails -O3 only
+tests[245]='
+sub foo {
+    my ( $a, $b ) = @_;
+    print "a: ".ord($a)." ; b: ".ord($b)." [ from foo ]\n";
+}
+print "a: ". ord(lc("\x{1E9E}"))." ; ";
+print "b: ". ord("\x{df}")."\n";
+foo(lc("\x{1E9E}"), "\x{df}");'
+result[245]='a: 223 ; b: 223
+a: 223 ; b: 223 [ from foo ]'
 
 tests[300]='sub PVBM () { 'foo' } { my $dummy = index 'foo', PVBM } print PVBM'
 result[300]='foo'
