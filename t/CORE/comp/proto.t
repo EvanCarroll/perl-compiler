@@ -17,6 +17,8 @@ BEGIN {
 # strict
 use strict;
 
+$| = 1;
+
 print "1..172\n";
 
 my $i = 1;
@@ -673,55 +675,53 @@ print "ok ", $i++, "\n";
 # [perl #75904]
 # Test that the following prototypes make subs parse as unary functions:
 #  * \sigil \[...] ;$ ;* ;\sigil ;\[...]
-print "not "
- unless eval 'sub uniproto1 (*) {} uniproto1 $_, 1' or warn $@;
-print "ok ", $i++, "\n";
-print "not "
- unless eval 'sub uniproto2 (\$) {} uniproto2 $_, 1' or warn $@;
-print "ok ", $i++, "\n";
-print "not "
- unless eval 'sub uniproto3 (\[$%]) {} uniproto3 %_, 1' or warn $@;
-print "ok ", $i++, "\n";
-print "not "
- unless eval 'sub uniproto4 (;$) {} uniproto4 $_, 1' or warn $@;
-print "ok ", $i++, "\n";
-print "not "
- unless eval 'sub uniproto5 (;*) {} uniproto5 $_, 1' or warn $@;
-print "ok ", $i++, "\n";
-print "not "
- unless eval 'sub uniproto6 (;\@) {} uniproto6 @_, 1' or warn $@;
-print "ok ", $i++, "\n";
-print "not "
- unless eval 'sub uniproto7 (;\[$%@]) {} uniproto7 @_, 1' or warn $@;
-print "ok ", $i++, "\n";
-print "not "
- unless eval 'sub uniproto8 (+) {} uniproto8 $_, 1' or warn $@;
-print "ok ", $i++, "\n";
-print "not "
- unless eval 'sub uniproto9 (;+) {} uniproto9 $_, 1' or warn $@;
-print "ok ", $i++, "\n";
+sub eval_ok {
+    my ( $code ) = @_;
+
+    print "not "
+     unless eval ''.$code or warn $@;
+    print "ok ", $i++, " # ".$code."\n";
+}
+
+my @tests = (
+    'sub uniproto1 (*) {} uniproto1 $_, 1',
+    'sub uniproto2 (\$) {} uniproto2 $_, 1',
+    'sub uniproto3 (\[$%]) {} uniproto3 %_, 1',
+    'sub uniproto4 (;$) {} uniproto4 $_, 1',
+    'sub uniproto5 (;*) {} uniproto5 $_, 1',
+    'sub uniproto6 (;\@) {} uniproto6 @_, 1',
+    'sub uniproto7 (;\[$%@]) {} uniproto7 @_, 1',
+    'sub uniproto8 (+) {} uniproto8 $_, 1',
+    'sub uniproto9 (;+) {} uniproto9 $_, 1',
+);
+
+foreach my $t ( @tests ) {
+    eval_ok($t);
+}
 
 {
   # Lack of prototype on a subroutine definition should override any prototype
   # on the declaration.
   sub z_zwap (&);
 
+  my $thiswarn;
   local $SIG{__WARN__} = sub {
-    my $thiswarn = join "",@_;
-    if ($thiswarn =~ /^Prototype mismatch: sub main::z_zwap/) {
-      print 'ok ', $i++, "\n";
-    } else {
-      print 'not ok ', $i++, "\n";
-      print STDERR $thiswarn;
-    }
+    $thiswarn = join "", @_;
   };
 
   eval q{sub z_zwap {return @_}};
 
+  # fix a bad plan when the warning is not raised
+  if ($thiswarn =~ /^Prototype mismatch: sub main::z_zwap/) {
+      print 'ok ', $i++, " # Prototype mismatch\n";
+  } else {
+      print 'not ok ', $i++, " # $thiswarn\n";
+  }
+
   if ($@) {
     print "not ok ", $i++, "# $@";
   } else {
-    print "ok ", $i++, "\n";
+    print "ok ", $i++, " # sub z_zwap \n";
   }
 
 
@@ -731,11 +731,11 @@ print "ok ", $i++, "\n";
   if ($@) {
     print "not ok ", $i++, " # $@";
   } else {
-    print "ok ", $i++, "\n";
+    print "ok ", $i++, " # z_zwap\n";
   }
 
   if ("@got" eq "@a") {
-    print "ok ", $i++, "\n";
+    print "ok ", $i++, " # >@got\n";
   } else {
     print "not ok ", $i++, " # >@got<\n";
   }
