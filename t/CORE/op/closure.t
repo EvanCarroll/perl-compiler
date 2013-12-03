@@ -6,8 +6,7 @@
 #
 #   Run with -debug for debugging output.
 
-INIT {
-    unshift @INC, 't/CORE/lib';
+BEGIN {
     require 't/CORE/test.pl';
 }
 
