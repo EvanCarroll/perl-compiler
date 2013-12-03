@@ -1,7 +1,6 @@
 #!./perl
 
-INIT { # https://code.google.com/p/perl-compiler/issues/detail?id=155
-    unshift @INC, 't/CORE/lib';
+BEGIN {
     require 't/CORE/test.pl';
 }
 
@@ -180,7 +179,7 @@ close F;
 unlink($a_file);
 
 open F, ">:utf8", $a_file;
-@a = map { chr(1 << ($_ << 2)) } 0..5; # 0x1, 0x10, .., 0x100000
+@a = map { chr(1 << 0 + ($_ << 2)) } 0..5; # 0x1, 0x10, .., 0x100000 # 0 + is required for some poor editors
 unshift @a, chr(0); # ... and a null byte in front just for fun
 print F @a;
 close F;
