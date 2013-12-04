@@ -155,9 +155,13 @@ sub check_env {
 #line 64
         ok( chdir(undef),           "chdir(undef) w/ only \$ENV{$key} set" );
         is( abs_path, $ENV{$key},   '  abs_path() agrees' );
+
+        my $program_name = $0;
+        $program_name =~ s/\.bin$/.t/;
+
         is( $warning, <<WARNING,   '  got uninit & deprecation warning' );
-Use of uninitialized value in chdir at $0 line 64.
-Use of chdir('') or chdir(undef) as chdir() is deprecated at $0 line 64.
+Use of uninitialized value in chdir at $program_name line 64.
+Use of chdir('') or chdir(undef) as chdir() is deprecated at $program_name line 64.
 WARNING
 
         chdir($Cwd);
@@ -168,7 +172,7 @@ WARNING
         ok( chdir(''),              "chdir('') w/ only \$ENV{$key} set" );
         is( abs_path, $ENV{$key},   '  abs_path() agrees' );
 	is( $warning, <<WARNING,   '  got deprecation warning' );
-Use of chdir('') or chdir(undef) as chdir() is deprecated at $0 line 76.
+Use of chdir('') or chdir(undef) as chdir() is deprecated at $program_name line 76.
 WARNING
 
         chdir($Cwd);
