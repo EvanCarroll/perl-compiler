@@ -1,7 +1,7 @@
-# B::C::VERSION = 1.42_67 74d12f6 2013-12-26 | module test updates: 1.42_67 c248eeb
-# perlversion = 5.012005-nt
-# path = /usr/local/bin/perl5.12.5-nt
-# platform = linux 64bit non-threaded
+# B::C::VERSION = 1.42_67 c248eeb 2013-12-26 | modules: add 5.008008 5.008008-nt
+# perlversion = 5.008008
+# path = /usr/bin/perl
+# platform = linux 64bit threaded
 pass Exporter
 pass Text::Tabs
 pass Text::Wrap
@@ -47,7 +47,7 @@ pass List::MoreUtils
 pass Params::Util
 pass Task::Weaken
 pass Class::Accessor
-pass Test::Tester
+fail Test::Tester #TODO non-debugging with threads
 pass Sub::Install
 pass Attribute::Handlers
 pass Data::OptList
@@ -65,8 +65,8 @@ pass Time::HiRes
 pass Class::Data::Inheritable
 pass Try::Tiny
 pass Devel::GlobalDestruction
-pass Class::MOP
-pass Moose
+skip Class::MOP
+skip Moose
 pass Test::Deep
 pass Carp::Clan
 pass Module::Pluggable
@@ -85,7 +85,7 @@ pass Encode
 pass Variable::Magic
 pass CGI
 pass B::Hooks::EndOfScope
-pass Test::Pod
+pass Test::Pod #TODO 5.8.1-5.8.8 with threads
 pass Digest::SHA1
 pass namespace::clean
 pass Class::Inspector
@@ -93,7 +93,7 @@ pass Clone
 pass XML::NamespaceSupport
 pass XML::SAX
 pass YAML
-pass MooseX::Types
+skip MooseX::Types
 pass Class::Singleton
 pass DateTime::TimeZone
 pass DateTime::Locale
@@ -102,8 +102,8 @@ pass IO::String
 pass AppConfig
 pass UNIVERSAL::require
 pass Template::Stash
-# 100 / 100 modules tested with B-C-1.42_67 - perl-5.012005-nt
-# pass 100 / 100 (100.0%)
-# fail   0 / 100 (0.0%)
-# todo   0 /   0 ()
-# skip   0 / 100 (0.0% not installed)
+# 97 / 100 modules tested with B-C-1.42_67 - perl-5.008008
+# pass  96 /  97 (99.0%)
+# fail   1 /  97 (1.0%)
+# todo   2 /   1 (200.0%)
+# skip   3 / 100 (3.0% not installed)

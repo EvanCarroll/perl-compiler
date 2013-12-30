@@ -164,7 +164,7 @@ sub run_code {
         }
     }
     vprint 0, "Running code $Output @ARGV";
-    run("$Output @ARGV");
+    system(join(" ",$Output,@ARGV));
     exit(0);
 }
 
@@ -570,7 +570,20 @@ sub cc_harness_msvc {
         $link =~ s/ -opt:ref,icf//;
     }
     $link .= " ".opt('Wl') if opt('Wl');
-    $link .= $extra_libs;
+    if (opt('staticxs')) { # TODO: can msvc link to dll's directly? otherwise use dlltool
+        $extra_libs =~ s/^\s+|\s+$//g; # code by stengcode@gmail.com
+        foreach (split /\.dll(?:\s+|$)/, $extra_libs) {
+            $_ .= '.lib';
+            if (!-e $_) {
+                die "--staticxs requires $_, you should copy it from build area";
+            }
+            else {
+              $link .= ' ' . $_;
+            }
+        }
+    } else {
+        $link .= $extra_libs;
+    }
     $link .= " perl5$Config{PERL_VERSION}.lib kernel32.lib msvcrt.lib";
     $link .= $B::C::Flags::extra_libs;
     vprint 3, "Calling $Config{cc} $compile";
@@ -890,8 +903,11 @@ sub run {
     my (@commands) = @_;
 
     my $t0 = [gettimeofday] if opt('time');
-    print interruptrun(@commands) if (!opt('log'));
-    $logfh->print(interruptrun(@commands)) if (opt('log'));
+    if (!opt('log')) {
+        print interruptrun(@commands);
+    } else {
+        $logfh->print(interruptrun(@commands));
+    }
     my $elapsed = tv_interval ( $t0 ) if opt('time');
     vprint -1, "r time: $elapsed" if opt('time');
 }

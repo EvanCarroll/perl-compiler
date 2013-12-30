@@ -15,6 +15,18 @@ sub faster { ($_[1] - $_[0]) < 0.05 }
 sub diagv {
   diag @_ if $ENV{TEST_VERBOSE};
 }
+sub todofaster {
+  my ($t1, $t2, $cmt) = @_;
+  if (faster($t1,$t2)) {
+    ok(1, $cmt);
+  } else {
+  TODO: {
+    # esp. with $ENV{HARNESS_ACTIVE}
+    local $TODO = " (unreliable timings with parallel testing)";
+    ok(0, $cmt);
+    }
+  }
+}
 
 my $X = $^X =~ m/\s/ ? qq{"$^X"} : $^X;
 my $Mblib = Mblib();
@@ -38,13 +50,13 @@ system("$X $Mblib script/cc_harness -o $perldocexe perldoc.c") if $] < 5.010;
 ok(-s $perldocexe, "$perldocexe compiled"); #1
 
 diagv "see if $perldoc -T works";
-my $T_opt = "-T -f wait";
+my $T_opt = "-- -T -f wait";
 my $ori;
 my $PAGER = '';
 my ($result, $out, $err);
 my $t0 = [gettimeofday];
 if ($^O eq 'MSWin32') {
-  $T_opt = "-t -f wait";
+  $T_opt = "-- -t -f wait";
   $PAGER = "PERLDOC_PAGER=type ";
   ($result, $ori, $err) = run_cmd("$PAGER$X -S $perldoc $T_opt", 20);
 } else {
@@ -52,7 +64,7 @@ if ($^O eq 'MSWin32') {
 }
 my $t1 = tv_interval( $t0 );
 if ($ori =~ /Unknown option/) {
-  $T_opt = "-t -f wait";
+  $T_opt = "-- -t -f wait";
   $PAGER = "PERLDOC_PAGER=cat " if $^O ne 'MSWin32';
   diagv "No, use $PAGER instead";
   $t0 = [gettimeofday];
@@ -73,11 +85,7 @@ TODO: {
 
 SKIP: {
   skip "cannot compare times", 1 if $out ne $ori;
-  if (faster($t1,$t2)) {
-    ok(1, "compiled faster than uncompiled: $t2 < $t1"); #3
-  } else {
-    ok(0, "TODO compiled faster than uncompiled: $t2 < $t1 (unreliable with parallel testing)"); #3
-  }
+  todofaster($t1,$t2,"compiled faster than uncompiled: $t2 < $t1"); #3
 }
 
 unlink $perldocexe if -e $perldocexe;
@@ -100,12 +108,8 @@ TODO: {
 
 SKIP: {
   skip "cannot compare times", 2 if $out ne $ori;
-  ok(faster($t2,$t3), "compiled -O3 not slower than -O0: $t3 <= $t2"); #6
-  if (faster($t1,$t3)) {
-    ok(1, "compiled -O3 faster than uncompiled: $t3 < $t1"); #7
-  } else { # unreliable with parallel testing
-    ok(0, "TODO compiled -O3 faster than uncompiled: $t3 < $t1 (unreliable with parallel testing)"); #7
-  }
+  todofaster($t2,$t3,"compiled -O3 not slower than -O0: $t3 <= $t2"); #6
+  todofaster($t1,$t3,"compiled -O3 faster than uncompiled: $t3 < $t1"); #7
 }
 
 END {

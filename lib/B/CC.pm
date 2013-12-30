@@ -105,7 +105,7 @@ pv_copy_on_grow
 
 B<-O1> sets B<-ffreetmps-each-bblock>.
 
-B<-O2> adds B<-ffreetmps-each-loop> and B<-fno-destruct> from L<B::C>.
+B<-O2> adds B<-ffreetmps-each-loop>, C<-faelem> and B<-fno-destruct> from L<B::C>.
 
 The following options must be set explicitly:
 
@@ -136,6 +136,13 @@ of basic blocks forming a loop. At most one of the freetmps-each-*
 options can be used.
 
 Enabled with B<-O2>.
+
+=item B<-faelem>
+
+Enable array element access optimizations, allowing unchecked
+fast access under certain circumstances.
+
+Enabled with B<-O2> and not-threaded perls only.
 
 =item B<-fno-inline-ops>
 
@@ -1777,7 +1784,7 @@ sub pp_aelemfast {
       if ($op->can('padix')) {
         #warn "padix\n";
         $gvsym = $pad[ $op->padix ]->as_sv;
-	my @c = comppadlist->ARRAY;
+	my @c = comppadlist->ARRAY; # XXX curpad, not comppad!!
 	my @p = $c[1]->ARRAY;
 	my $lex = $p[ $op->padix ];
 	$rmg  = ($lex and ref $lex eq 'B::AV' and $lex->MAGICAL & SVs_RMG) ? 1 : 0;
@@ -2632,7 +2639,7 @@ sub pp_return {
 
 sub nyi {
   my $op = shift;
-  warn sprintf( "%s not yet implemented properly\n", $op->ppaddr );
+  warn sprintf( "Warning: %s not yet implemented properly\n", $op->ppaddr );
   return default_pp($op);
 }
 
@@ -2644,7 +2651,7 @@ sub pp_range {
     if ($strict) {
       error("context of range unknown at compile-time\n");
     } else {
-      warn("context of range unknown at compile-time\n");
+      warn("Warning: context of range unknown at compile-time\n");
       runtime('warn("context of range unknown at compile-time");');
     }
     return default_pp($op);
@@ -2671,7 +2678,7 @@ sub pp_flip {
     if ($strict) {
       error("context of flip unknown at compile-time\n");
     } else {
-      warn("context of flip unknown at compile-time\n");
+      warn("Warning: context of flip unknown at compile-time\n");
       runtime('warn("context of flip unknown at compile-time");');
     }
     return default_pp($op);
@@ -3288,7 +3295,7 @@ OPTION:
 	  $c_optimise{$ref}++;
         }
         else {
-          warn qq(ignoring unknown optimisation option "$arg"\n);
+          warn qq(Warning: ignoring unknown optimisation "$arg"\n);
         }
       }
     }
@@ -3300,7 +3307,10 @@ OPTION:
       $B::C::destruct = 0 unless $] < 5.008; # fast_destruct
       if ($arg >= 2) {
         $freetmps_each_loop = 1;
-        $opt_aelem = 1; # unstable, test: 68 pp_padhv targ assert
+        if (!$ITHREADS) {
+          #warn qq(Warning: ignoring -faelem with threaded perl\n);
+          $opt_aelem = 1; # unstable, test: 68 pp_padhv targ assert
+        }
       }
       if ( $arg >= 1 ) {
         $opt_type_attr = 1;
@@ -3365,7 +3375,7 @@ OPTION:
           $B::C::debug{ $B::C::debug_map{$arg} }++;
 	}
 	else {
-	  warn qq(ignoring unknown -D option "$arg"\n);
+	  warn qq(Warning: ignoring unknown -D option "$arg"\n);
 	}
       }
     }
@@ -3373,7 +3383,7 @@ OPTION:
   $strict++ if !$strict and $Config{ccflags} !~ m/-DDEBUGGING/;
   if ($opt_omit_taint) {
     $opt_taint = 0;
-    warn "-fomit_taint is deprecated. Use -fno-taint instead.\n";
+    warn "Warning: -fomit_taint is deprecated. Use -fno-taint instead.\n";
   }
 
   # rgs didn't want opcodes to be added to Opcode. So I had to add it to a
@@ -3448,7 +3458,7 @@ sub compile {
       print "\n";
       output_all( $init_name || "init_module" );
       output_runtime();
-      # output_main_rest();
+      output_main_rest();
     }
   }
   else {
@@ -3624,15 +3634,16 @@ In doubt B::CC code behaves more like with C<use integer>.
 
 Features of standard perl such as C<$[> which have been deprecated
 in standard perl since Perl5 was released have not been implemented
-in the compiler.
+in the optimizing compiler.
 
 =head1 AUTHORS
 
 Malcolm Beattie C<MICB at cpan.org> I<(1996-1998, retired)>,
 Vishal Bhatia <vishal at deja.com> I(1999),
-Gurusamy Sarathy <gsar@cpan.org> I(1998-2001),
-Reini Urban C<perl-compiler@googlegroups.com> I(2008-),
+Gurusamy Sarathy <gsar at cpan.org> I(1998-2001),
+Reini Urban C<perl-compiler at googlegroups.com> I(2008-now),
 Heinz Knutzen C<heinz.knutzen at gmx.de> I(2010)
+Will Braswell C<wbraswell at hush.com> I(2012)
 
 =cut
 

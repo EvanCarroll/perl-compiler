@@ -86,6 +86,7 @@ function runopt {
 	vcmd ${CMD}-o${o}${suff}.c $o.pl
     fi
     test -z $CPP || vcmd $CCMD ${o}${suff}.c -c -E -o ${o}${suff}_E.c
+    test -n "$QUIET" || echo ${CMD}-o${o}${suff}.c $o.pl
     vcmd $CCMD ${o}${suff}.c $LCMD -o ${o}${suff}
     test -x ${o}${suff} || (test -z $CONT && exit)
     if [ -z "$QUIET" ]; then echo "./${o}${suff}"
@@ -132,6 +133,7 @@ function ctest {
 	vcmd ${OCMD}-o$o.c $o.pl
         test -s $o.c || (echo "empty $o.c"; test -z $CONT && exit 2)
 	test -z $CPP || vcmd $CCMD $o.c -c -E -o ${o}_E.c
+        test -n "$QUIET" || echo ${OCMD}-o$o.c $o.pl
 	vcmd $CCMD $o.c $LCMD -o $o
 	test -x $o || (test -z $CONT && exit)
 	if [ -z "$QUIET" ]; then echo "./$o"
@@ -337,8 +339,8 @@ tests[511]='BEGIN{$SIG{USR1}=sub{$w++;};} kill USR1 => $$; print q(ok) if $w';
 result[511]='ok'
 #-------------
 # issue27
-tests[227]='require LWP::UserAgent;print q(ok);'
-result[227]='ok'
+tests[527]='require LWP::UserAgent;print q(ok);'
+result[527]='ok'
 #issue 24
 tests[224]='dbmopen(%H,q(f),0644);print q(ok);'
 result[224]='ok'
@@ -660,7 +662,7 @@ result[166]='ok'
 tests[167]='$a = "a\xFF\x{100}";
 eval {$b = crypt($a, "cd")};
 print $@;'
-result[167]='Wide character in crypt at ccode167.c line 2.'
+result[167]='Wide character in crypt at ccode167.pl line 2.'
 tests[168]='my $start_time = time;
 eval {
     local $SIG{ALRM} = sub { die "ALARM !\n" };
@@ -691,19 +693,16 @@ ok
 tests[170]='# TODO
 eval "sub xyz (\$) : bad ;"; print "~~~~\n$@~~~~\n"'
 result[170]='~~~~
-Invalid CODE attribute: bad at (eval 1) line 1
+Invalid CODE attribute: bad at (eval 1) line 1.
 BEGIN failed--compilation aborted at (eval 1) line 1.
 ~~~~'
-tests[172]='# TODO
-package Foo;
+tests[172]='package Foo;
 use overload q("") => sub { "Foo" };
-
 package main;
 my $foo = bless {}, "Foo";
-print "ok\n" if "$foo" eq "Foo";
+print "ok " if "$foo" eq "Foo";
 print "$foo\n";'
-result[172]='ok
-Foo'
+result[172]='ok Foo'
 tests[173]='# WontFix
 use constant BEGIN   => 42; print "ok 1\n" if BEGIN == 42;
 use constant INIT   => 42; print "ok 2\n" if INIT == 42;
@@ -840,7 +839,7 @@ my $m;
 $SIG{__DIE__} = sub { $m = shift };
 { my $f = Foo->new }
 print "m: $m\n";'
-result[196]='m: Modification of a read-only value attempted at ccode196.c line 3.'
+result[196]='m: Modification of a read-only value attempted at ccode196.pl line 3.'
 tests[197]='# TODO
 package FINALE;
 {
@@ -889,10 +888,10 @@ $str =~ /^[ET1]/i;
 }'
 result[207]='ok 1
 ok 2'
-tests[208]='#TODO
+tests[208]='#TODO 197
 sub MyKooh::DESTROY { print "${^GLOBAL_PHASE} MyKooh " }  my $k=bless {}, MyKooh;
 sub OurKooh::DESTROY { print "${^GLOBAL_PHASE} OurKooh" }our $k=bless {}, OurKooh;'
-if [[ $v513 -gt 0 ]]; then
+if [[ `$PERL -e'print (($] < 5.014)?0:1)'` -gt 0 ]]; then
   result[208]='RUN MyKooh DESTRUCT OurKooh'
 else
   result[208]=' MyKooh  OurKooh'
@@ -966,9 +965,9 @@ sub f ($) {
   my $test = $_[0];
   write;
   format STDOUT =
-  ok @<<<<<<<
-  $test
-  .
+ok @<<<<<<<
+$test
+.
 }
 f("");
 '
@@ -988,12 +987,10 @@ result[240]='ok'
 tests[241]='#TODO
 package Pickup; use UNIVERSAL qw( can ); if (can( "Pickup", "can" ) != \&UNIVERSAL::can) { print "not " } print "ok\n";'
 result[241]='ok'
-tests[242]='#TODO
-$xyz = ucfirst("\x{3C2}"); # no problem without that line
+tests[242]='$xyz = ucfirst("\x{3C2}"); # no problem without that line
 $a = "\x{3c3}foo.bar";
 ($c = $a) =~ s/(\p{IsWord}+)/ucfirst($1)/ge;
-print "ok\n" if $c eq "\x{3a3}foo.Bar";
-__END__'
+print "ok\n" if $c eq "\x{3a3}foo.Bar";'
 result[242]='ok'
 tests[243]='use warnings "deprecated"; print hex(${^WARNINGS}) . " "; print hex(${^H})'
 result[243]='0 598'
@@ -1041,7 +1038,7 @@ result[253]='1..2
 ok 1
 ok 2
 '
-tests[254]='# TODO
+tests[254]='# TODO 197 destroy lexvar
 my $flag = 0;
 sub  X::DESTROY { $flag = 1 }
 {my $x; # x only exists in that scope
@@ -1064,6 +1061,16 @@ BEGIN{ $| = 1; } print "ok\n" if $| == 1'
 result[256]='ok'
 #tests[257]=''
 #result[257]='ok'
+tests[260]='sub FETCH_SCALAR_ATTRIBUTES {''} sub MODIFY_SCALAR_ATTRIBUTES {''}; my $a :x=1; print $a'
+result[260]='1'
+tests[261]='q(12-feb-2015) =~ m#(\d\d?)([\-\./])(feb|jan)(?:\2(\d\d+))?#; print $4'
+result[261]='2015'
+tests[262]='use POSIX'
+result[262]=''
+tests[263]='use JSON::XS; print encode_json []'
+result[263]='[]'
+tests[264]='no warnings; warn "$a.\n"'
+result[264]='.'
 
 tests[300]='sub PVBM () { 'foo' } { my $dummy = index 'foo', PVBM } print PVBM'
 result[300]='foo'

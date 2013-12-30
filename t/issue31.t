@@ -27,14 +27,13 @@ use Ccode31i;
 &Ccode31i::test();
 EOF
 
-use B::C;
+use B::C ();
 # $]<5.007: same as test 33
-# 5.18 errors unrelated
+my $todo = ($] >= 5.010 and $] < 5.011) ? "TODO #31 5.10 " : "";
 ctestok(1, "CC", "ccode31i", $script,
-      # XXX TODO >5.10 since 1.35. copy SvANY(CALLREGCOMP) SvANY(REGEXP) ?
       ($B::C::VERSION lt '1.42_55')
       ? "TODO B:CC Regex in pkg var fails with 5.6 and >5.10 since 1.35 until 1.42_54"
-      : ($] > 5.017 ? "TODO " : "")."B:CC Regex in pkg var");
-ctestok(2, "C,-O3", "ccode31i", $script, ($] > 5.017 ? "TODO " : "")."B:C Regex in pkg var");
+      : $todo."B:CC Regex in pkg var");
+ctestok(2, "C,-O3", "ccode31i", $script, $todo."B:C Regex in pkg var");
 
 END { unlink $pm; }
