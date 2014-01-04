@@ -3,7 +3,7 @@
 	The Perl compiler was in CORE from alpha4 until Perl 5.9.4
 	and worked quite fine with Perl 5.6 and 5.8
 
-1.43	2013-?? rurban
+1.43	2014-?? rurban
 	new 5.16, 5.18, 5.20 and partial windows support, many more fixes and testcases
 
         * C: Fix -u<module> without file extension.
@@ -44,6 +44,8 @@
         use Config does not include B anymore, Internals::V now in __ANON__ package
         Fixed handling of empty - not successfully autoloaded - CVs (#235, #159, ...)
           by storing the SV and XPVCV but ignoring it and defer to run-time get_cv()
+        Unify handling of static and dynamic strings, use ptr_undef throughout instead
+          of NULL vs &PL_sv_undef (save_pv_or_rv => savesym, cur, len, pv, static)
         Restore $^H, the numeric value of global warnings flags (#193,#207,#243)
         Restore more missing globals: ${^UNICODE} ${^UTF8LOCALE} $; $\ $, $/ $" $|
           $^A $^L $: $^ $^ $^ $% $- $= if set in a BEGIN block or via cmdline (#256,#231)
@@ -62,6 +64,10 @@
         Add more DynaLoader::dl_debug output (set PERL_DL_DEBUG=1)
         Enforce -ffold on an ucfirst op or $INC{'unicore/To/Title.pl'} (#242)
         Mark empty but overloaded packages (#172). This is merely workaround for reduced testcases.
+        Set PadnamelistMAXNAMED(comppad_name) needed since 5.19.3 for eval string (#268)
+        Add new option -fno-delete-pkg to control if to ignore compiler-only dependent packages,
+          compiler-independent packages are now always saved. Save those package names at Makefile.PL
+          in @B::C::Flags::deps.
 
         * perlcc (2.14): new option --dryrun, -v5 does not -Dsp,-v
          new option -f passthru to C and CC
@@ -75,10 +81,11 @@
         If the input file is an absolute path on non-windows systems use the basename.
 	* CC (1.13): Use the B::C integer and double precision logic (ivx, nvx).
         Fixed double precision to 16 digits. The nbody shootout is now 2x faster than perl.
-        Added optimizations: -fno-magic, -fno-autovivify
+        Added optimizations: -fno-magic, -fno-autovivify, -faelem
         Detect "no autovivification;" pragma.
-        New -fno-taint, deprecate -fomit_taint
+        New -fno-taint, -fomit_taint is deprecated
         Fix amagic_generation which was removed with 5.17
+        Use new perl6 type names: int, num, str. double and string are deprecated.
 	* Bytecode (1.14): fixed require and op_first, issue 97
 	Fixed regex_pad offset in threaded perls >= 5.11, issue 68.
         New type B::PAD isa B::AV (PADLIST for 5.17.5),
@@ -90,6 +97,10 @@
         Support IsCOW xpvshared strings (>=5.18)
         Fixed wrong xpvshared logic (5.10-5.17), issue 138
         Optimized away 0=default op and gp flags and pointers
+        Optimized away default sv_refcnt=1 (GV not), and skip redundant bytecodes
+        Set PadnamelistMAXNAMED(comppad_name) needed since 5.19.3 for eval string (#268)
+        
+	* ByteLoader (0.10): set sv_refcnt to 1 in newsv
         * Assembler (1.11): allow "newpadlx 0"
         * Disassembler (1.12): use B::Concise op_flags and private_flags
 	* Stash (1.03): fix compilation for 5.8.8 and below: gv_fetchsv missing

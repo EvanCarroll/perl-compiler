@@ -12,7 +12,7 @@
 package B::C;
 use strict;
 
-our $VERSION = '1.42_67';
+our $VERSION = '1.42_70';
 my %debug;
 our $check;
 my $eval_pvs = '';
@@ -303,16 +303,11 @@ my %all_bc_subs = map {$_=>1}
 
 # track all internally used packages. all other may not be deleted automatically
 # - hidden methods
-my %all_bc_pkg = map {$_=>1}
-  qw(B B::AV B::BINOP B::BM B::COP B::CV B::FAKEOP B::GV B::HV
-     B::IO B::IV B::LISTOP B::LOGOP B::LOOP B::NULL B::NV B::OBJECT
-     B::OP B::PADOP B::PMOP B::PV B::PVIV B::PVLV B::PVMG B::PVNV B::PVOP
-     B::REGEXP B::RV B::SPECIAL B::SV B::SVOP B::UNOP B::UV
-     AnyDBM_File Fcntl Regexp overload Errno Exporter Exporter::Heavy Config
-     warnings warnings::register DB next maybe maybe::next FileHandle fields vars
-     AutoLoader Carp Symbol PerlIO PerlIO::scalar SelectSaver ExtUtils ExtUtils::Constant
-     ExtUtils::Constant::ProxySubs threads base IO::File
-    );
+# uses now @B::C::Flags::deps
+my %all_bc_deps = map {$_=>1}
+  @B::C::Flags::deps ? @B::C::Flags::deps
+  : qw(AnyDBM_File AutoLoader B B::AV B::Asmdata B::BINOP B::BM B::C B::C::Flags B::C::InitSection B::C::Section B::CC B::COP B::CV B::FAKEOP B::FM B::GV B::HE B::HV B::IO B::IV B::LEXWARN B::LISTOP B::LOGOP B::LOOP B::MAGIC B::NULL B::NV B::OBJECT B::OP B::PADLIST B::PADOP B::PMOP B::PV B::PVIV B::PVLV B::PVMG B::PVNV B::PVOP B::REGEXP B::RHE B::RV B::SPECIAL B::STASHGV B::SV B::SVOP B::Section B::UNOP B::UV CORE CORE::GLOBAL Carp Config DB DynaLoader Errno Exporter Exporter::Heavy ExtUtils ExtUtils::Constant ExtUtils::Constant::ProxySubs Fcntl FileHandle IO IO::File IO::Handle IO::Poll IO::Seekable IO::Socket Internals O POSIX PerlIO PerlIO::Layer PerlIO::scalar Regexp SelectSaver Symbol UNIVERSAL XSLoader __ANON__ arybase arybase::mg base fields main maybe maybe::next mro next overload re strict threads utf8 vars version warnings warnings::register );
+
 # B::C stash footprint: mainly caused by blib, warnings, and Carp loaded with DynaLoader
 # perl5.15.7d-nt -MO=C,-o/dev/null -MO=Stash -e0
 # -umain,-ure,-umro,-ustrict,-uAnyDBM_File,-uFcntl,-uRegexp,-uoverload,-uErrno,-uExporter,-uExporter::Heavy,-uConfig,-uwarnings,-uwarnings::register,-uDB,-unext,-umaybe,-umaybe::next,-uFileHandle,-ufields,-uvars,-uAutoLoader,-uCarp,-uSymbol,-uPerlIO,-uPerlIO::scalar,-uSelectSaver,-uExtUtils,-uExtUtils::Constant,-uExtUtils::Constant::ProxySubs,-uthreads,-ubase
@@ -728,7 +723,8 @@ sub save_pv_or_rv {
     if ($savesym =~ /(\(char\*\))?get_cv\("/) { # Moose::Util::TypeConstraints::Builtins::_RegexpRef
       $static = 0;
       $pv = $savesym;
-      $savesym = 'NULL';
+      #$savesym = 'NULL';
+      $savesym = 'ptr_undef';
     }
   }
   else {
@@ -738,7 +734,7 @@ sub save_pv_or_rv {
     } else {
       if ($gmg && $fullname) {
 	no strict 'refs';
-	$pv = $fullname and ref($fullname) ? "${$fullname}" : '';
+	$pv = ($fullname and ref($fullname)) ? "${$fullname}" : '';
 	$cur = length (pack "a*", $pv);
 	$pok = 1;
       } else {
@@ -768,7 +764,8 @@ sub save_pv_or_rv {
         if ($savesym =~ /^(\(char\*\))?get_cv\("/) { # Moose::Util::TypeConstraints::Builtins::_RegexpRef
           $static = 0;
           $pv = $savesym;
-          $savesym = 'NULL';
+          $savesym = 'ptr_undef';
+          #$savesym = 'NULL';
         }
         $len = $cur+2 if IsCOW($sv) and $cur;
         push @B::C::static_free, $s if $len and !$B::C::in_endav;
@@ -1462,7 +1459,7 @@ sub B::COP::save {
     my $ix = $copsect->index + 1;
     # XXX No idea how a &sv_list[] came up here, a re-used object. Anyway.
     $warn_sv = substr($warn_sv,1) if substr($warn_sv,0,3) eq '&sv';
-    $warn_sv = "($warnsvcast)&".$warn_sv.($verbose ?' /*lexwarn*/':'');
+    $warn_sv = "($warnsvcast)&".$warn_sv;
     $free->add( sprintf( "    cop_list[%d].cop_warnings = NULL;", $ix ) );
     #push @B::C::static_free, sprintf("cop_list[%d]", $ix);
   }
@@ -2238,7 +2235,7 @@ sub B::REGEXP::save {
   my $pv = $sv->PV;
   my $cur = $sv->CUR;
   # construct original PV
-  $pv =~ s/^(\(\?\^[adluimsx-]*\:)(.*)\)$/\2/;
+  $pv =~ s/^(\(\?\^[adluimsx-]*\:)(.*)\)$/$2/;
   $cur -= length($sv->PV) - length($pv);
   my $cstr = cstring($pv);
   # Unfortunately this XPV is needed temp. Later replaced by struct regexp.
@@ -2282,20 +2279,11 @@ sub B::PVMG::save {
     if ($sv->FLAGS & SVf_ROK) {  # sv => sv->RV cannot be initialized static.
       $init->add(sprintf("SvRV_set(&sv_list[%d], (SV*)%s);", $svsect->index+1, $savesym))
 	if $savesym ne '';
-      $savesym = '0';
+      $savesym = "ptr_undef"; # was "0"
     } else {
       if ( $static ) {
         # comppadnames needs &PL_sv_undef instead of 0
-	# But threaded PL_sv_undef => my_perl->Isv_undef, and my_perl is not available static
-	if (!$pv or !$savesym or $savesym eq 'NULL') {
-	  if ($MULTI) {
-	    $savesym = "NULL";
-	    $init->add( sprintf( "sv_list[%d].sv_u.svu_pv = (char*)&PL_sv_undef;",
-				 $svsect->index+1 ) );
-	  } else {
-	    $savesym = '&PL_sv_undef';
-	  }
-	}
+        $savesym = "ptr_undef" unless $pv;
       }
     }
     my ($ivx,$nvx) = (0, "0");
@@ -2341,16 +2329,12 @@ sub B::PVMG::save {
   if ( !$static ) {
     # comppadnames need &PL_sv_undef instead of 0
     if ($PERL510) {
-      if ($savesym) {
-	if (!$pv or $savesym eq 'NULL') {
-	  $init->add( "$s.sv_u.svu_pv = (char*)&PL_sv_undef;" );
-	} else {
-	  $init->add( savepvn( "$s.sv_u.svu_pv", $pv, $sv, $cur ) );
-	}
+      if ($savesym and $pv) {
+        $init->add( savepvn( "$s.sv_u.svu_pv", $pv, $sv, $cur ) );
       }
     } else {
-      if (!$pv or !$savesym or $savesym eq 'NULL') {
-        $init->add( sprintf( "xpvmg_list[%d].xpv_pv = (char*)&PL_sv_undef;",
+      if (!$pv) {
+        $init->add( sprintf( "xpvmg_list[%d].xpv_pv = (char*)ptr_undef;",
 			     $xpvmgsect->index ) );
       } else {
         $init->add(savepvn( sprintf( "xpvmg_list[%d].xpv_pv", $xpvmgsect->index ),
@@ -5306,6 +5290,29 @@ sub walk_syms {
                 $package.'::' );
 }
 
+# simplified walk_syms
+# needed to populate @B::C::Flags::deps from Makefile.PL from within this %INC context
+sub walk_stashes {
+  my ($symref, $prefix) = @_;
+  no strict 'refs';
+  $prefix = '' unless defined $prefix;
+  foreach my $sym ( sort keys %$symref ) {
+    if ($sym =~ /::$/) {
+      $sym = $prefix . $sym;
+      $B::C::deps{ substr($sym,0,-2) }++;
+      if ($sym ne "main::" && $sym ne "<none>::") {
+        walk_stashes(\%$sym, $sym);
+      }
+    }
+  }
+}
+
+sub collect_deps {
+  %B::C::deps = ();
+  walk_stashes(\%main::);
+  print join " ",(sort keys %B::C::deps);
+}
+
 sub mark_package {
   my $package = shift;
   my $force = shift;
@@ -5420,10 +5427,12 @@ sub skip_pkg {
   return 0;
 }
 
-# with -O0 or -O1 do not delete packages which were brought in from
-# the script, i.e. not defined in B::C or O. Just to be on the safe side.
+# Do not delete/ignore packages which were brought in from the script,
+# i.e. not defined in B::C or O. Just to be on the safe side.
 sub can_delete {
-  return $B::C::can_delete_pkg or $all_bc_pkg{$_{0}};
+  my $pkg = shift;
+  if (exists $all_bc_deps{$pkg} and $B::C::can_delete_pkg) { return 1 };
+  return undef;
 }
 
 sub should_save {
@@ -5497,15 +5506,15 @@ sub should_save {
   }
 
   if ( exists $include_package{$package} ) {
-    if ($debug{pkg}) {
-      if (exists $include_package{$package} and $include_package{$package}) {
-        warn "$package is cached\n";
-      } else {
-        warn "Cached $package is already deleted\n";
-      }
+    if (! exists $all_bc_deps{$package}) {
+      $include_package{$package} = 1;
+      warn "Cached new $package is kept\n" if $debug{pkg};
     }
-    if (!$include_package{$package} and can_delete($package)) {
+    elsif (!$include_package{$package}) {
       delete_unsaved_hashINC($package);
+      warn "Cached $package is already deleted\n" if $debug{pkg};
+    } else {
+      warn "Cached $package is cached\n" if $debug{pkg};
     }
     return $include_package{$package};
   }
@@ -5529,7 +5538,16 @@ sub should_save {
   if ($package !~ /^PerlIO/ and can_delete($package)) {
     delete_unsaved_hashINC($package);
   }
-  return $include_package{$package} = 0;
+  if (can_delete($package)) {
+    warn "Delete $package\n" if $debug{pkg};
+    return $include_package{$package} = 0;
+  } elsif (! exists $all_bc_deps{$package}) { # and not in @deps
+    warn "Keep $package\n" if $debug{pkg};
+    return $include_package{$package} = 1;
+  } else { # in @deps
+    # warn "Ignore $package\n" if $debug{pkg};
+    return;
+  }
 }
 
 sub inc_packname {
@@ -5764,9 +5782,14 @@ sub save_context {
     $init->add(
       "av_store((AV*)CvPADLIST(PL_main_cv), 0, SvREFCNT_inc($curpad_nam)); /* namepad */",
       "av_store((AV*)CvPADLIST(PL_main_cv), 1, SvREFCNT_inc($curpad_sym)); /* curpad */");
+  } elsif ($] < 5.019003) {
+    $init->add(
+      "PadlistARRAY(CvPADLIST(PL_main_cv))[0] = PL_comppad_name = (PAD*)SvREFCNT_inc($curpad_nam); /* namepad */",
+      "PadlistARRAY(CvPADLIST(PL_main_cv))[1] = (PAD*)SvREFCNT_inc($curpad_sym); /* curpad */");
   } else {
     $init->add(
-      "PadlistARRAY(CvPADLIST(PL_main_cv))[0] = (PAD*)SvREFCNT_inc($curpad_nam); /* namepad */",
+      "PadlistARRAY(CvPADLIST(PL_main_cv))[0] = PL_comppad_name = (PAD*)SvREFCNT_inc($curpad_nam); /* namepad */",
+      "PadnamelistMAXNAMED(PL_comppad_name) = AvFILL($curpad_nam);",
       "PadlistARRAY(CvPADLIST(PL_main_cv))[1] = (PAD*)SvREFCNT_inc($curpad_sym); /* curpad */");
   }
   if ($] < 5.017) {
@@ -6023,7 +6046,7 @@ sub mark_skip {
 sub compile {
   my @options = @_;
   # Allow debugging in CHECK blocks without Od
-  $DB::single=1 if defined &DB::DB;
+  $DB::single = 1 if defined &DB::DB;
   my ( $option, $opt, $arg );
   my @eval_at_startup;
   $B::C::can_delete_pkg = 1;
@@ -6427,15 +6450,6 @@ enabled automatically where it is known to work.
 
 Enabled with C<-O2>.
 
-=item B<-fdelete-pkg>
-
-Delete packages which appear to be nowhere used automatically.
-This might miss run-time called stringified methods.
-Note that you can always use C<-u> to add automatically deleted
-packages.
-
-Needs to be used with C<-fno-delete-pkg>.
-
 =item B<-fconst-strings>
 
 Declares static readonly strings as const.
@@ -6495,6 +6509,14 @@ the source code, the requested stash member(s) is/are automatically created.
 
 C<-fno-stash> is the default.
 
+=item B<-fno-delete-pkg>
+
+Do not delete compiler-internal and dependent packages which appear to be
+nowhere used automatically. This might miss run-time called stringified methods.
+See L<B::C::Flags> for C<@deps> which packages are affected.
+
+C<-fdelete-pkg> is the default.
+
 =item B<-fuse-script-name>
 
 Use the script name instead of the program name as C<$0>.
@@ -6534,7 +6556,7 @@ Note that C<-fcog> without C<-fno-destruct> will be disabled >= 5.10.
 
 =item B<-O2>
 
-Enable B<-O1> plus B<-fro-inc>, B<-fsave-data> and B<-fdelete-pkg>.
+Enable B<-O1> plus B<-fro-inc> and B<-fsave-data>.
 
 =item B<-O3>
 
