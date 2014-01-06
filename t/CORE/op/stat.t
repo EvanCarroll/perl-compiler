@@ -16,7 +16,7 @@ if(eval {require File::Spec; 1}) {
 }
 
 
-plan tests => 107;
+plan tests => 108;
 
 my $Perl = which_perl();
 
@@ -367,13 +367,21 @@ SKIP: {
 
 
 # These aren't strictly "stat" calls, but so what?
-my $statfile = './op/stat.t';
+my $statfile;
+foreach my $f ( './op/stat.t', './CORE/op/stat.t', './t/CORE/op/stat.t' ) {
+    $statfile = $f;
+    last if -e $statfile;
+}
+
+ok -e $statfile, "statfile exists [prerequire]" or die "Cannot find file $statfile";
 ok(  -T $statfile,    '-T');
 ok(! -B $statfile,    '!-B');
 
+note "perl $Perl";
+
 SKIP: {
      skip("DG/UX", 1) if $Is_DGUX;
-ok(-B $Perl,      '-B');
+    ok(-B $Perl,      '-B');
 }
 
 ok(! -T $Perl,    '!-T');
@@ -505,12 +513,13 @@ SKIP: {
     # And now for the ambiguous bareword case
     {
 	no warnings 'deprecated';
-	ok(open(DIR, "TEST"), 'Can open "TEST" dir')
-	    || diag "Can't open 'TEST':  $!";
+
+	ok(open(DIR, q{TESTS}), "Can open 'TESTS' dir")
+	    || diag "Can't open 'TESTS':  $!";
     }
     my $size = (stat(DIR))[7];
     ok(defined $size, "stat() on bareword works");
-    is($size, -s "TEST", "size returned by stat of bareword is for the file");
+    is($size, -s q{TESTS}, "size returned by stat of bareword is for the file");
     ok(-f _, "ambiguous bareword uses file handle, not dir handle");
     ok(-f DIR);
     closedir DIR or die $!;
@@ -538,12 +547,12 @@ SKIP: {
 	# And now for the ambiguous bareword case
 	{
 	    no warnings 'deprecated';
-	    ok(open(DIR, "TEST"), 'Can open "TEST" dir')
+	    ok(open(DIR, "TESTS"), 'Can open "TEST" dir')
 		|| diag "Can't open 'TEST':  $!";
 	}
 	my $size = (stat(*DIR{IO}))[7];
 	ok(defined $size, "stat() on *THINGY{IO} works");
-	is($size, -s "TEST",
+	is($size, -s "TESTS",
 	   "size returned by stat of *THINGY{IO} is for the file");
 	ok(-f _, "ambiguous *THINGY{IO} uses file handle, not dir handle");
 	ok(-f *DIR{IO});
