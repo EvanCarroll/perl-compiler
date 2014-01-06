@@ -28,6 +28,8 @@ $ord = 0;
 
 sub wrn {"@_"}
 
+sub note { print join ' ', '#', @_, "\n" }
+
 # Check correct optimization of ucfirst etc
 $ord++;
 my $a = "AB";
@@ -60,9 +62,12 @@ print "ok $ord\n";
 
 {				# Check calling STORE
   my $sc = 0;
-  sub B::TIESCALAR {bless [11], 'B'}
-  sub B::FETCH { -(shift->[0]) }
-  sub B::STORE { $sc++; my $o = shift; $o->[0] = 17 + shift }
+  no warnings q/redefine/;
+  # adjust test for B::C
+  local *B::TIESCALAR = sub {bless [11], 'B'};
+  local *B::FETCH = sub { -(shift->[0]) };
+  local *B::STORE = sub { $sc++; my $o = shift; $o->[0] = 17 + shift };
+
 
   my $m;
   tie $m, 'B';
@@ -92,11 +97,10 @@ print "ok $ord\n";
   $ord++;
   print "# $m\nnot " unless $m == 89;
   print "ok $ord\n";
-
 }
 
-# Chains of assignments
 
+# Chains of assignments
 my ($l1, $l2, $l3, $l4);
 my $zzzz = 12;
 $zzz1 = $l1 = $l2 = $zzz2 = $l3 = $l4 = 1 + $zzzz;
@@ -107,23 +111,24 @@ print "# $zzz1 = $l1 = $l2 = $zzz2 = $l3 = $l4 = 13\nnot "
   and $l2 == 13 and $l3 == 13 and $l4 == 13;
 print "ok $ord\n";
 
+
 for (@INPUT) {
   $ord++;
   ($op, undef, $comment) = /^([^\#]+)(\#\s+(.*))?/;
   $comment = $op unless defined $comment;
-  chomp;
+  chomp;  
   $op = "$op==$op" unless $op =~ /==/;
   ($op, $expectop) = $op =~ /(.*)==(.*)/;
   
   $skip = ($op =~ /^'\?\?\?'/ or $comment =~ /skip\(.*\Q$^O\E.*\)/i)
 	  ? "skip" : "# '$_'\nnot";
-  $integer = ($comment =~ /^i_/) ? "use integer" : '' ;
+  $integer = ($comment =~ /^i_/) ? "use integer;" : '' ;
   (print "#skipping $comment:\nok $ord\n"), next if $skip eq 'skip';
-  
-  eval <<EOE;
+
+  my $code = <<EOE;
   local \$SIG{__WARN__} = \\&wrn;
   my \$a = 'fake';
-  $integer;
+  $integer
   \$a = $op;
   \$b = $expectop;
   if (\$a ne \$b) {
@@ -131,7 +136,11 @@ for (@INPUT) {
     print "\$skip " if \$a ne \$b or \$skip eq 'skip';
   }
   print "ok \$ord - $comment\\n";
+  1;
 EOE
+
+  eval $code == 1 or note "test $comment does not return 1";
+  
   if ($@) {
     if ($@ =~ /is unimplemented/) {
       print "# skipping $comment: unimplemented:\nok $ord\n";
