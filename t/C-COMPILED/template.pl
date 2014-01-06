@@ -64,7 +64,7 @@ foreach my $optimization (@optimizations) {
         # Generate the C code at $optimization level
         my $cmd = "$PERL $taint -MO=-qq,C,$optimization,-o$c_file $file_to_test 2>&1";
 
-        #diag $cmd;
+        diag $cmd if $ENV{VERBOSE};
         my $BC_output = `$cmd`;
         note $BC_output if ($BC_output);
         ok( !-z $c_file, "$c_file is generated ($optimization)" );
@@ -77,7 +77,9 @@ foreach my $optimization (@optimizations) {
         # gcc the c code.
         local $TODO = $todo if ( $todo =~ /gcc cannot compile generated c code/ );
 
-        my $compile_output = `$PERL script/cc_harness -q $c_file -o $bin_file 2>&1`;
+        $cmd = "$PERL script/cc_harness -q $c_file -o $bin_file 2>&1";
+        diag $cmd if $ENV{VERBOSE};
+        my $compile_output = `$cmd`;
         note $compile_output if ($compile_output);
 
         # Validate compiles
