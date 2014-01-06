@@ -31,14 +31,14 @@ ok ((~0 > 0 && do { use integer; ~0 } == -1));
 
 my $bits = 0;
 for (my $i = ~0; $i; $i >>= 1) { ++$bits; }
-my $cusp = 1 << ($bits - 1);
+my $cusp = eval qq{1 << ($bits - 1)}; # poor editor fix
 
 
 ok (($cusp & -1) > 0 && do { use integer; $cusp & -1 } < 0);
 ok (($cusp | 1) > 0 && do { use integer; $cusp | 1 } < 0);
 ok (($cusp ^ 1) > 0 && do { use integer; $cusp ^ 1 } < 0);
-ok ((1 << ($bits - 1)) == $cusp &&
-    do { use integer; 1 << ($bits - 1) } == -$cusp);
+ok ((eval qq{1 << ($bits - 1)}) == $cusp &&
+    do { use integer; eval qq{1 << ($bits - 1)} } == -$cusp);
 ok (($cusp >> 1) == ($cusp / 2) &&
     do { use integer; abs($cusp >> 1) } == ($cusp / 2));
 
