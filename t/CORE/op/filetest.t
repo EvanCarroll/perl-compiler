@@ -11,6 +11,8 @@ BEGIN {
 use Config;
 plan(tests => 28 + 27*14);
 
+chdir('./t/CORE');
+
 ok( -d 'op' );
 ok( -f 'TEST' );
 ok( !-f 'op' );
