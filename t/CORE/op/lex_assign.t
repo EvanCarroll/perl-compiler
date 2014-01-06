@@ -130,7 +130,7 @@ for (@INPUT) {
     print "# \$comment: got `\$a', expected `\$b'\n";
     print "\$skip " if \$a ne \$b or \$skip eq 'skip';
   }
-  print "ok \$ord\\n";
+  print "ok \$ord - $comment\\n";
 EOE
   if ($@) {
     if ($@ =~ /is unimplemented/) {
