@@ -41,7 +41,11 @@ blib
 lib/B/C/Flags.pm
 MANIFEST.files
 TAGS
-log.*
+log.test-*
+log.make-*
+log.do-*
+log.critical-*
+status.1*
 .DS_Store
 B-C-*.tar.gz
 .commit
@@ -52,7 +56,6 @@ t/CORE/perl
 t/perl
 locks/*.t
 fails
-
 t/CORE/base/*.bin
 t/CORE/cmd/*.bin
 t/CORE/comp/*.bin
@@ -64,3 +67,5 @@ t/CORE/op/*.bin
 tmp*
 /utf*.pl
 a.out
+*.patch
+x*.p

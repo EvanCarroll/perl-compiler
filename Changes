@@ -3,8 +3,10 @@
 	The Perl compiler was in CORE from alpha4 until Perl 5.9.4
 	and worked quite fine with Perl 5.6 and 5.8
 
-1.43	2014-?? rurban
-	new 5.16, 5.18, 5.20 and partial windows support, many more fixes and testcases
+1.43	2014-01-15 rurban
+	new 5.16, and partial 5.18, 5.20 and windows support.
+        Many more fixes and testcases.
+        Bytecode is still broken on 5.18, esp non-threaded. 5.20 looks pretty good though.
 
         * C: Fix -u<module> without file extension.
 	With hek do not drop FAKE, only for const pv.
@@ -48,7 +50,7 @@
           of NULL vs &PL_sv_undef (save_pv_or_rv => savesym, cur, len, pv, static)
         Restore $^H, the numeric value of global warnings flags (#193,#207,#243)
         Restore more missing globals: ${^UNICODE} ${^UTF8LOCALE} $; $\ $, $/ $" $|
-          $^A $^L $: $^ $^ $^ $% $- $= if set in a BEGIN block or via cmdline (#256,#231)
+          $^A $^L $: $^H $^R $% $- $= if set in a BEGIN block or via cmdline (#256,#231)
         Restore even deprecated vars $] $# $* (#171)
         Fix HvAUX memory corruption, accessing HvAUX beyond HE fields, esp. with threaded perls.
           Initialize now HvAUX backref and mro_meta fields.
@@ -99,8 +101,8 @@
         Optimized away 0=default op and gp flags and pointers
         Optimized away default sv_refcnt=1 (GV not), and skip redundant bytecodes
         Set PadnamelistMAXNAMED(comppad_name) needed since 5.19.3 for eval string (#268)
-        
-	* ByteLoader (0.10): set sv_refcnt to 1 in newsv
+
+	* ByteLoader (0.10): set sv_refcnt to 1 in newsv to skip most defaults
         * Assembler (1.11): allow "newpadlx 0"
         * Disassembler (1.12): use B::Concise op_flags and private_flags
 	* Stash (1.03): fix compilation for 5.8.8 and below: gv_fetchsv missing

@@ -383,7 +383,7 @@ sub script {my($package,@args)=@_;print "ok"}'
 result[74]='ok'
 # issue 71_2+3: cop_warnings issue76 and const destruction issue71 fixed
 # ok with "utf-8-strict"
-tests[75]='#TODO
+tests[75]='#TODO 5.8.8-5.10
 use Encode;
 my $x = "abc";
 print "ok" if "abc" eq Encode::decode("UTF-8", $x);'
@@ -992,7 +992,7 @@ result[240]='ok'
 tests[241]='#TODO
 package Pickup; use UNIVERSAL qw( can ); if (can( "Pickup", "can" ) != \&UNIVERSAL::can) { print "not " } print "ok\n";'
 result[241]='ok'
-tests[242]='$xyz = ucfirst("\x{3C2}"); # no problem without that line
+tests[242]='$xyz = ucfirst("\x{3C2}");
 $a = "\x{3c3}foo.bar";
 ($c = $a) =~ s/(\p{IsWord}+)/ucfirst($1)/ge;
 print "ok\n" if $c eq "\x{3a3}foo.Bar";'

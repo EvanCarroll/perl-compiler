@@ -15,6 +15,8 @@ unless (-e 'lib/B/C/Flags.pm') {
 }
 
 # generate lib/B/Asmdata.pm beforehand
+my $asmdata = File::Spec->catfile('lib', 'B', 'Asmdata.pm');
+unlink $asmdata if -f $asmdata;
 # my $X = $^X =~ / / ? qq("$^X") : $^X;
 if ($core) {
     system($^X,"-I../../lib/auto","-I../../lib","bytecode.pl");
@@ -359,7 +361,7 @@ testcc :: pure_all
 testbc :: pure_all
 	PERL_DL_NONLAZY=1 $(FULLPERLRUN) -Iblib/arch -Iblib/lib t/bytecode.t
 testfast :: pure_all
-	NO_AUTHOR=1 $(FULLPERLRUN) -S prove -b -j10
+	NO_AUTHOR=1 $(FULLPERLRUN) -S prove -b -j10 -f
 testcritical :: pure_all
 	t/critical.sh
 teststatus :: pure_all

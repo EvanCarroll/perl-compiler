@@ -1,7 +1,7 @@
-# B::C::VERSION = 1.43 7d0386f 2013-09-06 | add 5.18 module tests
-# perlversion = 5.019004d-nt
-# path = /usr/local/bin/perl5.19.4d-nt@9fb52c7b
-# platform = linux 64bit non-threaded debug
+# B::C::VERSION = 1.42_70 103ab13 2014-01-14 | Merge remote-tracking branch 'origin/master' into release
+# perlversion = 5.018002-nt
+# path = /usr/local/bin/perl5.18.2-nt
+# platform = linux 64bit non-threaded
 pass Exporter
 pass Text::Tabs
 pass Text::Wrap
@@ -24,8 +24,8 @@ pass File::Temp
 pass ExtUtils::Install
 pass Text::ParseWords
 pass ExtUtils::CBuilder
-fail ExtUtils::ParseXS
-fail Module::Build
+fail ExtUtils::ParseXS #TODO >= 5.18 #135 Eval-group not allowed at runtime
+fail Module::Build #TODO >= 5.16
 pass File::Path
 pass XSLoader
 pass MIME::Base64
@@ -84,7 +84,7 @@ pass Test::Warn
 pass Encode
 pass Variable::Magic
 pass CGI
-fail B::Hooks::EndOfScope
+pass B::Hooks::EndOfScope
 pass Test::Pod
 pass Digest::SHA1
 pass namespace::clean
@@ -102,8 +102,8 @@ pass IO::String
 pass AppConfig
 pass UNIVERSAL::require
 pass Template::Stash
-# 100 / 100 modules tested with B-C-1.43 - perl-5.019004d-nt
-# pass  97 / 100 (97.0%)
-# fail   3 / 100 (3.0%)
-# todo   0 /   3 (0.0%)
+# 100 / 100 modules tested with B-C-1.42_70 - perl-5.018002-nt
+# pass  98 / 100 (98.0%)
+# fail   2 / 100 (2.0%)
+# todo   2 /   2 (100.0%)
 # skip   0 / 100 (0.0% not installed)

@@ -23,10 +23,10 @@ BEGIN {
     print "1..0 # Skip -- Perl configured without B module\n";
     exit 0;
   }
-  #if ($Config{ccflags} =~ /-DPERL_COPY_ON_WRITE/) {
-  #  print "1..0 # skip - no COW for now\n";
-  #  exit 0;
-  #}
+  if ((!-d '.git' or $ENV{NO_AUTHOR}) and $] >= 5.018 and $Config{useithreads}) {
+    print "1..0 # skip - bytecode 5.18 threaded broken\n";
+    exit 0;
+  }
   require 'test.pl'; # for run_perl()
 }
 use strict;
@@ -61,8 +61,7 @@ push @todo, (21,24..26,28,33,38..39) if $^O eq 'solaris' and $] eq '5.008008';
 #push @todo, (10,18,22,24,27..28,30,45) if $^O eq 'linux' and $] eq '5.008008';
 push @todo, (43)   if $] >= 5.008004 and $] <= 5.008008;
 push @todo, (7)    if $] >= 5.008004 and $] < 5.008008 and $ITHREADS;
-push @todo, (27)   if $] >= 5.010 and $] < 5.018002;
-push @todo, (27)   if $] >= 5.018002 and !$ITHREADS;
+push @todo, (27)   if $] >= 5.010 and !$ITHREADS;
 push @todo, (32)   if $] > 5.011 and $] < 5.013008; # 2x del_backref fixed with r790
 #push @todo, (48)  if $] > 5.013; # END block del_backref fixed with r1004
 #push @todo, (41)  if !$ITHREADS;

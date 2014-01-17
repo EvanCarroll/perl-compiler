@@ -1,7 +1,7 @@
-# B::C::VERSION = 1.42_67 0918736 2013-12-28 | C: fix 5.18 segv with SvSTASH of magic stashes even without OVERLOAD flag
-# perlversion = 5.018001-nt
-# path = /usr/local/bin/perl5.18.1-nt
-# platform = darwin 64bit non-threaded
+# B::C::VERSION = 1.42_70 aad9377 2014-01-11 | t/issue27.t: improve TODO message
+# perlversion = 5.006002-nt
+# path = /usr/local/bin/perl5.6.2-nt
+# platform = linux 64bit non-threaded
 pass Exporter
 pass Text::Tabs
 pass Text::Wrap
@@ -24,8 +24,8 @@ pass File::Temp
 pass ExtUtils::Install
 pass Text::ParseWords
 pass ExtUtils::CBuilder
-fail ExtUtils::ParseXS #TODO >= 5.18 #135 Eval-group not allowed at runtime
-fail Module::Build
+pass ExtUtils::ParseXS
+pass Module::Build
 pass File::Path
 pass XSLoader
 pass MIME::Base64
@@ -55,13 +55,13 @@ pass Sub::Exporter
 pass Test::NoWarnings
 pass version
 pass Params::Validate
-pass Sub::Name
+fail Sub::Name
 pass Filter::Util::Call
 pass Algorithm::C3
 pass Class::C3
 pass Scope::Guard
 pass MRO::Compat
-pass Time::HiRes
+skip Time::HiRes
 pass Class::Data::Inheritable
 pass Try::Tiny
 pass Devel::GlobalDestruction
@@ -79,12 +79,12 @@ pass Sub::Identify
 pass Class::ISA
 pass FCGI
 pass Tree::DAG_Node
-pass Path::Class
+skip Path::Class
 pass Test::Warn
-pass Encode
-pass Variable::Magic
+skip Encode
+skip Variable::Magic
 pass CGI
-pass B::Hooks::EndOfScope
+skip B::Hooks::EndOfScope
 pass Test::Pod
 pass Digest::SHA1
 pass namespace::clean
@@ -92,7 +92,7 @@ pass Class::Inspector
 pass Clone
 pass XML::NamespaceSupport
 pass XML::SAX
-pass YAML
+skip YAML
 pass MooseX::Types
 pass Class::Singleton
 pass DateTime::TimeZone
@@ -102,8 +102,8 @@ pass IO::String
 pass AppConfig
 pass UNIVERSAL::require
 pass Template::Stash
-# 100 / 100 modules tested with B-C-1.42_67 - perl-5.018001-nt
-# pass  98 / 100 (98.0%)
-# fail   2 / 100 (2.0%)
-# todo   1 /   2 (50.0%)
-# skip   0 / 100 (0.0% not installed)
+# 94 / 100 modules tested with B-C-1.42_70 - perl-5.006002-nt
+# pass  93 /  94 (98.9%)
+# fail   1 /  94 (1.1%)
+# todo   0 /   1 (0.0%)
+# skip   6 / 100 (6.0% not installed)
