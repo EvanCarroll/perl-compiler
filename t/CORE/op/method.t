@@ -202,12 +202,12 @@ like ($@, qr/^\QCan't locate object method "foo" via package "E::A" at/);
 eval '$e = bless {}, "E::B"; $e->foo()';  
 like ($@, qr/^\QCan't locate object method "foo" via package "E::B" at/);
 eval 'E::C->foo()';
-like ($@, qr/^\QCan't locate object method "foo" via package "E::C" (perhaps /);
+like ($@, qr/^\QCan't locate object method "foo" via package "E::C" \(perhaps /);
 
 eval 'UNIVERSAL->E::D::foo()';
-like ($@, qr/^\QCan't locate object method "foo" via package "E::D" (perhaps /);
+like ($@, qr/^\QCan't locate object method "foo" via package "E::D" \(perhaps /);
 eval 'my $e = bless {}, "UNIVERSAL"; $e->E::E::foo()';
-like ($@, qr/^\QCan't locate object method "foo" via package "E::E" (perhaps /);
+like ($@, qr/^\QCan't locate object method "foo" via package "E::E" \(perhaps /);
 
 $e = bless {}, "E::F";  # force package to exist
 eval 'UNIVERSAL->E::F::foo()';
