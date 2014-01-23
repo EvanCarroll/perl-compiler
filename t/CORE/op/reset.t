@@ -16,7 +16,6 @@ plan( tests => 24 );
 package aiieee;
 
 sub zlopp {
-    # perlcc issue #160 https://code.google.com/p/perl-compiler/issues/detail?id=160
     (shift =~ m?zlopp?) ? 1 : 0;
 }
 
@@ -27,7 +26,6 @@ sub reset_zlopp {
 package CLINK;
 
 sub ZZIP {
-    # perlcc issue #160 https://code.google.com/p/perl-compiler/issues/detail?id=160
     shift =~ m?ZZIP? ? 1 : 0;
 }
 
