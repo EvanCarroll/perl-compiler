@@ -303,7 +303,7 @@ package main; Foo->$meth->[0]();
 EOT
 	"Foo $meth->[1]",
 	{ switches => [ '-w' ] },
-	"check if UNIVERSAL::AUTOLOAD works",
+	"check if UNIVERSAL::AUTOLOAD works with [ ".join(', ', @$meth).' ]',
     );
 }
 
