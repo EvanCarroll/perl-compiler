@@ -149,4 +149,4 @@ foreach my $optimization (@optimizations) {
           or note( "TODO Passed: " . join( ", ", @{ $parser->{todo_passed} } ) );
     }
 }
-unlink $bin_file, $c_file;
+unlink $bin_file, $c_file unless $ENV{BC_DEVELOPING};
