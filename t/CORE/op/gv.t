@@ -267,7 +267,7 @@ is($j[0], 1);
     is ($w, '');
     sub abc3 ();
     *abc3 = sub { };
-    like ($w, qr/Prototype mismatch/);
+    like ($w, qr/Prototype mismatch/, 'Prototype mismatch');
 }
 
 {
@@ -276,7 +276,7 @@ is($j[0], 1);
     my $x = "not ";
     $x  = undef;
     $x .= <DATA>;
-    is ($x, "Rules\n");
+    is ($x, "Rules\n", 'Rules');
 }
 
 {
@@ -286,7 +286,7 @@ is($j[0], 1);
     my %v;
     sub f { $_[0] = 0; $_[0] = "a"; $_[0] = *DATA }
     f($v{v});
-    is ($v{v}, '*main::DATA');
+    is ($v{v}, '*main::DATA', '*main::DATA');
     is (ref\$v{v}, 'GLOB', 'lvalue assignment preserves globs');
     my $x = readline $v{v};
     is ($x, "perl\n");
