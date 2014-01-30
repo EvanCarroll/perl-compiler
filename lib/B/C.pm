@@ -12,7 +12,7 @@
 package B::C;
 use strict;
 
-our $VERSION = '1.43_02';
+our $VERSION = '1.43_03';
 my %debug;
 our $check;
 my $eval_pvs = '';
@@ -910,6 +910,28 @@ sub nvx ($) {
   return $sval;
 }
 
+# for bytes and utf8 only
+# TODO: Carp::Heavy, Exporter::Heavy
+# special case: warnings::register via -fno-warnings
+sub force_heavy {
+  my $pkg = shift;
+  my $pkg_heavy = $pkg."_heavy.pl";
+  no strict 'refs';
+  if (!$include_package{$pkg_heavy}) {
+    #eval qq[sub $pkg\::AUTOLOAD {
+    #    require '$pkg_heavy';
+    #    goto &\$AUTOLOAD if defined &\$AUTOLOAD;
+    #    warn("Undefined subroutine \$AUTOLOAD called");
+    #  }];
+    #warn "Redefined $pkg\::AUTOLOAD to omit Carp\n" if $debug{gv};
+    warn "Forcing early $pkg_heavy\n" if $debug{pkg};
+    require $pkg_heavy;
+    mark_package($pkg_heavy, 1);
+    #walk_syms($pkg); #before we stub unloaded CVs
+  }
+  return svref_2object( \*{$pkg."::AUTOLOAD"} );
+}
+
 # See also init_op_ppaddr below; initializes the ppaddr to the
 # OpTYPE; init_op_ppaddr iterates over the ops and sets
 # op_ppaddr to PL_ppaddr[op_ppaddr]; this avoids an explicit assignment
@@ -1255,7 +1277,7 @@ sub B::LISTOP::save {
     if ($svop->name == 'const' and $B::C::const_strings and $svop->can('sv')) {
       # non-static only when the const string contains ~ #277
       my $sv = $svop->sv;
-      if ($sv->PV =~ /~/) {
+      if ($sv->can("PV") and $sv->PV =~ /~/) {
 	local $B::C::const_strings;
 	$svop->save("svop const");
       }
@@ -1514,9 +1536,10 @@ sub B::COP::save {
 	      "$opsect_common, line, stashoff, file, hints, seq, warnings, hints_hash");
       $copsect->add(
 	sprintf(
-		"%s, %u, " . "%d, %s, 0, " . "%s, %s, NULL",
+		"%s, %u, " . "%d, %s, %u, " . "%s, %s, NULL",
 		$op->_save_common, $op->line,
 		$op->stashoff, "(char*)".constpv( $file ), #hints=0
+                $op->hints,
 		ivx($op->cop_seq), $B::C::optimize_warn_sv ? $warn_sv : 'NULL'
 	       ));
     } elsif ($ITHREADS and $] >= 5.016) {
@@ -1525,13 +1548,14 @@ sub B::COP::save {
 	      "$opsect_common, line, stashpv, file, stashlen, hints, seq, warnings, hints_hash");
       $copsect->add(
 	sprintf(
-		"%s, %u, " . "%s, %s, %d, 0, " . "%s, %s, NULL",
+		"%s, %u, " . "%s, %s, %d, %u, " . "%s, %s, NULL",
 		$op->_save_common, $op->line,
 		"(char*)".constpv( $op->stashpv ), # we can store this static
 		"(char*)".constpv( $file ),
 		# XXX at broken 5.16.0 with B-1.34 we do non-utf8, non-null only (=> negative len),
 		# 5.16.0 B-1.35 has stashlen, 5.16.1 we will see.
 		$op->can('stashlen') ? $op->stashlen : length($op->stashpv),
+                $op->hints,
 		ivx($op->cop_seq), $B::C::optimize_warn_sv ? $warn_sv : 'NULL'
 	       ));
     } elsif ($ITHREADS and $] >= 5.015004 and $] < 5.016) {
@@ -1539,11 +1563,13 @@ sub B::COP::save {
 	      "$opsect_common, line, stashpv, file, stashflags, hints, seq, warnings, hints_hash");
       $copsect->add(
 	sprintf(
-              "%s, %u, " . "%s, %s, %d, 0, " . "%s, %s, NULL",
-              $op->_save_common, $op->line,
-	      "(char*)".constpv( $op->stashpv ), # we can store this static
-	      "(char*)".constpv( $file ), $op->stashflags,
-              ivx($op->cop_seq), $B::C::optimize_warn_sv ? $warn_sv : 'NULL'
+                "%s, %u, " . "%s, %s, %d, %u, " . "%s, %s, NULL",
+                $op->_save_common, $op->line,
+                "(char*)".constpv( $op->stashpv ), # we can store this static
+                "(char*)".constpv( $file ),
+                $op->stashflags, $op->hints,
+                ivx($op->cop_seq),
+                $B::C::optimize_warn_sv ? $warn_sv : 'NULL'
 	       ));
     } else {
       # cop_label now in hints_hash (Change #33656)
@@ -1551,11 +1577,11 @@ sub B::COP::save {
 	      "$opsect_common, line, stash, file, hints, seq, warn_sv, hints_hash");
       $copsect->add(
 	sprintf(
-              "%s, %u, " . "%s, %s, 0, " . "%s, %s, NULL",
+              "%s, %u, " . "%s, %s, %u, " . "%s, %s, NULL",
               $op->_save_common, $op->line,
 	      $ITHREADS ? "(char*)".constpv( $op->stashpv ) : "Nullhv",# we can store this static
 	      $ITHREADS ? "(char*)".constpv( $file ) : "Nullgv",
-              ivx($op->cop_seq),
+              $op->hints, ivx($op->cop_seq),
               ( $B::C::optimize_warn_sv ? $warn_sv : 'NULL' )
 	       ));
     }
@@ -1580,11 +1606,11 @@ sub B::COP::save {
   }
   elsif ($PERL510) {
     $copsect->comment("$opsect_common, line, label, stash, file, hints, seq, warnings, hints_hash");
-    $copsect->add(sprintf("%s, %u, %s, " . "%s, %s, 0, " . "%u, %s, NULL",
+    $copsect->add(sprintf("%s, %u, %s, " . "%s, %s, %u, " . "%u, %s, NULL",
 			  $op->_save_common,     $op->line, 'NULL',
 			  $ITHREADS ? "(char*)".constpv( $op->stashpv ) : "NULL", # we can store this static
 			  $ITHREADS ? "(char*)".constpv( $file ) : "NULL",
-			  $op->cop_seq,
+                          $op->hints, $op->cop_seq,
 			  ( $B::C::optimize_warn_sv ? $warn_sv : 'NULL' )));
     if ($op->label) {
       $init->add(sprintf( "CopLABEL_set(&cop_list[%d], CopLABEL_alloc(%s));",
@@ -1600,7 +1626,7 @@ sub B::COP::save {
 	      $op->_save_common, cstring( $op->label ),
 	      $ITHREADS ? "(char*)".constpv( $op->stashpv ) : "NULL", # we can store this static
 	      $ITHREADS ? "(char*)".constpv( $file ) : "NULL",
-	      ivx($op->cop_seq),      $op->arybase,
+	      ivx($op->cop_seq), $op->arybase,
 	      $op->line, ( $B::C::optimize_warn_sv ? $warn_sv : 'NULL' ),
 	      ( $PERL56 ? "" : ", 0" )
 	     )
@@ -2916,8 +2942,18 @@ sub B::CV::save {
   if ($fullname eq 'utf8::SWASHNEW') { # bypass utf8::AUTOLOAD, a new 5.13.9 mess
     require "utf8_heavy.pl" unless $INC{"utf8_heavy.pl"};
     # sub utf8::AUTOLOAD {}; # How to ignore &utf8::AUTOLOAD with Carp? The symbol table is
-    # already polluted. See issue 61.
+    # already polluted. See issue 61 and force_heavy()
     svref_2object( \&{"utf8\::SWASHNEW"} )->save;
+  }
+  if (!$$root && !$cvxsub and $cvstashname =~ /^(bytes|utf8)$/) { # no autoload, force compile-time
+    force_heavy($cvstashname);
+    $cv = svref_2object( \&{"$cvstashname\::$cvname"} );
+    $gv = $cv->GV;
+    warn sprintf( "Redefined CV 0x%x as PVGV 0x%x %s CvFLAGS=0x%x\n",
+                  $$cv, $$gv, $fullname, $CvFLAGS ) if $debug{cv};
+    $sym = savesym( $cv, $sym );
+    $root    = $cv->ROOT;
+    $cvxsub  = $cv->XSUB;
   }
   if ( !$$root && !$cvxsub ) {
     if ( my $auto = try_autoload( $cvstashname, $cvname ) ) {
@@ -3373,6 +3409,10 @@ sub B::GV::save {
   my $egvsym;
   my $is_special = ref($gv) eq 'B::SPECIAL';
 
+  if ($fullname =~ /^(bytes|utf8)::AUTOLOAD$/) {
+    $gv = force_heavy($package); # defer to run-time autoload, or compile it in?
+    $sym = savesym( $gv, $sym ); # override new gv ptr to sym
+  }
   if ( !$is_empty ) {
     my $egv = $gv->EGV;
     unless (ref($egv) eq 'B::SPECIAL' or ref($egv->STASH) eq 'B::SPECIAL') {
@@ -5318,6 +5358,9 @@ sub B::GV::savecv {
   if ($package eq 'B::C') {
     warn sprintf( "Skip XS \&$fullname 0x%x\n", $$cv ) if $debug{gv};
     return;
+  }
+  if ($fullname =~ /^(bytes|utf8)::AUTOLOAD$/) {
+    $gv = force_heavy($package);
   }
   # we should not delete already saved packages
   $saved{$package}++;
