@@ -59,6 +59,7 @@ for my $line (@version_cases) {
     foreach my $suffix (";", "{}") {
 	$withversion::VERSION = undef;
 	if ($package eq 'fail') {
+        note "package withversion $v$suffix";
 	    eval "package withversion $v$suffix";
 	    like($@, qr/$match/, "package withversion $v$suffix -> syntax error ($match)");
 	    ok(! version::is_strict($v), qq{... and "$v" should also fail STRICT regex});
