@@ -152,7 +152,7 @@ $_ = "global";
     my $_ = "titi";
     my $r;
     {
-	local $::TODO = 'Marked as todo since test was added in 59f00321bbc2d046';
+	local $::TODO = 'Marked as todo since test was added in 59f00321bbc2d046' unless $0 =~ m{.bin$}; # fixed in perlcc
 	$r = $s =~ /to(?{ is($_, 'toto', 'my $_ in code-match' ) })to/;
     }
     ok($r, "\$s=$s should match!");
