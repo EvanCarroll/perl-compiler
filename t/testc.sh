@@ -823,9 +823,9 @@ tests[192]='use warnings;
 result[192]='ok'
 tests[193]='unlink q{not.a.file}; $! = 0; open($FOO, q{not.a.file}); print( $! ne 0 ? "ok" : q{error: $! should not be 0}."\n"); close $FOO;'
 result[193]='ok'
-tests[194]='$0 = q{good morning, Dave}; #print "pid: $$\n";
-$s=`ps auxw | grep "$$" | grep ", Dave"|grep -v grep`;
-print q(ok) if $s =~ /good morning, Dave/'
+tests[194]='$0 = q{ccdave}; #print "pid: $$\n";
+$s=`ps auxw | grep "$$" | grep "ccdave"|grep -v grep`;
+print q(ok) if $s =~ /ccdave/'
 result[194]='ok'
 # duplicate of 152
 tests[195]='use PerlIO;  eval { require PerlIO::scalar }; find PerlIO::Layer "scalar"'
@@ -1038,11 +1038,10 @@ result[251]='ok'
 tests[252]='my $i = 0; for ("-3".."0") { ++$i } print $i'
 result[252]='4'
 tests[253]='# TODO
-INIT { require "t/test.pl"}plan(tests=>2);is("\x{2665}", v9829);is(v9829,"\x{2665}");'
+INIT{require "t/test.pl"}plan(tests=>2);is("\x{2665}", v9829);is(v9829,"\x{2665}");'
 result[253]='1..2
 ok 1
-ok 2
-'
+ok 2'
 tests[254]='# TODO 197 destroy lexvar
 my $flag = 0;
 sub  X::DESTROY { $flag = 1 }
@@ -1064,8 +1063,8 @@ result[255]='ok'
 tests[256]='# TODO
 BEGIN{ $| = 1; } print "ok\n" if $| == 1'
 result[256]='ok'
-#tests[257]=''
-#result[257]='ok'
+tests[259]='use JSON::XS; print encode_json([\0])'
+result[259]='[false]'
 tests[260]='sub FETCH_SCALAR_ATTRIBUTES {''} sub MODIFY_SCALAR_ATTRIBUTES {''}; my $a :x=1; print $a'
 result[260]='1'
 tests[261]='q(12-feb-2015) =~ m#(\d\d?)([\-\./])(feb|jan)(?:\2(\d\d+))?#; print $4'
@@ -1076,6 +1075,28 @@ tests[263]='use JSON::XS; print encode_json []'
 result[263]='[]'
 tests[264]='no warnings; warn "$a.\n"'
 result[264]='.'
+tests[272]='#TODO
+$d{""} = qq{ok\n}; print $d{""};'
+result[272]='ok'
+tests[2721]='#TODO
+BEGIN{$d{""} = qq{ok\n};} print $d{""};'
+result[2721]='ok'
+tests[277]='#TODO -O3
+format OUT =
+bar ~~
+.
+open(OUT, ">/dev/null"); write(OUT); close OUT;'
+result[277]=''
+tests[280]='package M; $| = 1; sub DESTROY {eval {print "Farewell ",ref($_[0])};} package main; bless \$A::B, q{M}; *A:: = \*B::;'
+result[280]='Farewell M'
+tests[282]='use vars qw($glook $smek $foof); $glook = 3; $smek = 4; $foof = "halt and cool down"; my $rv = \*smek; *glook = $rv; my $pv = ""; $pv = \*smek; *foof = $pv; print "ok\n";'
+result[282]='ok'
+tests[283]='#TODO #238
+format =
+ok
+.
+write'
+result[283]='ok'
 
 tests[300]='sub PVBM () { 'foo' } { my $dummy = index 'foo', PVBM } print PVBM'
 result[300]='foo'

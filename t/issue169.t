@@ -6,11 +6,11 @@ BEGIN {
   unshift @INC, 't';
   require "test.pl";
 }
-use Test::More tests => 1;
+use Test::More tests => 3;
 use B::C ();
-my $todo = ($B::C::VERSION ge '1.42_71') ? "" : "TODO ";
+my $todo = ($B::C::VERSION ge '1.44') ? "" : "TODO ";
 
-ctestok(1,'C,-O3','ccode169i',<<'EOF',$todo.'#169 Attribute::Handlers');
+ctestok(1,'C,-O3','ccode169i',<<'EOF',$todo.'Attribute::Handlers #169');
 package MyTest;
 
 use Attribute::Handlers;
@@ -25,4 +25,20 @@ sub a_sub :Check(qw/a b c/) {
 }
 
 print a_sub()."\n";
+EOF
+
+ctestok(2,'C,-O3','ccode169i',<<'EOF',$todo.'run-time attributes::get #278');
+our $anon1;
+eval q/$anon1 = sub : method { $_[0]++ }/;
+use attributes;
+@attrs = eval q/attributes::get $anon1/;
+print qq{ok\n} if "@attrs" eq "method";
+#print "@attrs"
+EOF
+
+ctestok(3,'C,-O3','ccode169i',<<'EOF','compile-time attributes::get #278');
+use attributes;
+our $anon = sub : method { $_[0]++ };
+@attrs = attributes::get $anon;
+print qq{ok\n} if "@attrs" eq "method";
 EOF
