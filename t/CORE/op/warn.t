@@ -114,20 +114,21 @@ fresh_perl_like(
    print STDERR $a; warn $a;
  ',
   qr/^\xee(?:\r?\n\xee){3}/,
-  { switches => [ "-C0" ] },
- 'warn emits logical characters, not internal bytes [perl #45549]'  
+#  { switches => [ "-C0" ] }, # switches don't work with perlcc
+ 'warn emits logical characters, not internal bytes [perl #45549]'
 );
 
 {
 fresh_perl_like(
  '
+   INIT { binmode(STDERR, ":utf8") }
    $a = "\xee\n";
    print STDERR $a; warn $a;
    utf8::upgrade($a);
    print STDERR $a; warn $a;
  ',
   qr/^\xc3\xae(?:\r?\n\xc3\xae){3}/,
-  { switches => ['-CE'] },
+#  { switches => ['-CE'] }, # switches don't work with perlcc
  'warn respects :utf8 layer'
 );
 }
