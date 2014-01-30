@@ -191,7 +191,7 @@ for (
     [ 'named sub',      CODE    => \&mysub,             ],
     [ 'anon sub',       CODE    => sub { 1; }           ],
     [ 'glob',           GLOB    => \*foo                ],
-    [ 'format',         FORMAT  => *STDERR{FORMAT}      ],
+    [ 'format',         FORMAT  => *STDERR{FORMAT}      ], # issue 285
 ) {
     my ($desc, $type, $ref) = @$_;
     is (ref $ref, $type, "ref() for ref to $desc");
