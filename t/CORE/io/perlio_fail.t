@@ -3,8 +3,9 @@
 BEGIN {
     unshift @INC, 't/CORE/lib';
     require 't/CORE/test.pl';
-    plan (15);
 }
+
+plan (15);
 
 use warnings 'layer';
 my $warn;
