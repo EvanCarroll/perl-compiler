@@ -606,7 +606,7 @@ is ( (sub {"bar"})[0]->(), "bar", 'code deref from list slice w/ ->' );
     format STDERR =
 .
     my $ref;
-    foreach $ref (*STDOUT{IO}, *STDERR{FORMAT}) {
+    foreach $ref (*STDOUT{IO}, *STDERR{FORMAT}) { # issue 286
 	eval q/ $$ref /;
 	like($@, qr/Not a SCALAR reference/, "Scalar dereference");
 	eval q/ @$ref /;
