@@ -417,15 +417,16 @@ print "ok ", $i++, "\n";
 # correctly note too-short parameter lists that don't end with '$',
 #  a possible regression.
 
+
 sub foo1 ($\@);
 eval q{ foo1 "s" };
 print "not " unless $@ =~ /^Not enough/;
-print "ok ", $i++, "\n";
+print "ok ", $i++, " # TODO: Not a big deal in B::C that this doesn't work (perlcc #246)\n";
 
 sub foo2 ($\%);
 eval q{ foo2 "s" };
 print "not " unless $@ =~ /^Not enough/;
-print "ok ", $i++, "\n";
+print "ok ", $i++, " # TODO: Not a big deal in B::C that this doesn't work (perlcc #246)\n";
 
 sub X::foo3;
 *X::foo3 = sub {'ok'};
@@ -709,6 +710,7 @@ foreach my $t ( @tests ) {
     $thiswarn = join "", @_;
   };
 
+  # https://code.google.com/p/perl-compiler/issues/detail?id=279
   eval q{sub z_zwap {return @_}};
 
   # fix a bad plan when the warning is not raised
