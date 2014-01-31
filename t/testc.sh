@@ -877,6 +877,14 @@ open F, "<", "/dev/null";
 my %l = map {$_=>1} PerlIO::get_layers(F, input  => 1);
 print $l{crlf} ? q(ok) : keys(%l);'
 result[203]='ok'
+# issue 29
+tests[2900]='use open qw(:std :utf8);
+BEGIN{ `echo ö > xx.bak`; }
+open X, "xx.bak";
+$_ = <X>;
+print unpack("U*", $_), " ";
+print $_ if /\w/;'
+result[2900]='24610 ö'
 tests[207]='use warnings;
 sub asub { }
 asub(tests => 48);
@@ -1026,6 +1034,18 @@ syntax error at (eval 1) line 1, near "package withversion 1.1_"'
 tests[251]='# TODO
 sub f;print "ok" if exists &f'
 result[251]='ok'
+tests[2511]='# TODO
+sub f :lvalue;print "ok" if exists &f'
+result[2511]='ok'
+tests[2512]='# TODO
+sub f ();print "ok" if exists &f'
+result[2512]='ok'
+tests[2513]='# TODO
+sub f ($);print "ok" if exists &f'
+result[2513]='ok'
+tests[2514]='# TODO
+sub f;print "ok" if exists &f'
+result[2514]='ok'
 # duplicate of 234
 tests[252]='my $i = 0; for ("-3".."0") { ++$i } print $i'
 result[252]='4'
@@ -1068,6 +1088,8 @@ tests[272]='$d{""} = qq{ok\n}; print $d{""};'
 result[272]='ok'
 tests[2721]='BEGIN{$d{""} = qq{ok\n};} print $d{""};'
 result[2721]='ok'
+tests[273]='package Foo; use overload; sub import { overload::constant "integer" => sub { return shift }}; package main; BEGIN { $INC{"Foo.pm"} = "/lib/Foo.pm" }; use Foo; my $result = eval "5+6"; print "$result\n"'
+result[273]='11'
 tests[277]='format OUT =
 bar ~~
 .
@@ -1077,7 +1099,7 @@ tests[280]='package M; $| = 1; sub DESTROY {eval {print "Farewell ",ref($_[0])};
 result[280]='Farewell M'
 tests[282]='use vars qw($glook $smek $foof); $glook = 3; $smek = 4; $foof = "halt and cool down"; my $rv = \*smek; *glook = $rv; my $pv = ""; $pv = \*smek; *foof = $pv; print "ok\n";'
 result[282]='ok'
-tests[283]='#TODO #238 Undefined format "STDOUT"
+tests[283]='#238 Undefined format "STDOUT"
 format =
 ok
 .
