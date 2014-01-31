@@ -14,7 +14,6 @@ my $no_signedness = $] > 5.009 ? '' :
 plan tests => 14700;
 
 use strict;
-# perlcc issue - https://code.google.com/p/perl-compiler/issues/detail?id=175
 use warnings qw(FATAL all);
 use Config;
 
