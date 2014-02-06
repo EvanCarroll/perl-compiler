@@ -620,6 +620,8 @@ ok  defined *{$::{CmT}}{FORMAT}, "glob assign";
     is $buf, "ok $test\n", "write to duplicated format";
 }
 
+SKIP: {
+    skip "Testing warnings at compile time (BEGIN) not relevant to B::C", 1;
 fresh_perl_like(<<'EOP', qr/^Format STDOUT redefined at/, {stderr => 1}, '#64562 - Segmentation fault with redefined formats and warnings');
 #!./perl
 
@@ -636,6 +638,7 @@ format =
 
 write;
 EOP
+}
 
 #############################
 ## Section 4
