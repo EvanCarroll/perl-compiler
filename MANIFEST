@@ -182,7 +182,7 @@ t/test.pl
 t/test10
 t/testc.sh
 t/testcc.sh
-t/testcore.pl
+t/testcore.t
 t/testm.sh
 t/testplc.sh
 t/todomod.pl
