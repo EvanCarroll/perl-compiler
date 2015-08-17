@@ -8,7 +8,11 @@ use IO::Scalar;
 
 use Test::More;
 
-#my @optimizations = ( '-O3,-fno-fold', '-O1' );
+if ( $0 =~ m{/template\.pl$} ) {
+    plan q{skip_all} => "This program is not designed to be called directly";
+    exit;
+}
+
 my @optimizations = ('-O3,-fno-fold');
 my $todo          = '';
 
