@@ -14,7 +14,8 @@ if ( $0 =~ m{/template\.pl$} ) {
 }
 
 my @optimizations = ('-O3,-fno-fold');
-my $todo          = '';
+$optimizations[0] .= ',-v' if ( $ENV{VERBOSE} );
+my $todo = '';
 
 # Setup file_to_test to be the file we actually want to test.
 my $file_to_test = $0;
@@ -69,7 +70,7 @@ foreach my $optimization (@optimizations) {
         ok( -e $c_file && !-z _, "$c_file is generated ($optimization)" );
 
         if ( -z $c_file ) {
-            unlink $c_file;
+            unlink $c_file unless $ENV{BC_DEVELOPING};
             skip( "Can't test further due to failure to create a c file.", 9 );
         }
 
@@ -85,7 +86,7 @@ foreach my $optimization (@optimizations) {
         ok( -x $bin_file, "$bin_file is compiled and ready to run." );
 
         if ( !-x $bin_file ) {
-            unlink $c_file, $bin_file;
+            unlink $c_file, $bin_file unless $ENV{BC_DEVELOPING};
             skip( "Can't test further due to failure to create a binary file.", 8 );
         }
 
