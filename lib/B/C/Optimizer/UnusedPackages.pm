@@ -179,6 +179,13 @@ sub should_save {
 
     # Needed since 5.12.2: Check already if deleted
     my $incpack = inc_packname($package);
+    if (    exists $B::C::all_bc_deps{$package}
+        and !exists $curINC{$incpack}
+        and $savINC{$incpack} ) {
+        mark_package_unused($package);
+        debug( 'pkg' => "Cached $package not in \%INC, already deleted (early)" );
+        return 0;
+    }
 
     # issue348: only drop B::C packages, not any from user code.
     if (   ( $package =~ /^DynaLoader|XSLoader$/ and $use_xsloader )

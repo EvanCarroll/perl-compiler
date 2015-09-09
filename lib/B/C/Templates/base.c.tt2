@@ -106,6 +106,7 @@ EXTERN_C void boot_[% xsub %] (pTHX_ CV* cv);
 */
 
 typedef struct p5rx RE;
+Static IV PL_sv_objcount; /* deprecated with 5.21.1 but still needed and used? TODO: Open ticket with p5p? */
 [%- IF gv_index %]
 Static GV *gv_list[[% gv_index %]];
 [% END -%]
@@ -132,7 +133,7 @@ Static const char xsfile[] = "universal.c";
 [% IF MULTI %]
 #define ptr_undef 0
 [% ELSE %]
-#define ptr_undef &PL_sv_undef
+#define ptr_undef NULL
 #undef CopFILE_set
 #define CopFILE_set(c,pv)  CopFILEGV_set((c), gv_fetchfile(pv))
 [% END %]
@@ -442,11 +443,7 @@ int my_perl_destruct( PerlInterpreter *my_perl ) {
     [% IF ITHREADS OR ! MULTI %]
     CopFILE_set(&[% to_free %], NULL);
     [% END %]
-    [% IF ITHREADS %]
- CopSTASHPV(&[% to_free %]) = NULL;
-    [% ELSE %]
- CopSTASH(&[% to_free %]) = NULL;
-    [% END %]
+    CopSTASH_set(&[% to_free %], NULL);
   /* was marked: end of dead code --- */
   [% END %]
 [% END %]
@@ -563,13 +560,17 @@ dl_init(pTHX)
 
 /* XSLoader has the 2nd insanest API in whole Perl, right after make_warnings_object() */
 #ifndef STATICXS
+      [%- IF xsub.$stashname == 'Dynamic' %]
     PUTBACK;
-    [%- IF xsub.$stashname == 'Dynamic' %]
     call_method("DynaLoader::bootstrap_inherit", G_VOID|G_DISCARD);
-    [%- ELSIF (matches = xsub.$stashname.match('^Dynamic-(.+)$')) %]
-    CopFILE_set(cxstack[cxstack_ix].blk_oldcop, "[% matches.0 %]"); /* $stashfile if $stashfile;*/
-    call_pv("XSLoader::load", G_VOID|G_DISCARD);
-    [% END %]
+      [% ELSE %]
+        [%- stashfile = xsub.$stashname.remove('^Dynamic-') -%]
+        [% IF stashfile -%]
+    mXPUSHp("[% stashfile %]", [% stashfile.length %]);
+        [%- END %]
+    PUTBACK;
+    call_pv("XSLoader::load_file", G_VOID|G_DISCARD);
+      [% END %]
 #else
     PUTBACK;
     [%- IF staticxs %]
