@@ -1,10 +1,11 @@
 #!/bin/sh
 
 PERL=$(which perl)
+BINPERL="/usr/local/cpanel/3rdparty/perl/520/bin"
 
-if [ "$PERL" != "/usr/local/cpanel/3rdparty/perl/520/bin/perl" ]; then
-    echo "Adding /usr/local/cpanel/3rdparty/perl/520/bin to your path"
-    export PATH=/usr/local/cpanel/3rdparty/perl/520/bin:$PATH
+if [ "$PERL" != "$BINPERL/perl" ]; then
+    echo "Adding $BINPERL to your path"
+    export PATH=$BINPERL:$PATH
 fi
 
 export VERBOSE=1
