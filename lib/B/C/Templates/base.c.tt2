@@ -106,10 +106,9 @@ EXTERN_C void boot_[% xsub %] (pTHX_ CV* cv);
 */
 
 typedef struct p5rx RE;
-Static IV PL_sv_objcount; /* deprecated with 5.21.1 but still needed and used? TODO: Open ticket with p5p? */
-[%- IF gv_index %]
+[% IF gv_index -%]
 Static GV *gv_list[[% gv_index %]];
-[% END -%]
+[%- END %]
 
 /* Need fresh re-hash of strtab. share_hek does not allow hash = 0 */
 HEK *my_share_hek( pTHX_ const char *str, I32 len, register U32 hash );
