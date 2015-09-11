@@ -3,7 +3,7 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = ('../lib');
-    require './test.pl';
+    require 'test.pl';
     skip_all('cygwin specific test') unless $^O eq 'cygwin';
 }
 
