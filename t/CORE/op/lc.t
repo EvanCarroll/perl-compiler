@@ -3,11 +3,12 @@
 # This file is intentionally encoded in latin-1.
 
 BEGIN {
-    unshift @INC, 't/CORE-CPANEL/lib';
-    require 't/CORE-CPANEL/test.pl';
-    require 't/CORE-CPANEL/loc_tools.pl';
+    chdir 't';
+    @INC = '../lib';
     require Config;
     import Config;
+    require './test.pl';
+    require './loc_tools.pl';    # Contains find_utf8_ctype_locale()
 }
 
 use feature qw( fc );
