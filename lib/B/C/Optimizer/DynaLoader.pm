@@ -130,7 +130,7 @@ sub optimize {
 
             # TODO: Why no strict refs? Also why are we doing a second save here?
             no strict 'refs';
-            unless ( grep /^DynaLoader$/, get_isa($stashname) ) {
+            unless ( grep /^DynaLoader$/, B::C::get_isa($stashname) ) {
                 push @{ $stashname . "::ISA" }, 'DynaLoader';
                 svref_2object( \@{ $stashname . "::ISA" } )->save;
             }
