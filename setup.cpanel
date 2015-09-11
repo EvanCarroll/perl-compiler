@@ -1,0 +1,12 @@
+#!/bin/sh
+
+PERL=$(which perl)
+
+if [ "$PERL" != "/usr/local/cpanel/3rdparty/perl/520/bin/perl" ]; then
+    echo "Adding /usr/local/cpanel/3rdparty/perl/520/bin to your path"
+    export PATH=/usr/local/cpanel/3rdparty/perl/520/bin:$PATH
+fi
+
+export VERBOSE=1
+export BC_DEVELOPING=1
+
