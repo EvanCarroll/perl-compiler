@@ -1,1 +1,1 @@
-../CORE/op/qr.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/io/crlf.t
+template.pl

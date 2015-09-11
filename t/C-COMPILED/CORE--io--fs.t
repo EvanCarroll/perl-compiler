@@ -1,1 +1,1 @@
-../CORE/io/fs.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/tie.t
+template.pl

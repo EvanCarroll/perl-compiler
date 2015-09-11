@@ -1,1 +1,1 @@
-../CORE/op/exists_sub.t
+template.pl

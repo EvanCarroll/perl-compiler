@@ -1,1 +1,1 @@
-../CORE/op/list.t
+template.pl

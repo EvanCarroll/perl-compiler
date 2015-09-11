@@ -1,1 +1,1 @@
-../CORE/op/getppid.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/hashassign.t
+template.pl

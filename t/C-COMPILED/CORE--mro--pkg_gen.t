@@ -1,1 +1,1 @@
-../CORE/mro/pkg_gen.t
+template.pl

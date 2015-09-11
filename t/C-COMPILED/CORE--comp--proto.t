@@ -1,1 +1,1 @@
-../CORE/comp/proto.t
+template.pl

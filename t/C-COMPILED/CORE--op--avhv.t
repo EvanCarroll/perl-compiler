@@ -1,1 +1,1 @@
-../CORE/op/avhv.t
+template.pl

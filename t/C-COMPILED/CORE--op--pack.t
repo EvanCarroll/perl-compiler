@@ -1,1 +1,1 @@
-../CORE/op/pack.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/method.t
+template.pl

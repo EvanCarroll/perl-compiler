@@ -1,1 +1,1 @@
-../CORE/lib/no_load.t
+template.pl

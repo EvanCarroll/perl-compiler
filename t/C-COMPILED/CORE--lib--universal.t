@@ -1,1 +1,1 @@
-../CORE/lib/universal.t
+template.pl

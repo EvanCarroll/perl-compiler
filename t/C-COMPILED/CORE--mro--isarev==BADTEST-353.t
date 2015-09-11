@@ -1,1 +1,1 @@
-../CORE/mro/isarev.t
+template.pl

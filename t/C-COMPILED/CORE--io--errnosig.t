@@ -1,1 +1,1 @@
-../CORE/io/errnosig.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/uni/bless.t
+template.pl

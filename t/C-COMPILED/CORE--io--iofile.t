@@ -1,1 +1,1 @@
-../CORE/io/iofile.t
+template.pl

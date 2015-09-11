@@ -1,1 +1,1 @@
-../CORE/uni/sprintf.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/split.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/threads-dirh.t
+template.pl

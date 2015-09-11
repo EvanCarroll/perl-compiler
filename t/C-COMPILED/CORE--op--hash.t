@@ -1,1 +1,1 @@
-../CORE/op/hash.t
+template.pl

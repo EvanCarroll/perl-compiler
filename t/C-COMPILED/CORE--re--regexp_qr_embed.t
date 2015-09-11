@@ -1,1 +1,1 @@
-../CORE/re/regexp_qr_embed.t
+template.pl

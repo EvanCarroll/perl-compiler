@@ -1,1 +1,1 @@
-../CORE/op/dor.t
+template.pl

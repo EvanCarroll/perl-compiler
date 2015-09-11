@@ -1,1 +1,1 @@
-../CORE/comp/use.t
+template.pl

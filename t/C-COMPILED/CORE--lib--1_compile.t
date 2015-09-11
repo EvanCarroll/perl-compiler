@@ -1,1 +1,1 @@
-../CORE/lib/1_compile.t
+template.pl

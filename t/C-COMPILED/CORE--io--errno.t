@@ -1,1 +1,1 @@
-../CORE/io/errno.t
+template.pl

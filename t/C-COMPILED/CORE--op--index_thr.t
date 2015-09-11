@@ -1,1 +1,1 @@
-../CORE/op/index_thr.t
+template.pl

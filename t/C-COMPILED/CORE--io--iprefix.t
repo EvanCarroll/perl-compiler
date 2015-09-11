@@ -1,1 +1,1 @@
-../CORE/io/iprefix.t
+template.pl

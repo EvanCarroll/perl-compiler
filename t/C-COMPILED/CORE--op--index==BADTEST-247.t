@@ -1,1 +1,1 @@
-../CORE/op/index.t
+template.pl

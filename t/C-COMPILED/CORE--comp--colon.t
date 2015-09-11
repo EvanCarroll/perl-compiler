@@ -1,1 +1,1 @@
-../CORE/comp/colon.t
+template.pl

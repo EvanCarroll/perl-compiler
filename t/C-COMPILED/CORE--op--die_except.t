@@ -1,1 +1,1 @@
-../CORE/op/die_except.t
+template.pl

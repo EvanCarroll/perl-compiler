@@ -1,1 +1,1 @@
-../CORE/op/lex_assign.t
+template.pl

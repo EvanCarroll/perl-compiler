@@ -1,1 +1,1 @@
-../CORE/op/length.t
+template.pl

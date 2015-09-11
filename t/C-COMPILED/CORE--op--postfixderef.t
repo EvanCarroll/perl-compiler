@@ -1,1 +1,1 @@
-../CORE/op/postfixderef.t
+template.pl

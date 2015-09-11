@@ -1,1 +1,1 @@
-../CORE/mro/next_NEXT.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/re/pat_advanced_thr.t
+template.pl

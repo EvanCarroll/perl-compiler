@@ -1,1 +1,1 @@
-../CORE/io/eintr_print.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/gv.t
+template.pl

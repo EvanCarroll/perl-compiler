@@ -1,1 +1,1 @@
-../CORE/uni/goto.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/mro/basic_04_dfs.t
+template.pl

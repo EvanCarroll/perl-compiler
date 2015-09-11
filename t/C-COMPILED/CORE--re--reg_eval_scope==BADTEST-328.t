@@ -1,1 +1,1 @@
-../CORE/re/reg_eval_scope.t
+template.pl

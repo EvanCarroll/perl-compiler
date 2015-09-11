@@ -1,1 +1,1 @@
-../CORE/uni/opcroak.t
+template.pl

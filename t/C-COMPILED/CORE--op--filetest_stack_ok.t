@@ -1,1 +1,1 @@
-../CORE/op/filetest_stack_ok.t
+template.pl

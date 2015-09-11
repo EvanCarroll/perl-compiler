@@ -1,1 +1,1 @@
-../CORE/io/nargv.t
+template.pl

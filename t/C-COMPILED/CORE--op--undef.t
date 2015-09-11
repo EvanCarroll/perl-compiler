@@ -1,1 +1,1 @@
-../CORE/op/undef.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/mro/basic_02_dfs_utf8.t
+template.pl

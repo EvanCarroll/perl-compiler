@@ -1,1 +1,1 @@
-../CORE/op/warn.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/lib/deprecate.t
+template.pl

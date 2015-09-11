@@ -1,1 +1,1 @@
-../CORE/re/reg_mesg.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/tiearray.t
+template.pl

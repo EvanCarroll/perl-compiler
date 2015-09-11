@@ -1,1 +1,1 @@
-../CORE/uni/write.t
+template.pl

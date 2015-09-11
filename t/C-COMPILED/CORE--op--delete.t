@@ -1,1 +1,1 @@
-../CORE/op/delete.t
+template.pl

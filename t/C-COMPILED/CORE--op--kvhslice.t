@@ -1,1 +1,1 @@
-../CORE/op/kvhslice.t
+template.pl

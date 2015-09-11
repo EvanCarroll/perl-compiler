@@ -1,1 +1,1 @@
-../CORE/re/reg_60508.t
+template.pl

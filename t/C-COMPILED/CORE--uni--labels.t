@@ -1,1 +1,1 @@
-../CORE/uni/labels.t
+template.pl

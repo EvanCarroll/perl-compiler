@@ -1,1 +1,1 @@
-../CORE/op/sub_lval.t
+template.pl

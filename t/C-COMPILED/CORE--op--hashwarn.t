@@ -1,1 +1,1 @@
-../CORE/op/hashwarn.t
+template.pl

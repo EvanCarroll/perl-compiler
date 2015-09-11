@@ -1,1 +1,1 @@
-../CORE/op/exp.t
+template.pl

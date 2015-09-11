@@ -1,1 +1,1 @@
-../CORE/op/flip.t
+template.pl

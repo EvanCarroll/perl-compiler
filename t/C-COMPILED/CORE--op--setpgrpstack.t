@@ -1,1 +1,1 @@
-../CORE/op/setpgrpstack.t
+template.pl

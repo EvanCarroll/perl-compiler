@@ -1,1 +1,1 @@
-../CORE/op/attrhand.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/kvaslice.t
+template.pl

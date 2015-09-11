@@ -1,1 +1,1 @@
-../CORE/op/reverse.t
+template.pl

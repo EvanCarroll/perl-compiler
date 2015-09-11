@@ -1,1 +1,1 @@
-../CORE/op/pwent.t
+template.pl

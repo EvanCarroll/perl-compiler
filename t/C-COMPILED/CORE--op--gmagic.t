@@ -1,1 +1,1 @@
-../CORE/op/gmagic.t
+template.pl

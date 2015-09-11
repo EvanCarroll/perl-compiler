@@ -1,1 +1,1 @@
-../CORE/op/append.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/io/socket.t
+template.pl

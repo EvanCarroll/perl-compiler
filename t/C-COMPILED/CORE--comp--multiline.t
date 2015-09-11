@@ -1,1 +1,1 @@
-../CORE/comp/multiline.t
+template.pl

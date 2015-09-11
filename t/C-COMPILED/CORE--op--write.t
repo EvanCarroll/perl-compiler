@@ -1,1 +1,1 @@
-../CORE/op/write.t
+template.pl

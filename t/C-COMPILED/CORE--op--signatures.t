@@ -1,1 +1,1 @@
-../CORE/op/signatures.t
+template.pl

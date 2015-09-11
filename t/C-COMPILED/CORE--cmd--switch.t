@@ -1,1 +1,1 @@
-../CORE/cmd/switch.t
+template.pl

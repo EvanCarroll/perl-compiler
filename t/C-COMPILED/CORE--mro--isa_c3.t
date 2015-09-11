@@ -1,1 +1,1 @@
-../CORE/mro/isa_c3.t
+template.pl

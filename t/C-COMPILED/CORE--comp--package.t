@@ -1,1 +1,1 @@
-../CORE/comp/package.t
+template.pl

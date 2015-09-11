@@ -1,1 +1,1 @@
-../CORE/io/defout.t
+template.pl

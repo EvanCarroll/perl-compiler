@@ -1,1 +1,1 @@
-../CORE/op/substr_thr.t
+template.pl

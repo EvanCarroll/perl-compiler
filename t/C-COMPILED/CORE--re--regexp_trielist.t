@@ -1,1 +1,1 @@
-../CORE/re/regexp_trielist.t
+template.pl

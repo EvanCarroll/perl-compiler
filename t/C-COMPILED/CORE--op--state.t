@@ -1,1 +1,1 @@
-../CORE/op/state.t
+template.pl

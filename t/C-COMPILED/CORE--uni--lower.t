@@ -1,1 +1,1 @@
-../CORE/uni/lower.t
+template.pl

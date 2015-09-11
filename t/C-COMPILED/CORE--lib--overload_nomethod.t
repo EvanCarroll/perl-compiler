@@ -1,1 +1,1 @@
-../CORE/lib/overload_nomethod.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/args.t
+template.pl

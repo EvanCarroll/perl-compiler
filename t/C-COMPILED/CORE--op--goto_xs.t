@@ -1,1 +1,1 @@
-../CORE/op/goto_xs.t
+template.pl

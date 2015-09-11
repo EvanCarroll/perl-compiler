@@ -1,1 +1,1 @@
-../CORE/op/splice.t
+template.pl

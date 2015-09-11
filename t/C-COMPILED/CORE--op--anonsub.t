@@ -1,1 +1,1 @@
-../CORE/op/anonsub.t
+template.pl

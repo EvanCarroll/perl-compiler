@@ -1,1 +1,1 @@
-../CORE/re/reg_namedcapture.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/die.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/re/reg_eval.t
+template.pl

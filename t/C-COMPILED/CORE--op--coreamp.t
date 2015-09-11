@@ -1,1 +1,1 @@
-../CORE/op/coreamp.t
+template.pl

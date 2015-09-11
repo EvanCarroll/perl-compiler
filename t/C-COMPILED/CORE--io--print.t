@@ -1,1 +1,1 @@
-../CORE/io/print.t
+template.pl

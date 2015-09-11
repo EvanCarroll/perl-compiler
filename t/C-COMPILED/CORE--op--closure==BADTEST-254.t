@@ -1,1 +1,1 @@
-../CORE/op/closure.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/mro/next_edgecases.t
+template.pl

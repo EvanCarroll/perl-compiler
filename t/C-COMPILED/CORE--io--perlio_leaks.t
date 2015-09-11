@@ -1,1 +1,1 @@
-../CORE/io/perlio_leaks.t
+template.pl

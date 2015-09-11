@@ -1,1 +1,1 @@
-../CORE/re/qr_gc.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/tiehandle.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/re/qr-72922.t
+template.pl

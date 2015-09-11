@@ -1,1 +1,1 @@
-../CORE/op/defins.t
+template.pl

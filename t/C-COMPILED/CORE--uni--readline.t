@@ -1,1 +1,1 @@
-../CORE/uni/readline.t
+template.pl

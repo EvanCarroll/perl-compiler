@@ -1,1 +1,1 @@
-../CORE/op/rand.t
+template.pl

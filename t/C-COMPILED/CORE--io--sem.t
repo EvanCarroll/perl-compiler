@@ -1,1 +1,1 @@
-../CORE/io/sem.t
+template.pl

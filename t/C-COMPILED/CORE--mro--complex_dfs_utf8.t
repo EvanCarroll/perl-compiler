@@ -1,1 +1,1 @@
-../CORE/mro/complex_dfs_utf8.t
+template.pl

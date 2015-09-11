@@ -1,1 +1,1 @@
-../CORE/base/cond.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/uni/select.t
+template.pl

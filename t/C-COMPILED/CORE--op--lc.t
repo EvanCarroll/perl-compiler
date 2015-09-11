@@ -1,1 +1,1 @@
-../CORE/op/lc.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/study.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/local.t
+template.pl

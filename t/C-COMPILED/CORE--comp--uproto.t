@@ -1,1 +1,1 @@
-../CORE/comp/uproto.t
+template.pl

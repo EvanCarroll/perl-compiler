@@ -33,7 +33,7 @@ if ( $file_to_test =~ s{==(.*)\.t$}{.t} ) {
 }
 
 $file_to_test =~ s{--}{/}g;
-$file_to_test =~ s{C-COMPILED-CPANEL/}{};    # Strip the BINARY dir off to look for this test elsewhere.
+$file_to_test =~ s{C-COMPILED/}{};    # Strip the BINARY dir off to look for this test elsewhere.
 
 plan tests => 3 + 10 * scalar @optimizations;
 

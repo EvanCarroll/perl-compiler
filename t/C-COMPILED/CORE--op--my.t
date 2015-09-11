@@ -1,1 +1,1 @@
-../CORE/op/my.t
+template.pl

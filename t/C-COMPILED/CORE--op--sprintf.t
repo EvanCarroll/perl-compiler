@@ -1,1 +1,1 @@
-../CORE/op/sprintf.t
+template.pl

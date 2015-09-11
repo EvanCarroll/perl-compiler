@@ -1,1 +1,1 @@
-../CORE/re/reg_pmod.t
+template.pl

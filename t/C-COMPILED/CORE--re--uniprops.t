@@ -1,1 +1,1 @@
-../CORE/re/uniprops.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/ord.t
+template.pl

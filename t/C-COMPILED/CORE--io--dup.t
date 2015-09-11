@@ -1,1 +1,1 @@
-../CORE/io/dup.t
+template.pl

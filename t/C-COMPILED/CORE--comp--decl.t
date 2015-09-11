@@ -1,1 +1,1 @@
-../CORE/comp/decl.t
+template.pl

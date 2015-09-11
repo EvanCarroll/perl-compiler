@@ -1,1 +1,1 @@
-../CORE/op/lock.t
+template.pl

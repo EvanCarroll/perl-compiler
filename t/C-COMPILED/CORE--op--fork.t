@@ -1,1 +1,1 @@
-../CORE/op/fork.t
+template.pl

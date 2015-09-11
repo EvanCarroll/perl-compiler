@@ -1,1 +1,1 @@
-../CORE/op/lexsub.t
+template.pl

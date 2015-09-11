@@ -1,1 +1,1 @@
-../CORE/op/cproto.t
+template.pl

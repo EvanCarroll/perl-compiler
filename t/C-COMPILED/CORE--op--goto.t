@@ -1,1 +1,1 @@
-../CORE/op/goto.t
+template.pl

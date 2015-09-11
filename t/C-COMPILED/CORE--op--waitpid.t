@@ -1,1 +1,1 @@
-../CORE/op/waitpid.t
+template.pl

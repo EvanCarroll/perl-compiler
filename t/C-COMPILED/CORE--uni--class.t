@@ -1,1 +1,1 @@
-../CORE/uni/class.t
+template.pl

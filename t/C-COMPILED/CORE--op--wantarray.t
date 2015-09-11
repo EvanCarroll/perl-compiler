@@ -1,1 +1,1 @@
-../CORE/op/wantarray.t
+template.pl

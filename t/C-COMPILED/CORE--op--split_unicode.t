@@ -1,1 +1,1 @@
-../CORE/op/split_unicode.t
+template.pl

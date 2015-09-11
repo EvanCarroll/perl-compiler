@@ -1,1 +1,1 @@
-../CORE/re/regex_sets.t
+template.pl

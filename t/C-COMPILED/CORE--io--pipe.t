@@ -1,1 +1,1 @@
-../CORE/io/pipe.t
+template.pl

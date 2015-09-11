@@ -1,1 +1,1 @@
-../CORE/uni/attrs.t
+template.pl

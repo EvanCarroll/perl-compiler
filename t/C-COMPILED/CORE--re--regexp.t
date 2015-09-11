@@ -1,1 +1,1 @@
-../CORE/re/regexp.t
+template.pl

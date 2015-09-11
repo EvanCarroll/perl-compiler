@@ -1,1 +1,1 @@
-../CORE/io/argv.t
+template.pl

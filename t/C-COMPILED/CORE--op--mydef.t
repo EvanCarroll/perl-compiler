@@ -1,1 +1,1 @@
-../CORE/op/mydef.t
+template.pl

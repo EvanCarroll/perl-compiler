@@ -1,1 +1,1 @@
-../CORE/op/attrs.t
+template.pl

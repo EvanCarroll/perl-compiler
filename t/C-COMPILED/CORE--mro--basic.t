@@ -1,1 +1,1 @@
-../CORE/mro/basic.t
+template.pl

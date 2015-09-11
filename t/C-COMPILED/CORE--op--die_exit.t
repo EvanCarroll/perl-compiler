@@ -1,1 +1,1 @@
-../CORE/op/die_exit.t
+template.pl

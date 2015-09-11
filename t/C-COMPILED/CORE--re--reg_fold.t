@@ -1,1 +1,1 @@
-../CORE/re/reg_fold.t
+template.pl

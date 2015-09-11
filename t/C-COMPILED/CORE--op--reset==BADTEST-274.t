@@ -1,1 +1,1 @@
-../CORE/op/reset.t
+template.pl

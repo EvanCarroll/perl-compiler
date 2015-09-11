@@ -1,1 +1,1 @@
-../CORE/uni/chr.t
+template.pl

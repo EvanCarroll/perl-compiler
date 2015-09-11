@@ -1,1 +1,1 @@
-../CORE/op/chop.t
+template.pl

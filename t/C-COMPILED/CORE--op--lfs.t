@@ -1,1 +1,1 @@
-../CORE/op/lfs.t
+template.pl

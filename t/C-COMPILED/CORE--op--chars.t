@@ -1,1 +1,1 @@
-../CORE/op/chars.t
+template.pl

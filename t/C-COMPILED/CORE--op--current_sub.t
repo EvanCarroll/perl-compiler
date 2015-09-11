@@ -1,1 +1,1 @@
-../CORE/op/current_sub.t
+template.pl

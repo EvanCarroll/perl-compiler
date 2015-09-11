@@ -1,1 +1,1 @@
-../CORE/io/utf8.t
+template.pl

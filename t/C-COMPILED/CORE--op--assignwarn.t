@@ -1,1 +1,1 @@
-../CORE/op/assignwarn.t
+template.pl

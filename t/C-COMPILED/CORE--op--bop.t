@@ -1,1 +1,1 @@
-../CORE/op/bop.t
+template.pl

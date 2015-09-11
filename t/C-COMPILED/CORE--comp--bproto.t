@@ -1,1 +1,1 @@
-../CORE/comp/bproto.t
+template.pl

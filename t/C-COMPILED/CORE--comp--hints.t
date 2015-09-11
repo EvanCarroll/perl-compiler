@@ -1,1 +1,0 @@
-../CORE/comp/hints.t

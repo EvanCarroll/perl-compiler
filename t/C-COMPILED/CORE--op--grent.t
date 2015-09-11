@@ -1,1 +1,1 @@
-../CORE/op/grent.t
+template.pl

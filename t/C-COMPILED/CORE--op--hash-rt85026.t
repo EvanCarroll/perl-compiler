@@ -1,1 +1,1 @@
-../CORE/op/hash-rt85026.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/re/reg_nc_tie.t
+template.pl

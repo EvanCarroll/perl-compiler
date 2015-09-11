@@ -1,1 +1,1 @@
-../CORE/re/pat_re_eval.t
+template.pl

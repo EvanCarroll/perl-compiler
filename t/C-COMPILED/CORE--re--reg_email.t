@@ -1,1 +1,1 @@
-../CORE/re/reg_email.t
+template.pl

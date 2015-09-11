@@ -1,1 +1,1 @@
-../CORE/op/select.t
+template.pl

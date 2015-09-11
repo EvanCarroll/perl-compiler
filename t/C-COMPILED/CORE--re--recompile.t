@@ -1,1 +1,1 @@
-../CORE/re/recompile.t
+template.pl

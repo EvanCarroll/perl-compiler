@@ -1,1 +1,1 @@
-../CORE/io/openpid.t
+template.pl

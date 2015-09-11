@@ -1,1 +1,1 @@
-../CORE/lib/mypragma.t
+template.pl

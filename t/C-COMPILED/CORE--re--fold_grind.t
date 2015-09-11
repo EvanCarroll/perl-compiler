@@ -1,1 +1,1 @@
-../CORE/re/fold_grind.t
+template.pl

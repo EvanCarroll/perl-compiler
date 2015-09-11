@@ -1,1 +1,1 @@
-../CORE/op/utf8decode.t
+template.pl

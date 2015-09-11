@@ -1,1 +1,1 @@
-../CORE/op/leaky-magic.t
+template.pl

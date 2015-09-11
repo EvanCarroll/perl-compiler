@@ -1,1 +1,1 @@
-../CORE/op/groups.t
+template.pl

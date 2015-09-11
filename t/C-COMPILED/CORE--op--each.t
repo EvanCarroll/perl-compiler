@@ -1,1 +1,1 @@
-../CORE/op/each.t
+template.pl

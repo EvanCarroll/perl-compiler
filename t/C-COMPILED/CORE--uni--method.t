@@ -1,1 +1,1 @@
-../CORE/uni/method.t
+template.pl

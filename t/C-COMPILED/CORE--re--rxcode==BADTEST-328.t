@@ -1,1 +1,1 @@
-../CORE/re/rxcode.t
+template.pl

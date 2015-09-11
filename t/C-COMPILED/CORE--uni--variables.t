@@ -1,1 +1,1 @@
-../CORE/uni/variables.t
+template.pl

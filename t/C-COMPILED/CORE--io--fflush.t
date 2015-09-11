@@ -1,1 +1,1 @@
-../CORE/io/fflush.t
+template.pl

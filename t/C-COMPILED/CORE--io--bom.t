@@ -1,1 +1,1 @@
-../CORE/io/bom.t
+template.pl

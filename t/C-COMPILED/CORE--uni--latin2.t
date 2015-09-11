@@ -1,1 +1,1 @@
-../CORE/uni/latin2.t
+template.pl

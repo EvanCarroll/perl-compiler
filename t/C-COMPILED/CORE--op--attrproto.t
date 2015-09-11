@@ -1,1 +1,1 @@
-../CORE/op/attrproto.t
+template.pl

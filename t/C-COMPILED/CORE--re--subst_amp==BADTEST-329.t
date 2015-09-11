@@ -1,1 +1,1 @@
-../CORE/re/subst_amp.t
+template.pl

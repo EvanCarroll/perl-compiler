@@ -1,1 +1,1 @@
-../CORE/op/symbolcache.t
+template.pl

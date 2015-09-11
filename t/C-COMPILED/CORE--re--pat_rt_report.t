@@ -1,1 +1,1 @@
-../CORE/re/pat_rt_report.t
+template.pl

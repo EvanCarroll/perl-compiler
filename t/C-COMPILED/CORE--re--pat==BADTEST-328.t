@@ -1,1 +1,1 @@
-../CORE/re/pat.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/smartmatch.t
+template.pl

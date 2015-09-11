@@ -1,1 +1,1 @@
-../CORE/io/binmode.t
+template.pl

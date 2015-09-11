@@ -1,1 +1,1 @@
-../CORE/uni/greek.t
+template.pl

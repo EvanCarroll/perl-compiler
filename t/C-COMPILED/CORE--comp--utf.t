@@ -1,1 +1,1 @@
-../CORE/comp/utf.t
+template.pl

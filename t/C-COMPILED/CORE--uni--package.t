@@ -1,1 +1,1 @@
-../CORE/uni/package.t
+template.pl

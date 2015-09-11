@@ -1,1 +1,1 @@
-../CORE/op/taint.t
+template.pl

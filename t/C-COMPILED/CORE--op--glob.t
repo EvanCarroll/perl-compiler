@@ -1,1 +1,1 @@
-../CORE/op/glob.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/pos.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/repeat.t
+template.pl

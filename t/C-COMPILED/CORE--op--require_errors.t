@@ -1,1 +1,1 @@
-../CORE/op/require_errors.t
+template.pl

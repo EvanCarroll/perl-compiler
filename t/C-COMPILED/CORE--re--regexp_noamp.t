@@ -1,1 +1,1 @@
-../CORE/re/regexp_noamp.t
+template.pl

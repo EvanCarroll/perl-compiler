@@ -1,1 +1,1 @@
-../CORE/op/alarm.t
+template.pl

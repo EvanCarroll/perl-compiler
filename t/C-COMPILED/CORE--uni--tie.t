@@ -1,1 +1,1 @@
-../CORE/uni/tie.t
+template.pl

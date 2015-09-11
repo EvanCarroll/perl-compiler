@@ -1,1 +1,1 @@
-../CORE/comp/redef.t
+template.pl

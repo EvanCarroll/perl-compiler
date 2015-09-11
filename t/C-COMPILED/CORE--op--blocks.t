@@ -1,1 +1,1 @@
-../CORE/op/blocks.t
+template.pl

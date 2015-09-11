@@ -1,1 +1,1 @@
-../CORE/mro/c3_with_overload.t
+template.pl

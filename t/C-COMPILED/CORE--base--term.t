@@ -1,1 +1,1 @@
-../CORE/base/term.t
+template.pl

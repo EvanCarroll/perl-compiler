@@ -1,1 +1,1 @@
-../CORE/op/join.t
+template.pl

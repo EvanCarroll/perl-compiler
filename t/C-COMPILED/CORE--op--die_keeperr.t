@@ -1,1 +1,1 @@
-../CORE/op/die_keeperr.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/upgrade.t
+template.pl

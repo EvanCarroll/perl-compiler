@@ -1,1 +1,1 @@
-../CORE/uni/parser.t
+template.pl

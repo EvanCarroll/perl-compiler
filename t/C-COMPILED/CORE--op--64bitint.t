@@ -1,1 +1,1 @@
-../CORE/op/64bitint.t
+template.pl

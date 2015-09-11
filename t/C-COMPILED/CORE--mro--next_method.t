@@ -1,1 +1,1 @@
-../CORE/mro/next_method.t
+template.pl

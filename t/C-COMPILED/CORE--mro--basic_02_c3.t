@@ -1,1 +1,1 @@
-../CORE/mro/basic_02_c3.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/io/open.t
+template.pl

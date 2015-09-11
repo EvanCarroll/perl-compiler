@@ -1,1 +1,1 @@
-../CORE/comp/require.t
+template.pl

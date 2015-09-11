@@ -1,1 +1,1 @@
-../CORE/op/srand.t
+template.pl

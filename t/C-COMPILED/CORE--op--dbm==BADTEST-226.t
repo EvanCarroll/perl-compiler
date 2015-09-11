@@ -1,1 +1,1 @@
-../CORE/op/dbm.t
+template.pl

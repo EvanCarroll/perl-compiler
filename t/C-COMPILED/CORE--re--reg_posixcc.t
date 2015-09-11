@@ -1,1 +1,1 @@
-../CORE/re/reg_posixcc.t
+template.pl

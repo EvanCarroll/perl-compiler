@@ -1,1 +1,1 @@
-../CORE/lib/commonsense.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/sort.t
+template.pl

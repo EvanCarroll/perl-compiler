@@ -1,1 +1,1 @@
-../CORE/re/qrstack.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/range.t
+template.pl

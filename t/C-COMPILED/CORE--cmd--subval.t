@@ -1,1 +1,1 @@
-../CORE/cmd/subval.t
+template.pl

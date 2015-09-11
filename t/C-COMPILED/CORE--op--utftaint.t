@@ -1,1 +1,1 @@
-../CORE/op/utftaint.t
+template.pl

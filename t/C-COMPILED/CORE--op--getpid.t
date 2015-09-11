@@ -1,1 +1,1 @@
-../CORE/op/getpid.t
+template.pl

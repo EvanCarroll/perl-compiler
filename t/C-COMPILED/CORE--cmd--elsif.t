@@ -1,1 +1,1 @@
-../CORE/cmd/elsif.t
+template.pl

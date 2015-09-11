@@ -1,1 +1,1 @@
-../CORE/op/context.t
+template.pl

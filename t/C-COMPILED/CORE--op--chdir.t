@@ -1,1 +1,1 @@
-../CORE/op/chdir.t
+template.pl

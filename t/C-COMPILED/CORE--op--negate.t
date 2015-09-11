@@ -1,1 +1,1 @@
-../CORE/op/negate.t
+template.pl

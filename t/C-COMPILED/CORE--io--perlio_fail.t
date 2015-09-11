@@ -1,1 +1,1 @@
-../CORE/io/perlio_fail.t
+template.pl

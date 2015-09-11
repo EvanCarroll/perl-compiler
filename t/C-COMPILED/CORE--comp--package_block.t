@@ -1,1 +1,1 @@
-../CORE/comp/package_block.t
+template.pl

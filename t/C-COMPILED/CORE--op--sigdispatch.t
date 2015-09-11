@@ -1,1 +1,1 @@
-../CORE/op/sigdispatch.t
+template.pl

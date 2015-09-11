@@ -1,1 +1,1 @@
-../CORE/comp/parser.t
+template.pl

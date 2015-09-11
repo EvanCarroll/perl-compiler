@@ -1,1 +1,1 @@
-../CORE/op/yadayada.t
+template.pl

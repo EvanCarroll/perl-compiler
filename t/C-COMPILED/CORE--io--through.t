@@ -1,1 +1,1 @@
-../CORE/io/through.t
+template.pl

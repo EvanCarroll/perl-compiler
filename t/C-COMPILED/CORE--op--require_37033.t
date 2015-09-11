@@ -1,1 +1,1 @@
-../CORE/op/require_37033.t
+template.pl

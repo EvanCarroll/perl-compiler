@@ -1,1 +1,1 @@
-../CORE/comp/opsubs.t
+template.pl

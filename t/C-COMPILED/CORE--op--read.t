@@ -1,1 +1,1 @@
-../CORE/op/read.t
+template.pl

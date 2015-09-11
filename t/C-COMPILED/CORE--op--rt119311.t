@@ -1,1 +1,1 @@
-../CORE/op/rt119311.t
+template.pl

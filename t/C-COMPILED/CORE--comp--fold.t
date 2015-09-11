@@ -1,1 +1,1 @@
-../CORE/comp/fold.t
+template.pl

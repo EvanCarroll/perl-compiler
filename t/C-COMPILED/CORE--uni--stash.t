@@ -1,1 +1,1 @@
-../CORE/uni/stash.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/re/pat_psycho.t
+template.pl

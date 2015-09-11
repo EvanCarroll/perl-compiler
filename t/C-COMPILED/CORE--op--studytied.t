@@ -1,1 +1,1 @@
-../CORE/op/studytied.t
+template.pl

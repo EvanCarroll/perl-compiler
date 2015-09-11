@@ -1,1 +1,1 @@
-../CORE/op/heredoc.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/quotemeta.t
+template.pl

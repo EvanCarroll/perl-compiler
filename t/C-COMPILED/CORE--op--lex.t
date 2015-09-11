@@ -1,1 +1,1 @@
-../CORE/op/lex.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/for.t
+template.pl

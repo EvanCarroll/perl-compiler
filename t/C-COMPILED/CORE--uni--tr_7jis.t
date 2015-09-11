@@ -1,1 +1,1 @@
-../CORE/uni/tr_7jis.t
+template.pl

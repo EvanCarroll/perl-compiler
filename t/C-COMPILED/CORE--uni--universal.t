@@ -1,1 +1,1 @@
-../CORE/uni/universal.t
+template.pl

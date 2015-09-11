@@ -1,1 +1,1 @@
-../CORE/re/regexp_unicode_prop.t
+template.pl

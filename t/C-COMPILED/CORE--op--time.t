@@ -1,1 +1,1 @@
-../CORE/op/time.t
+template.pl

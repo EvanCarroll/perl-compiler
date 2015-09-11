@@ -1,1 +1,1 @@
-../CORE/op/stat.t
+template.pl

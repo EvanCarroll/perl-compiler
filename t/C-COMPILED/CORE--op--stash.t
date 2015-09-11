@@ -1,1 +1,1 @@
-../CORE/op/stash.t
+template.pl

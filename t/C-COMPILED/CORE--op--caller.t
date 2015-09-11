@@ -1,1 +1,1 @@
-../CORE/op/caller.t
+template.pl

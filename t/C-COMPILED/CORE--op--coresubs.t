@@ -1,1 +1,1 @@
-../CORE/op/coresubs.t
+template.pl

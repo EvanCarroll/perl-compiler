@@ -1,1 +1,1 @@
-../CORE/comp/form_scope.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/grep.t
+template.pl

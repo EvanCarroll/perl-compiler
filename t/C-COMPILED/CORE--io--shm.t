@@ -1,1 +1,1 @@
-../CORE/io/shm.t
+template.pl

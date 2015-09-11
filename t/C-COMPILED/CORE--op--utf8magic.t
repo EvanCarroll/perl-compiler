@@ -1,1 +1,1 @@
-../CORE/op/utf8magic.t
+template.pl

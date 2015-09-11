@@ -1,1 +1,1 @@
-../CORE/re/pat_special_cc.t
+template.pl

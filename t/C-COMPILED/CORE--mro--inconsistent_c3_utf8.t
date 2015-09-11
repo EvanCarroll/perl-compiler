@@ -1,1 +1,1 @@
-../CORE/mro/inconsistent_c3_utf8.t
+template.pl

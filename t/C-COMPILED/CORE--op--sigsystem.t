@@ -1,1 +1,1 @@
-../CORE/op/sigsystem.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/re/substT.t
+template.pl

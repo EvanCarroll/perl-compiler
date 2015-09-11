@@ -1,1 +1,1 @@
-../CORE/lib/croak.t
+template.pl

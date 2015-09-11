@@ -1,1 +1,1 @@
-../CORE/op/inccode.t
+template.pl

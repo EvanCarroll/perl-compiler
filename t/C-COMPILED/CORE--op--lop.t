@@ -1,1 +1,1 @@
-../CORE/op/lop.t
+template.pl

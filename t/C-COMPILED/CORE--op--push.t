@@ -1,1 +1,1 @@
-../CORE/op/push.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/io/read.t
+template.pl

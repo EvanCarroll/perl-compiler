@@ -1,1 +1,1 @@
-../CORE/op/ref.t
+template.pl

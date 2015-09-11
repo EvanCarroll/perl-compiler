@@ -1,1 +1,1 @@
-../CORE/op/exec.t
+template.pl

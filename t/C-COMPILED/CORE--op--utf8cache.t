@@ -1,1 +1,1 @@
-../CORE/op/utf8cache.t
+template.pl

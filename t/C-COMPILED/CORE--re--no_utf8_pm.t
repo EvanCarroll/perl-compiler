@@ -1,1 +1,1 @@
-../CORE/re/no_utf8_pm.t
+template.pl

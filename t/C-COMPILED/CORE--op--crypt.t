@@ -1,1 +1,1 @@
-../CORE/op/crypt.t
+template.pl

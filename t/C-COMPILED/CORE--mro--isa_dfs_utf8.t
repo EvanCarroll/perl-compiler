@@ -1,1 +1,1 @@
-../CORE/mro/isa_dfs_utf8.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/mro/dbic_dfs.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/auto.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/vec.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/op/protowarn.t
+template.pl

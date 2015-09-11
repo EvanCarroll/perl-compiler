@@ -1,1 +1,1 @@
-../CORE/uni/upper.t
+template.pl

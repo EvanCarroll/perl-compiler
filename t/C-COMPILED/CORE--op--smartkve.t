@@ -1,1 +1,1 @@
-../CORE/op/smartkve.t
+template.pl

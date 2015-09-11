@@ -1,1 +1,1 @@
-../CORE/mro/basic_03_c3_utf8.t
+template.pl

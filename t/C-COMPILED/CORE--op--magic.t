@@ -1,1 +1,1 @@
-../CORE/op/magic.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/re/regexp_notrie.t
+template.pl

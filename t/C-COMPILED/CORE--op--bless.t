@@ -1,1 +1,1 @@
-../CORE/op/bless.t
+template.pl

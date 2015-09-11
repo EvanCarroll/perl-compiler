@@ -1,1 +1,1 @@
-../CORE/comp/final_line_num.t
+template.pl

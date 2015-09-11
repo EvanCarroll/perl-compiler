@@ -1,1 +1,1 @@
-../CORE/io/closepid.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/mro/next_edgecases_utf8.t
+template.pl

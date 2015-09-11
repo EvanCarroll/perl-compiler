@@ -1,1 +1,1 @@
-../CORE/op/evalbytes.t
+template.pl

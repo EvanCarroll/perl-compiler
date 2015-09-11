@@ -1,1 +1,1 @@
-../CORE/op/sysio.t
+template.pl

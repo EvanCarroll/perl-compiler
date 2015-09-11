@@ -1,1 +1,1 @@
-../CORE/comp/line_debug.t
+template.pl

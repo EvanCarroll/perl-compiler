@@ -1,1 +1,1 @@
-../CORE/op/while.t
+template.pl

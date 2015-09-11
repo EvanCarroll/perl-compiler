@@ -1,1 +1,1 @@
-../CORE/io/inplace.t
+template.pl

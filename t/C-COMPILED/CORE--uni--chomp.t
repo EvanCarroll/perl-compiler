@@ -1,1 +1,1 @@
-../CORE/uni/chomp.t
+template.pl

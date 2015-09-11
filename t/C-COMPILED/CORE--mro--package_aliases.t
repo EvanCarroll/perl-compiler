@@ -1,1 +1,1 @@
-../CORE/mro/package_aliases.t
+template.pl

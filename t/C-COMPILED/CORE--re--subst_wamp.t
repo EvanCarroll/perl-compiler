@@ -1,1 +1,1 @@
-../CORE/re/subst_wamp.t
+template.pl

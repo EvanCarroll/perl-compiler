@@ -1,1 +1,1 @@
-../CORE/op/chr.t
+template.pl

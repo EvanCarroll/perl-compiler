@@ -1,1 +1,1 @@
-../CORE/mro/complex_c3.t
+template.pl

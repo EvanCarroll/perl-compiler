@@ -1,1 +1,1 @@
-../CORE/op/mkdir.t
+template.pl

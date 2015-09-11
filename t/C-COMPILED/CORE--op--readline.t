@@ -1,1 +1,1 @@
-../CORE/op/readline.t
+template.pl

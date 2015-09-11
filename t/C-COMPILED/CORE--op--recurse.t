@@ -1,1 +1,1 @@
-../CORE/op/recurse.t
+template.pl

@@ -1,1 +1,1 @@
-../CORE/io/data.t
+template.pl

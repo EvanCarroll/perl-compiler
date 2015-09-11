@@ -1,1 +1,1 @@
-../CORE/io/say.t
+template.pl

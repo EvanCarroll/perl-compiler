@@ -1,1 +1,1 @@
-../CORE/op/oct.t
+template.pl

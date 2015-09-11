@@ -1,1 +1,1 @@
-../CORE/re/charset.t
+template.pl

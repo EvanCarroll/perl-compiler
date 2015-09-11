@@ -1,1 +1,1 @@
-../CORE/io/eintr.t
+template.pl
