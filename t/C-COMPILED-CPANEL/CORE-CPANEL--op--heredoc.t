@@ -1,1 +1,0 @@
-../CORE-CPANEL/op/heredoc.t

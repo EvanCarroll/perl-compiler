@@ -1,1 +1,1 @@
-template.pl
+../CORE/op/filetest_t.t

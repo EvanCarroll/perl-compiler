@@ -1,0 +1,1 @@
+../CORE/op/heredoc.t

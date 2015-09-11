@@ -1,1 +1,1 @@
-template.pl
+../CORE/mro/basic_05_dfs.t

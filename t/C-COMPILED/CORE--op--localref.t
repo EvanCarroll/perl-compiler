@@ -1,1 +1,1 @@
-template.pl
+../CORE/op/localref.t

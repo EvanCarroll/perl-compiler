@@ -1,0 +1,1 @@
+../CORE/mro/method_caching_utf8.t

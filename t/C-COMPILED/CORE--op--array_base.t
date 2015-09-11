@@ -1,1 +1,1 @@
-template.pl
+../CORE/op/array_base.t

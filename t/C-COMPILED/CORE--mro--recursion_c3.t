@@ -1,1 +1,1 @@
-template.pl
+../CORE/mro/recursion_c3.t

@@ -1,1 +1,1 @@
-template.pl
+../CORE/mro/isa_dfs.t

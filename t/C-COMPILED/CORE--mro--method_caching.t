@@ -1,1 +1,1 @@
-template.pl
+../CORE/mro/method_caching.t

@@ -1,1 +1,1 @@
-template.pl
+../CORE/op/concat2.t

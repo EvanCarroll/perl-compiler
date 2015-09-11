@@ -1,1 +1,1 @@
-template.pl
+../CORE/re/reg_60508.t

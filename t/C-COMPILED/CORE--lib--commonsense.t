@@ -1,0 +1,1 @@
+../CORE/lib/commonsense.t

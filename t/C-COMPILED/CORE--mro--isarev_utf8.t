@@ -1,0 +1,1 @@
+../CORE/mro/isarev_utf8.t

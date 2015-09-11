@@ -1,1 +1,1 @@
-template.pl
+../CORE/io/perlio_open.t

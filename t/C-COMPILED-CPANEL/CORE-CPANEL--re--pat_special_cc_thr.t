@@ -1,1 +1,0 @@
-../CORE-CPANEL/re/pat_special_cc_thr.t

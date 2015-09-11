@@ -1,1 +1,1 @@
-template.pl
+../CORE/op/each_array.t

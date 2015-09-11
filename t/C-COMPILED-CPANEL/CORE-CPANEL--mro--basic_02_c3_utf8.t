@@ -1,1 +1,0 @@
-../CORE-CPANEL/mro/basic_02_c3_utf8.t

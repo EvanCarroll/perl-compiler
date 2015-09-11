@@ -1,0 +1,1 @@
+../CORE/mro/overload_c3_utf8.t

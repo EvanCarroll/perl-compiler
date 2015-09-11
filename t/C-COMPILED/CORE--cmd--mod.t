@@ -1,1 +1,1 @@
-template.pl
+../CORE/cmd/mod.t

@@ -1,0 +1,1 @@
+../CORE/lib/no_load.t

@@ -1,1 +1,1 @@
-template.pl
+../CORE/mro/vulcan_c3.t

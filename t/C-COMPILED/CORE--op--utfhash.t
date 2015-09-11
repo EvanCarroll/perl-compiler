@@ -1,1 +1,1 @@
-template.pl
+../CORE/op/utfhash.t

@@ -1,1 +1,1 @@
-template.pl
+../CORE/io/tell.t

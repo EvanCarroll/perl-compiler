@@ -1,1 +1,0 @@
-../CORE-CPANEL/re/subst_amp.t

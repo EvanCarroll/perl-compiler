@@ -1,1 +1,1 @@
-template.pl
+../CORE/op/inccode-tie.t

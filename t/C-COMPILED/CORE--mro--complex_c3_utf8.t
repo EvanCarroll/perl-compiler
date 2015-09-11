@@ -1,0 +1,1 @@
+../CORE/mro/complex_c3_utf8.t

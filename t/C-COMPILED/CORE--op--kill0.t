@@ -1,1 +1,1 @@
-template.pl
+../CORE/op/kill0.t

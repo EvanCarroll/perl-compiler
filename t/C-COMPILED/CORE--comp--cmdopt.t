@@ -1,1 +1,1 @@
-template.pl
+../CORE/comp/cmdopt.t

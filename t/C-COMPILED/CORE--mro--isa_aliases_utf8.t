@@ -1,0 +1,1 @@
+../CORE/mro/isa_aliases_utf8.t

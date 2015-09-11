@@ -1,1 +1,1 @@
-template.pl
+../CORE/op/magic-27839.t

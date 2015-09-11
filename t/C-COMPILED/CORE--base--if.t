@@ -1,1 +1,1 @@
-template.pl
+../CORE/base/if.t

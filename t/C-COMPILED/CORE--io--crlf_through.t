@@ -1,1 +1,1 @@
-template.pl
+../CORE/io/crlf_through.t

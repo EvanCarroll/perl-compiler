@@ -1,1 +1,1 @@
-template.pl
+../CORE/base/rs.t

@@ -1,1 +1,1 @@
-template.pl
+../CORE/mro/dbic_c3.t

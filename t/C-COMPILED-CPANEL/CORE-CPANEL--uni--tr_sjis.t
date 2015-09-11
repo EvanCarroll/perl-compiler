@@ -1,1 +1,0 @@
-../CORE-CPANEL/uni/tr_sjis.t

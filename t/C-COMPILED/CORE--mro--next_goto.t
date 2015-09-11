@@ -1,1 +1,1 @@
-template.pl
+../CORE/mro/next_goto.t

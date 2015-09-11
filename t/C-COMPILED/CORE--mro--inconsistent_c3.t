@@ -1,1 +1,1 @@
-template.pl
+../CORE/mro/inconsistent_c3.t

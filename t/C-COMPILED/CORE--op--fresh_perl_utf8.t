@@ -1,0 +1,1 @@
+../CORE/op/fresh_perl_utf8.t

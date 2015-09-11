@@ -1,1 +1,1 @@
-template.pl
+../CORE/op/sprintf2.t

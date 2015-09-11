@@ -1,1 +1,1 @@
-template.pl
+../CORE/base/num.t

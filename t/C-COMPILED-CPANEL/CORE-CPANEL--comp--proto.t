@@ -1,1 +1,0 @@
-../CORE-CPANEL/comp/proto.t

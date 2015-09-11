@@ -1,1 +1,1 @@
-template.pl
+../CORE/mro/basic_04_c3.t

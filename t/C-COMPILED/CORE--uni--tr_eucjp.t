@@ -1,0 +1,1 @@
+../CORE/uni/tr_eucjp.t

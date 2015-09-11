@@ -1,1 +1,1 @@
-template.pl
+../CORE/op/filehandle.t

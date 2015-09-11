@@ -1,0 +1,1 @@
+../CORE/lib/croak.t
