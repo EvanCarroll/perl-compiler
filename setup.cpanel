@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# usage: . setup.cpanel --debug
+#    or  . setup.cpanel
+
+ARG="$1" # --debug
 PERL=$(which perl)
 BINPERL="/usr/local/cpanel/3rdparty/perl/520/bin"
 
@@ -8,6 +12,12 @@ if [ "$PERL" != "$BINPERL/perl" ]; then
     export PATH=$BINPERL:$PATH
 fi
 
-export VERBOSE=1
-export BC_DEVELOPING=1
+DEBUG=0
+if [ "$ARG" == "--debug" ]; then
+    echo debug is ON
+    DEBUG=1
+fi
+
+export VERBOSE=$DEBUG
+export BC_DEVELOPING=$DEBUG
 
