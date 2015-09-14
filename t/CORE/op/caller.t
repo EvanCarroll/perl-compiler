@@ -3,15 +3,15 @@
 
 BEGIN {
     require 't/CORE/test.pl';
+    chdir 't/CORE';
+    plan( tests => 95 );
 }
 
-chdir 't/CORE';
-plan( tests => 95 );
 
 
 my @c;
 
-print "# Tests with caller(0)\n";
+BEGIN { print "# Tests with caller(0)\n"; }
 
 @c = caller(0);
 ok( (!@c), "caller(0) in main program" );
