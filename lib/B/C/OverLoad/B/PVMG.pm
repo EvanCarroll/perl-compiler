@@ -111,12 +111,12 @@ sub save_magic {
     else {
         my $pkg = $sv->SvSTASH;
         if ($$pkg) {
-            debug( mg => "stash isa class(\"%s\") 0x%x\n", $pkg->NAME, $$pkg );
+            debug( mg => "stash isa class(\"%s\") 0x%x\n", eval { $pkg->NAME }, $$pkg );
 
             $pkg->save($fullname);
 
             no strict 'refs';
-            debug( mg => "xmg_stash = \"%s\" (0x%x)\n", $pkg->NAME, $$pkg );
+            debug( mg => "xmg_stash = \"%s\" (0x%x)\n", eval { $pkg->NAME }, $$pkg );
 
             # Q: Who is initializing our stash from XS? ->save is missing that.
             # A: We only need to init it when we need a CV
