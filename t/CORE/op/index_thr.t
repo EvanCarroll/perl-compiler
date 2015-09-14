@@ -1,3 +1,2 @@
 #!./perl
-chdir 't/CORE';
-require './thread_it.pl';
+require 't/CORE/thread_it.pl';
