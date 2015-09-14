@@ -11,7 +11,7 @@ plan( tests => 95 );
 
 my @c;
 
-BEGIN { print "# Tests with caller(0)\n"; }
+print "# Tests with caller(0)\n";
 
 @c = caller(0);
 ok( (!@c), "caller(0) in main program" );
