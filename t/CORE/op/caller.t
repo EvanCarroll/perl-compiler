@@ -2,10 +2,12 @@
 # Tests for caller()
 
 BEGIN {
-    push @INC, "t/CORE/lib";
     require 't/CORE/test.pl';
-    plan( tests => 95 );
 }
+
+chdir 't/CORE';
+plan( tests => 95 );
+
 
 my @c;
 
