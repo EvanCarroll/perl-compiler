@@ -3,9 +3,9 @@
 # Test scoping issues with embedded code in regexps.
 
 BEGIN {
-    chdir 't';
+    
     unshift @INC, 't/CORE/lib';
-    require 'test.pl';
+    require 't/CORE/test.pl';
 }
 
 plan 48;

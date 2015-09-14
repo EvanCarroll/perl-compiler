@@ -15,9 +15,9 @@ $| = 1;
 
 
 BEGIN {
-    chdir 't' if -d 't';
+    
     unshift @INC, 't/CORE/lib';
-    require 'test.pl';
+    require 't/CORE/test.pl';
     skip_all_if_miniperl("no dynamic loading on miniperl, no re");
 }
 

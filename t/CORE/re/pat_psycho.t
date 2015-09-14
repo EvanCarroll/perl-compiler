@@ -18,9 +18,9 @@ $| = 1;
 
 
 BEGIN {
-    chdir 't' if -d 't';
+    
     unshift @INC, 't/CORE/lib';
-    require 'test.pl';
+    require 't/CORE/test.pl';
     if ($^O eq 'dec_osf') {
         skip_all("$^O cannot handle this test");
     }

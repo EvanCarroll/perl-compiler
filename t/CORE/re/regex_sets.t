@@ -11,9 +11,9 @@ use warnings;
 $| = 1;
 
 BEGIN {
-    chdir 't' if -d 't';
+    
     unshift @INC, 't/CORE/lib';
-    require 'test.pl';
+    require 't/CORE/test.pl';
 }
 
 use utf8;

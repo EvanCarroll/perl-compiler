@@ -4,9 +4,9 @@
 #
 
 BEGIN {
-    chdir 't' if -d 't';
+    
     push @INC, "t/CORE/lib";
-    require 'test.pl';
+    require 't/CORE/test.pl';
 }
 
 use strict;

@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
+    
     push @INC, "t/CORE/lib";
     unless (defined &DynaLoader::boot_DynaLoader) {
       print "1..0 # Skip: no dynamic loading on miniperl, no Tie::Hash::NamedCapture\n";

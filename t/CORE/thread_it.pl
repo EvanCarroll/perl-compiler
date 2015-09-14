@@ -7,7 +7,7 @@ use warnings;
 # So ensure that this, textually, is the same name as all the loaded tests use.
 # Otherwise if we require 'test.pl' and they require './test.pl', it is loaded
 # twice.
-require './test.pl';
+require './t/CORE/test.pl';
 skip_all_without_config('useithreads');
 skip_all_if_miniperl("no dynamic loading on miniperl, no threads");
 
