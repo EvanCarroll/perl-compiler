@@ -7,6 +7,7 @@ BEGIN {
 
 plan tests => 48;
 
+chdir 't/CORE';
 open(I, 'op/sysio.t') || die "sysio.t: cannot find myself: $!";
 
 $reopen = ($^O eq 'VMS' ||

@@ -2,8 +2,9 @@
 #line 3 warn.t
 
 BEGIN {
-    push @INC, "t/CORE/lib";
     require 't/CORE/test.pl';
+# Keep file len the same
+# so warning messages come out right.
 }
 
 plan 32;

@@ -1,7 +1,6 @@
 #!./perl
 
 BEGIN {
-    push @INC, "t/CORE/lib";
     require 't/CORE/test.pl';
 }
 

@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 
+BEGIN { require 't/CORE/test.pl' }
 
 plan(tests => 8);
 

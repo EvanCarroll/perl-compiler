@@ -7,7 +7,6 @@
 #   Run with -debug for debugging output.
 
 BEGIN {
-    push @INC, "t/CORE/lib";
     require 't/CORE/test.pl';
 }
 
@@ -730,7 +729,7 @@ BEGIN {
 
 # [perl #113812] Closure prototypes with no CvOUTSIDE (crash caused by the
 #                fix for #89544)
-do "./op/closure_test.pl" or die $@||$!;
+do "./t/CORE/op/closure_test.pl" or die $@||$!;
 is $closure_test::s2->()(), '10 cubes',
   'cloning closure proto with no CvOUTSIDE';
 

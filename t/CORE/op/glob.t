@@ -1,12 +1,12 @@
 #!./perl
 
 BEGIN {
-    push @INC, qw{t/CORE/lib};
     require 't/CORE/test.pl';
 }
 
 plan( tests => 18 );
 
+chdir 't/CORE';
 @oops = @ops = <op/*>;
 
 if ($^O eq 'MSWin32') {

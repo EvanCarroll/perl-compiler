@@ -4,7 +4,6 @@
 # See pod/perlport.pod for details.
 
 BEGIN {
-    push @INC, "t/CORE/lib";
     require 't/CORE/test.pl';
 }
 
@@ -14,6 +13,7 @@ if ($^O =~ /MSWin32|cygwin|msys/ && !is_miniperl) {
   require Win32; # for IsAdminUser()
 }
 
+chdir 't/CORE';
 # Tests presume we are in t/op directory and that file 'TEST' is found
 # therein.
 is(-d 'op', 1, "-d: directory correctly identified");

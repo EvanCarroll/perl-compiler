@@ -5,9 +5,10 @@
 #
 
 BEGIN {
-    push @INC, "t/CORE/lib";
     require 't/CORE/test.pl';
 }
+
+chdir 't/CORE';
 
 use warnings;
 

@@ -1,5 +1,9 @@
 #!perl
 
+BEGIN {
+    require 't/CORE/test.pl';
+}
+
 # Complicated enough to get its own test file.
 
 # When a subroutine is called recursively, it gets a new pad indexed by its
