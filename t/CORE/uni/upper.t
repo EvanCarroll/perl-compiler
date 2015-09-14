@@ -1,7 +1,5 @@
 BEGIN {
-    chdir 't' if -d 't';
-    push @INC, qw{t/CORE/lib t/CORE/uni}
-    require "case.pl";
+    require 't/CORE/uni/case.pl';
 }
 
 is(uc("\x{3B1}\x{345}\x{301}"), "\x{391}\x{301}\x{399}", 'Verify moves YPOGEGRAMMENI');

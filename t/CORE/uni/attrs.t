@@ -3,9 +3,9 @@
 # Regression tests for attributes.pm and the C< : attrs> syntax.
 
 BEGIN {
-    chdir 't' if -d 't';
+    
     push @INC, "t/CORE/lib";
-    require 'test.pl';
+    require 't/CORE/test.pl';
     skip_all_if_miniperl("miniperl can't load attributes");
 }
 

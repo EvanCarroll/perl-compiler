@@ -1,9 +1,7 @@
 #!./perl
 
 BEGIN {
-    chdir 't';
-    push @INC, "t/CORE/lib";
-    require 'test.pl';
+    require 't/CORE/test.pl';
 }
 
 plan tests => 7;

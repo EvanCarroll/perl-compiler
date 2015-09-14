@@ -1,5 +1,5 @@
 BEGIN {
-    chdir 't' if -d 't';
+    
     unshift @INC, 't/CORE/lib';
     require "test.pl";
 }

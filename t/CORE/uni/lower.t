@@ -1,7 +1,6 @@
 BEGIN {
-    chdir 't' if -d 't';
-    push @INC, qw{t/CORE/lib t/CORE/uni}
-    require "case.pl";
+    
+    require 't/CORE/uni/case.pl';
 }
 
 casetest(0, # No extra tests run here,

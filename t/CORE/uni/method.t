@@ -5,7 +5,7 @@
 #
 
 BEGIN {
-    chdir 't' if -d 't';
+    
     push @INC, qw{t/CORE/lib};
     require "test.pl";
 }
