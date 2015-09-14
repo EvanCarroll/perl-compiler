@@ -2,8 +2,8 @@
 
 BEGIN {
 	chdir 't' if -d 't';
-	@INC = '../lib';
-	require './test.pl';
+	push @INC, "t/CORE/lib";
+	require 'test.pl';
 	eval 'require Config'; # assume defaults if this fails
 }
 

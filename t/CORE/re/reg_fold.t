@@ -2,8 +2,8 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
-    require './test.pl';
+    push @INC, "t/CORE/lib";
+    require 'test.pl';
     skip_all_if_miniperl("no dynamic loading on miniperl, no File::Spec");
 }
 

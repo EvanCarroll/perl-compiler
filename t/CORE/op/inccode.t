@@ -3,9 +3,8 @@
 # Tests for the coderef-in-@INC feature
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
-    require './test.pl';
+    unshift @INC, 't/CORE/lib';
+    require 't/CORE/test.pl';
 }
 
 use Config;

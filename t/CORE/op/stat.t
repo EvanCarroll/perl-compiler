@@ -1,9 +1,8 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-    require './test.pl';	# for which_perl() etc
+    push @INC, "t/CORE/lib";
+    require 't/CORE/test.pl';	# for which_perl() etc
 }
 
 use Config;

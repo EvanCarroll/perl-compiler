@@ -4,8 +4,8 @@
 
 BEGIN {
     chdir 't';
-    @INC = qw(lib ../lib);
-    require './test.pl';
+    unshift @INC, 't/CORE/lib';
+    require 'test.pl';
 }
 
 plan 48;

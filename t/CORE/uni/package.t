@@ -3,7 +3,7 @@
 # Checks if 'package' work as intended.
 
 BEGIN {
-    require './test.pl';
+    require 'test.pl';
 }
 
 plan (tests => 18);

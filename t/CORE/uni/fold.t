@@ -6,9 +6,9 @@ use warnings;
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
+    push @INC, "t/CORE/lib";
     require Config; import Config;
-    require './test.pl';
+    require 'test.pl';
     require './loc_tools.pl';   # Contains find_utf8_ctype_locale()
 }
 

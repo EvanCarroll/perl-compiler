@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 
-BEGIN { chdir 't'; require './test.pl'; }
 
 plan(tests => 8);
 

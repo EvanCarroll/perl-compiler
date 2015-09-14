@@ -1,8 +1,7 @@
 #!./perl
 
 BEGIN {
-    chdir 't';
-    require './test.pl';
+    require 't/CORE/test.pl';
 }
 
 plan reverse 9;

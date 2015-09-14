@@ -2,9 +2,9 @@
 
 BEGIN {
     chdir 't';
-    @INC = '../lib';
+    push @INC, "t/CORE/lib";
     require Config; import Config;
-    require './test.pl';
+    require 'test.pl';
 }
 
 plan(tests => 215);

@@ -1,6 +1,6 @@
 BEGIN {
     chdir 't' if -d 't';
-    @INC = qw(../lib uni .);
+    push @INC, qw{t/CORE/lib t/CORE/uni}
     require "case.pl";
 }
 

@@ -4,9 +4,8 @@
 # See pod/perlport.pod for details.
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-    require './test.pl';
+    push @INC, "t/CORE/lib";
+    require 't/CORE/test.pl';
 }
 
 plan(tests => 53 + 27*14);

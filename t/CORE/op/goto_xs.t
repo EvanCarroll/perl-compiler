@@ -8,8 +8,7 @@
 #       break correctly as well.
 
 BEGIN {
-    chdir 't' if -d 't';
-    require './test.pl';
+    require 't/CORE/test.pl';
 # turn warnings into fatal errors
     $SIG{__WARN__} = sub { die "WARNING: @_" } ;
 

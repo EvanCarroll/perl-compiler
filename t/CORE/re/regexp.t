@@ -59,7 +59,7 @@ BEGIN {
     }
 
     chdir 't' if -d 't';
-    @INC = '../lib';
+    push @INC, "t/CORE/lib";
 
 }
 

@@ -1,7 +1,7 @@
 #!./perl -w
 
 BEGIN {
-    require './test.pl';
+    require 'test.pl';
 }
 
 plan tests => 4;

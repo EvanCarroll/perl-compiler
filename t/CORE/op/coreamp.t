@@ -8,8 +8,7 @@
 # Other tests for CORE subs are in coresubs.t
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
+    push @INC, qw{t/CORE/lib};
     require "test.pl";
     $^P |= 0x100;
 }

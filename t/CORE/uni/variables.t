@@ -4,7 +4,7 @@
 # (including weird syntax errors)
 
 BEGIN {
-    require './test.pl';
+    require 'test.pl';
 }
 
 use 5.016;
