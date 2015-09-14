@@ -1,22 +1,27 @@
 #!perl -w
 use strict;
 
+my %tests_in_begin_block;
+
 BEGIN {
  require 't/CORE/test.pl';
-
- plan (tests => my $tests = 11);
-
- # Run these at BEGIN time, before arybase loads
  use v5.15;
- is(eval('$[ = 1; 123'), undef);
- like($@, qr/\AAssigning non-zero to \$\[ is no longer possible/);
+ # Run these at BEGIN time, before arybase loads
+ $tests_in_begin_block{'eval'} = eval('$[ = 1; 123');
+ $tests_in_begin_block{'error'} = $@;
+ 
+}
+
+plan (tests => my $tests = 11);
+
+is($tests_in_begin_block{'eval'}, undef);
+like($tests_in_begin_block{'error'}, qr/\AAssigning non-zero to \$\[ is no longer possible/);
 
  if (is_miniperl()) {
    # skip the rest
    SKIP: { skip ("no arybase.xs on miniperl", $tests-2) }
    exit;
  }
-}
 
 no warnings 'deprecated';
 
