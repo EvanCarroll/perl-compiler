@@ -364,8 +364,7 @@ teststatus :: pure_all
 testrelease :: pure_all
 	\$(ECHO) run t/release-testing.sh and perlall testvm --all
 testcore :: pure_all
-	-/bin/rm -f .prove
-	-perl cprove -b -v comp/retainedlines.t op/reset.t op/taint.t op/utftaint.t re/substT.t xtestc/0046.t xtestc/0245.t xtestc/0259.t xtestc/0263.t xtestc/0272.t xtestc/0273.t xtestc/0274.t xtestc/0282.t xtestc/2721.t 
+	VERBOSE=1 \$(FULLPERLRUN) -S prove -b -v -f t/v5.22.0/C-COMPILED/comp/retainedlines.t t/v5.22.0/C-COMPILED/op/taint.t t/v5.22.0/C-COMPILED/op/utftaint.t t/v5.22.0/C-COMPILED/re/substT.t t/v5.22.0/C-COMPILED/xtestc/0273.t t/v5.22.0/C-COMPILED/xtestc/0274.t
 \%.t :: pure_all
 	\$(FULLPERLRUN) -S prove -b -v t/$^V/C-COMPILED/\$@
 )
