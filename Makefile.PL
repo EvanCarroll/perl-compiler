@@ -365,8 +365,7 @@ testrelease :: pure_all
 	\$(ECHO) run t/release-testing.sh and perlall testvm --all
 testcore :: pure_all
 	-/bin/rm -f .prove
-	-\$(FULLPERLRUN) -S prove -b --state=save -j4 -f t/$^V/C-COMPILED/*/*.t
-	\$(FULLPERLRUN) -S prove -v -b --state=failed
+	-perl cprove -b -v comp/retainedlines.t op/reset.t op/taint.t op/utftaint.t re/substT.t xtestc/0046.t xtestc/0245.t xtestc/0259.t xtestc/0263.t xtestc/0272.t xtestc/0273.t xtestc/0274.t xtestc/0282.t xtestc/2721.t 
 \%.t :: pure_all
 	\$(FULLPERLRUN) -S prove -b -v t/$^V/C-COMPILED/\$@
 )
