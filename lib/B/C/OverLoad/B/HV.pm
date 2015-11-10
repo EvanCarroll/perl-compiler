@@ -16,7 +16,7 @@ package B::HV;
 
 use strict;
 
-use B qw/cstring SVf_READONLY SVf_PROTECT SVs_OBJECT SVf_OOK/;
+use B qw/cstring SVf_READONLY SVf_PROTECT SVs_OBJECT SVf_OOK SVf_AMAGIC/;
 use B::C::Config;
 use B::C::File qw/init xpvhvsect svsect decl init1 init2/;
 use B::C::Helpers qw/mark_package read_utf8_string strlen_flags is_using_mro/;
@@ -55,6 +55,8 @@ sub save {
         $sym = savestashpv( $name, $no_gvadd );    # inc hv_index
         savesym( $hv, $sym );
 
+        init2()->add( sprintf(q/Perl_mro_isa_changed_in((HV*) %s );/, $sym ) );
+
         # issue 79, test 46: save stashes to check for packages.
         # and via B::STASHGV we only save stashes for stashes.
         # For efficiency we skip most stash symbols unless -fstash.
@@ -74,6 +76,7 @@ sub save {
             }
             return $sym;
         }
+
         return $sym if B::C::skip_pkg($name) or $name eq 'main';
         init()->add("SvREFCNT_inc($sym);");
         debug( hv => "Saving stash keys for HV \"$name\" from \"$fullname\"" );
@@ -210,6 +213,7 @@ sub save {
     }
     $magic = $hv->save_magic($fullname);
     init()->add("SvREADONLY_on($sym);") if $hv->FLAGS & SVf_READONLY;
+
     if ( $magic =~ /c/ ) {
 
         # defer AMT magic of XS loaded hashes
