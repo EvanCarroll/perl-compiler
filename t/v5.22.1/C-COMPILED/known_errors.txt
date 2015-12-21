@@ -80,7 +80,7 @@ re/qr_gc.t                   TESTS     BC issue #309 - regexp destruction
 re/reg_eval_scope.t          PLAN      BC issue #295 - (?{}) should have its own lexical scope
 re/reg_mesg.t                TESTS     CM issue #26 - warnings from re.pm - Subroutine redefined
 re/reg_pmod.t                TESTS     BC issue #295 - (?{}) should have its own lexical scope
-re/regex_sets.t              TESTS     Test results:
+re/regex_sets.t              COMPAT    skip this test for now
 re/rxcode.t                  TESTS     BC issue #295 - (?{}) should have its own lexical scope
 re/subst_amp.t               TESTS     BC issue #295 - (?{}) should have its own lexical scope
 uni/caller.t                 PLAN      BC issue #221 - delete is not anonymizing the returned sub
