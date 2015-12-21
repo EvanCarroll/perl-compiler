@@ -59,6 +59,7 @@ op/override.t                COMPAT    crazy test which override CORE::GLOBAL::r
 op/postfixderef.t            TESTS     BC issue #302 - quoted eval scope doesn't honor use feature.
 op/readline.t                TESTS     BC issue #269 - Modification of a read-only value attempted
 op/ref.t                     TESTS     BC issue #300 - PVFM not compiled
+op/reset.t                   TESTS     Test results:
 op/sprintf2.t                PLAN      BC issue #219 - overload issue
 op/stash.t                   TESTS     BC issue #221 - delete is not anonymizing the returned sub
 op/sub_lval.t                TESTS     BC issue #277 - sub declaration with :lvalue should apply it to XSUBs
@@ -79,6 +80,7 @@ re/qr_gc.t                   TESTS     BC issue #309 - regexp destruction
 re/reg_eval_scope.t          PLAN      BC issue #295 - (?{}) should have its own lexical scope
 re/reg_mesg.t                TESTS     CM issue #26 - warnings from re.pm - Subroutine redefined
 re/reg_pmod.t                TESTS     BC issue #295 - (?{}) should have its own lexical scope
+re/regex_sets.t              TESTS     Test results:
 re/rxcode.t                  TESTS     BC issue #295 - (?{}) should have its own lexical scope
 re/subst_amp.t               TESTS     BC issue #295 - (?{}) should have its own lexical scope
 uni/caller.t                 PLAN      BC issue #221 - delete is not anonymizing the returned sub
@@ -136,10 +138,13 @@ xtestc/0317.t                TESTS     Output is: ""
 xtestc/0319.t                TESTS     Output is: "Wide character in print at ..."
 xtestc/0321.t                TESTS     Output is: ""
 xtestc/0329.t                TESTS     Output is: "axxxx \n"
+xtestc/0340.t                TESTS     Output is: "die at new at xtestc 0340.pl ..."
+xtestc/0342.t                TESTS     Output is: ""
 xtestc/0350.t                TESTS     Output is: ""
 xtestc/0369.t                TESTS     Output is: ""
 xtestc/0371.t                TESTS     Output is: ""
 xtestc/0374.t                BC        xtestc/0374.c is generated (-O3,-fno-fold)
+xtestc/1960.t                TESTS     Output is: ""
 xtestc/2052.t                TESTS     Output is: ""
 xtestc/2201.t                TESTS     Output is: ""
 xtestc/2381.t                TESTS     Output is: "Undefined subroutine ..."
