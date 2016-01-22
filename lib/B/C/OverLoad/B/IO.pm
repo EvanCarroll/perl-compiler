@@ -54,7 +54,7 @@ sub save {
     }
     if ($cur) {
         $len = $cur + 1;
-        $len++ if B::C::IsCOW($io);
+        $len++ if B::C::IsCOW($io) and !$B::C::cow;
     }
     else {
         $len = 0;

@@ -524,7 +524,7 @@ sub save {
     my $pvsym = 'NULL';
     my $cur   = defined $pv ? $cv->CUR : 0;
     my $len   = $cur + 1;
-    $len++ if B::C::IsCOW($cv);
+    $len++ if B::C::IsCOW($cv) and !$B::C::cow;
     $len = 0 if $B::C::const_strings;
 
     # need to survive cv_undef as there is no protection against static CVs
@@ -560,12 +560,12 @@ sub save {
       # stash magic cur len cvstash start root cvgv cvfile cvpadlist     outside outside_seq cvflags cvdepth
       (
         "Nullhv, {0}, %u, {%u}, %s, {%s}, {s\\_%x}, {%s}, %s, {%s}, (CV*)%s, %s, 0x%x, %d",
-        $cur,        $len, "Nullhv",    #CvSTASH later
+        $cur, $len, "Nullhv",    #CvSTASH later
         $startfield, $$root,
-        "0",                            #GV later
-        "NULL",                         #cvfile later (now a HEK)
+        "0",                     #GV later
+        "NULL",                  #cvfile later (now a HEK)
         $padlistsym,
-        $xcv_outside,                   #if main_cv set later
+        $xcv_outside,            #if main_cv set later
         get_integer_value( $cv->OUTSIDE_SEQ ),
         $CvFLAGS,
         $cv->DEPTH
