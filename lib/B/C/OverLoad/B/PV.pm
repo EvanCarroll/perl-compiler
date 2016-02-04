@@ -20,11 +20,12 @@ sub save {
         }
         return $sym;
     }
-    my $flags = $sv->FLAGS;
+
+    my ( $savesym, $cur, $len, $pv, $static, $flags ) = B::C::save_pv_or_rv( $sv, $fullname );
     my $shared_hek = ( ( $flags & 0x09000000 ) == 0x09000000 );
     $shared_hek = $shared_hek ? 1 : B::C::IsCOW_hek($sv);
-    my ( $savesym, $cur, $len, $pv, $static ) = B::C::save_pv_or_rv( $sv, $fullname );
-    $static = 0 if !( $flags & SVf_ROK ) and $sv->PV and $sv->PV =~ /::bootstrap$/;
+
+    #$static = 0 if !( $flags & SVf_ROK ) and $sv->PV and $sv->PV =~ /::bootstrap$/;
 
     # sv_free2 problem with !SvIMMORTAL and del_SV
     my $refcnt = $sv->REFCNT;
@@ -60,7 +61,7 @@ sub save {
             sprintf(
                 qq(sv_list[%d].sv_debug_file = %s" sv_list[%d] 0x%x";),
                 $svix, cstring($pv) eq '0' ? q{"NULL"} : cstring($pv),
-                $svix, $sv->FLAGS
+                $svix, $flags
             )
         );
     }
