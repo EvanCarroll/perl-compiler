@@ -11,7 +11,7 @@ use B::C::File qw/init init1 init2 svsect xpvmgsect xpvsect pmopsect/;
 use B::C::Helpers::Symtable qw/objsym savesym/;
 use B::C::Helpers qw/mark_package read_utf8_string/;
 
-sub save {
+sub save {        # FIXME... savesym -> pvsym
     my ( $sv, $fullname ) = @_;
     my $sym = objsym($sv);
     if ( defined $sym ) {
@@ -21,11 +21,12 @@ sub save {
         }
         return $sym;
     }
-    my ( $savesym, $cur, $len, $pv, $static ) = B::C::save_pv_or_rv( $sv, $fullname );
-    if ($static) {    # 242: e.g. $1
-        $static = 0;
-        $len = $cur + 1 unless $len;
-    }
+    my ( $savesym, $cur, $len, $pv, $static, $flags ) = B::C::save_pv_or_rv( $sv, $fullname );
+
+    # if ($static) {    # 242: e.g. $1
+    #     $static = 0;
+    #     $len = $cur + 1 unless $len;
+    # }
 
     my ( $ivx, $nvx );
 
@@ -71,7 +72,7 @@ sub save {
     svsect()->add(
         sprintf(
             "&xpvmg_list[%d], %Lu, 0x%x, {%s}",
-            xpvmgsect()->index, $sv->REFCNT, $sv->FLAGS,
+            xpvmgsect()->index, $sv->REFCNT, $flags,
             $savesym eq 'NULL'
             ? '0'
             : ".svu_pv=(char*)" . $savesym

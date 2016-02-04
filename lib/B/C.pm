@@ -34,13 +34,14 @@ use B::C::File qw( init2 init0 init decl free
 );
 use B::C::Helpers qw/set_curcv is_using_mro/;
 use B::C::Helpers::Symtable qw(objsym savesym);
+use B::C::Save::Hek qw/save_hek/;
 
 use strict;
 use Exporter ();
-use Errno    ();               #needed since 5.14
+use Errno ();    #needed since 5.14
 our %Regexp;
 
-{                              # block necessary for caller to work
+{    # block necessary for caller to work
     my $caller = caller;
     if ( $caller eq 'O' or $caller eq 'Od' ) {
         require XSLoader;
@@ -137,8 +138,8 @@ our ( $init_name, %savINC, %curINC, $mainfile, @static_free );
 our (
     $optimize_ppaddr, $optimize_warn_sv, $use_perl_script_name,
     $save_data_fh, $optimize_cop, $av_init, $av_init2, $ro_inc, $destruct,
-    $fold, $warnings, $const_strings, $stash, $can_delete_pkg, $pv_copy_on_grow, $dyn_padlist,
-    $walkall
+    $fold,    $warnings, $const_strings, $stash, $can_delete_pkg, $pv_copy_on_grow, $dyn_padlist,
+    $walkall, $cow
 );
 
 our %option_map = (
@@ -154,6 +155,7 @@ our %option_map = (
     'av-init2'        => \$B::C::av_init2,
     'delete-pkg'      => \$B::C::can_delete_pkg,
     'ro-inc'          => \$B::C::ro_inc,
+    'cow'             => \$B::C::cow,                            # enable with -O2
     'stash'           => \$B::C::stash,                          # enable with -fstash
     'destruct'        => \$B::C::destruct,                       # disable with -fno-destruct
     'fold'            => \$B::C::fold,                           # disable with -fno-fold
@@ -168,7 +170,7 @@ our %option_map = (
 our %optimization_map = (
     0 => [qw()],                                                        # special case
     1 => [qw(-fppaddr -fav-init2)],                                     # falls back to -fav-init
-    2 => [qw(-fro-inc -fsave-data)],
+    2 => [qw(-fro-inc -fsave-data -fcow)],
     3 => [qw(-fno-destruct -fconst-strings -fno-fold -fno-warnings)],
     4 => [qw(-fcop -fno-dyn-padlist)],
 );
@@ -325,10 +327,12 @@ sub IsCOW_hek {
 sub save_pv_or_rv {
     my ( $sv, $fullname ) = @_;
 
-    my $rok   = $sv->FLAGS & SVf_ROK;
-    my $pok   = $sv->FLAGS & SVf_POK;
-    my $gmg   = $sv->FLAGS & SVs_GMG;
-    my $iscow = IsCOW($sv);
+    my $flags = $sv->FLAGS;
+    my $rok   = $flags & SVf_ROK;
+    my $pok   = $flags & SVf_POK;
+    my $gmg   = $flags & SVs_GMG;
+    my $iscow = ( IsCOW($sv) or $B::C::cow ) ? 1 : 0;
+
     my ( $cur, $len, $savesym, $pv ) = ( 0, 1, 'NULL', "" );
     my ( $static, $shared_hek );
 
@@ -362,14 +366,20 @@ sub save_pv_or_rv {
                 ( $pv, $cur ) = ( "", 0 );
             }
         }
-        $shared_hek = ( ( $sv->FLAGS & 0x09000000 ) == 0x09000000 )
+        $shared_hek = ( ( $flags & 0x09000000 ) == 0x09000000 )
           || IsCOW_hek($sv);
-        $static = $B::C::const_strings and ( $sv->FLAGS & SVf_READONLY ) ? 1 : 0;
+        $static = ( $B::C::const_strings or $iscow or ( $flags & SVf_READONLY ) ) ? 1 : 0;
         $static = 0
           if $shared_hek
-          or ( $fullname and ( $fullname =~ m/ :pad/ or ( $fullname =~ /^DynaLoader/ and $pv =~ /^boot_/ ) ) );
+          or (
+            $fullname
+            and ( $fullname =~ m/ :pad/
+                or ( $fullname =~ /^DynaLoader/ and $pv =~ /^boot_/ ) )
+          );
+        $static = 0 if $static and $pv =~ /::bootstrap$/;
         $static = 0
-          if $B::C::const_strings
+          if $static
+          and $B::C::const_strings
           and $fullname
           and ( $fullname =~ /^warnings::(Dead)?Bits/ or $fullname =~ /::AUTOLOAD$/ );
         if ( $shared_hek and $pok and !$cur ) {    #272 empty key
@@ -378,28 +388,53 @@ sub save_pv_or_rv {
             $static = 0;
         }
 
-        $static = 0 if ( $sv->FLAGS & 0x40008000 == 0x40008000 );    # SVp_SCREAM|SVpbm_VALID
+        if ( $flags & 0x40008000 == 0x40008000 ) {    # SVpad_NAME
+            debug( pv => "static=0 for SVpad_NAME $fullname" );
+            $static = 0;
+        }
 
         if ($pok) {
             my $s = "sv_list[" . ( svsect()->index + 1 ) . "]";
 
             # but we can optimize static set-magic ISA entries. #263, #91
-            if ( $B::C::const_strings and ref($sv) eq 'B::PVMG' and $sv->FLAGS & SVs_SMG ) {
-                $static = 1;                                         # warn "static $fullname";
+            if ( $B::C::const_strings and ref($sv) eq 'B::PVMG' and $flags & SVs_SMG ) {
+                $static = 1;                          # warn "static $fullname";
             }
             if ($static) {
                 $len = 0;
-                $savesym = $iscow ? savepv($pv) : constpv($pv);
-                if ( $savesym =~ /^get_cv/ ) {                       # Moose::Util::TypeConstraints::Builtins::_RegexpRef
+                if ($iscow) {                         # 5.18 COW logic
+                    if ($B::C::Config::have_HEK_STATIC) {    ## FIXME....
+                        $iscow      = 1;
+                        $shared_hek = 1;
+                        $savesym    = save_hek( $pv, $fullname, 0 );    ## check ??
+                    }
+                    elsif ($B::C::cow) {
+
+                        # wrong in many cases but saves a lot of memory, only do this with -O2
+                        $len = $cur + 2;
+                        $pv .= "\000\001";
+                        $savesym = savepv($pv);
+                    }
+                    else {
+                        $iscow   = 0;
+                        $savesym = constpv($pv);
+                    }
+                }
+                else {
+                    $savesym = constpv($pv);
+                }
+                if ( $savesym =~ /^get_cv/ ) {    # Moose::Util::TypeConstraints::Builtins::_RegexpRef
                     $static  = 0;
                     $len     = $cur + 1;
                     $pv      = $savesym;
                     $savesym = 'NULL';
                 }
 
-                # align to next wordsize
-                if ( $iscow and $cur ) {
-                    $len = $cur + 2;
+                if ($iscow) {
+                    $flags |= SVf_IsCOW;
+                }
+                else {
+                    $flags &= ~SVf_IsCOW;
                 }
 
                 #push @B::C::static_free, $savesym if $len and $savesym =~ /^pv/ and !$B::C::in_endav;
@@ -425,20 +460,20 @@ sub save_pv_or_rv {
         }
     }
 
-    # QUESTION: should not it be done for any xpvsect ?
-    if ($len) {    # COW logic
-        my $offset = $len % $Config{ptrsize};
-        $len += $Config{ptrsize} - $offset if $offset;
-    }
+    # # QUESTION: should not it be done for any xpvsect ?
+    # if ($len) {    # COW logic
+    #     my $offset = $len % $Config{ptrsize};
+    #     $len += $Config{ptrsize} - $offset if $offset;
+    # }
 
     $fullname = '' if !defined $fullname;
     debug(
-        pv => "Saving pv %s %s cur=%d, len=%d, static=%d cow=%d %s",
+        pv => "Saving pv %s %s cur=%d, len=%d, static=%d cow=%d %s flags=0x%x",
         $savesym, cstring($pv), $cur, $len,
-        $static, $iscow, $shared_hek ? "shared, $fullname" : $fullname
+        $static, $iscow, $shared_hek ? "shared, $fullname" : $fullname, $flags
     );
 
-    return ( $savesym, $cur, $len, $pv, $static );
+    return ( $savesym, $cur, $len, $pv, $static, $flags );
 }
 
 # This pair is needed because B::FAKEOP::save doesn't scalar dereference
@@ -1801,6 +1836,7 @@ sub compile {
     B::C::Save::Signals::enable();
     $B::C::destruct         = 1;
     $B::C::stash            = 0;
+    $B::C::cow              = 0;
     $B::C::fold             = 1;                                                 # always include utf8::Cased tables
     $B::C::warnings         = 1;                                                 # always include Carp warnings categories and B
     $B::C::optimize_warn_sv = 1 if $^O ne 'MSWin32' or $Config{cc} !~ m/^cl/i;
@@ -2216,6 +2252,12 @@ enabled automatically where it is known to work.
 
 Enabled with C<-O2>.
 
+=item B<-fcow>
+
+Enforce static COW strings since 5.18 for most strings.
+
+Enabled with C<-O2> since 5.20.
+
 =item B<-fconst-strings>
 
 Declares static readonly strings as const.
@@ -2340,7 +2382,7 @@ Note that C<-fcog> without C<-fno-destruct> will be disabled >= 5.10.
 
 =item B<-O2>
 
-Enable B<-O1> plus B<-fro-inc> and B<-fsave-data>.
+Enable B<-O1> plus B<-fro-inc>, B<-fsave-data> and B<fcow>.
 
 =item B<-O3>
 
