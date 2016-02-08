@@ -29,12 +29,16 @@ if ( grep { $_ eq 'INSTALL_PTMALLOC3' } @ARGV ) {
     install_independent_comalloc();
     $have_independent_comalloc = check_independent_comalloc();
 }
+my $have_op_rettype = check_op_rettype();
+my $have_HEK_STATIC = check_hek_static();
 {
     my ($e_c) = grep { /-extra-cflags[= ](.+)/ } @ARGV;
     my ($e_l) = grep { /-extra-libs[= ](.+)/ } @ARGV;
     $extra_cflags .= " $e_c" if $e_c;
     $extra_libs   .= " $e_l" if $e_l;
 }
+
+my $have_byteloader = check_byteloader();    # only for cperl
 
 sub b_c_deps {
     my $X = $^X =~ m/\s/ ? qq{"$^X"} : $^X;
@@ -65,6 +69,11 @@ sub write_b_c_flags {
     print PH "# -fav-init optimization\n";
     print PH "\$have_independent_comalloc = $have_independent_comalloc;\n";
     print PH "\$use_declare_independent_comalloc = $use_declare_independent_comalloc;\n\n";
+    print PH "# broken or patched upstream 5.22 ByteLoader. undef for yet undecided\n";
+    print PH "\$have_byteloader = $have_byteloader;\n";
+    print PH "# cperl 5.22.2:\n";
+    print PH "\$have_op_rettype = $have_op_rettype;\n";
+    print PH "\$have_HEK_STATIC = $have_HEK_STATIC;\n";
     print PH "# use extra compiler flags, after ccopts, resp. ldopts\n";
     print PH "\$extra_cflags = \"$extra_cflags\";\n";
     print PH "\$extra_libs = \"$extra_libs\";\n";
@@ -143,7 +152,7 @@ WriteMakefile(
           )
         : ()
     ),
-    SIGN  => 0,
+    SIGN => 0,
     clean => { FILES => "*.core *.stackdump a.out a.exe *.cee *.c *.asm *.dbg *.plc *.obj " . "*.concise *~ dll.base dll.exp mod.pl pcc* *.bak *.a " . "t/CORE/*/*.bin t/CORE/*/*.c Io_argv* t/CORE/*/*.subtest.*.t t/CORE/tmp* tmp*" },
 );
 
@@ -157,6 +166,13 @@ sub headerpath {
     else {
         return File::Spec->catdir( $Config::Config{archlibexp}, "CORE" );
     }
+}
+
+# probe for broken or patched ByteLoader since 5.22
+# sets $B::C::Config::have_byteloader
+sub check_byteloader {
+    return 1 if $Config::Config{usecperl} and $] >= 5.022002;
+    'undef';
 }
 
 # Check for Doug Lea's dlmalloc version, or ptmalloc2 included in glibc
@@ -189,6 +205,36 @@ sub try_compile {
         unlink "test.c", $executable;
         $? == 0 && return 1;
     }
+    return 0;
+}
+
+sub check_op_rettype {
+    return 0 if !$Config::Config{usecperl};
+    my $op_h = File::Spec->catfile( headerpath(), 'op.h' );
+    my ( $fh, $found );
+    open $fh, $op_h or die "$op_h: $!";
+    while (<$fh>) {
+        if (/^\s+U8\s+op_rettype/) {
+            close $fh;
+            return 1;
+        }
+    }
+    close $fh;
+    return 0;
+}
+
+sub check_hek_static {
+    return 0 if !$Config::Config{usecperl};
+    my $hv_h = File::Spec->catfile( headerpath(), 'hv.h' );
+    my ( $fh, $found );
+    open $fh, $hv_h or die "$hv_h: $!";
+    while (<$fh>) {
+        if (/^#define HEK_STATIC/) {
+            close $fh;
+            return 1;
+        }
+    }
+    close $fh;
     return 0;
 }
 

@@ -58,7 +58,7 @@ our @EXPORT_OK = qw(mark_skip set_callback save_context svop_or_padop_pv inc_cle
 use B qw(minus_c sv_undef walkoptree walkoptree_slow main_root main_start peekop
   class cchar svref_2object compile_stats comppadlist hash
   init_av end_av opnumber cstring
-  HEf_SVKEY SVf_POK SVf_ROK SVf_IOK SVf_NOK SVf_IVisUV SVf_READONLY);
+  HEf_SVKEY SVf_POK SVf_ROK SVf_IOK SVf_NOK SVf_IVisUV SVf_READONLY SVf_IsCOW);
 
 BEGIN {
     @B::NV::ISA = 'B::IV';                                            # add IVX to nv. This fixes test 23 for Perl 5.8
@@ -403,7 +403,8 @@ sub save_pv_or_rv {
             if ($static) {
                 $len = 0;
                 if ($iscow) {                         # 5.18 COW logic
-                    if ($B::C::Config::have_HEK_STATIC) {    ## FIXME....
+                                                      # B::C::Config::have_HEK_STATIC is a cperl only thing
+                    if ($B::C::Config::have_HEK_STATIC) {    ## cperl only # FIXME... ::Config namespace..
                         $iscow      = 1;
                         $shared_hek = 1;
                         $savesym    = save_hek( $pv, $fullname, 0 );    ## check ??

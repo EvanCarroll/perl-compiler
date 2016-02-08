@@ -78,7 +78,7 @@ sub savepvn {
         # If READONLY and FAKE use newSVpvn_share instead. (test 75)
         if ( $sv and ( ( $sv->FLAGS & 0x09000000 ) == 0x09000000 ) ) {
             debug( sv => "Saving shared HEK %s to %s\n", cstring($pv), $dest );
-            my $hek = save_hek($pv);
+            my $hek = save_hek( $pv, '', 1 );
             push @init, sprintf( "%s = HEK_KEY(%s);", $dest, $hek ) unless $hek eq 'NULL';
             if ( DEBUGGING() ) {    # we have to bypass a wrong HE->HEK assert in hv.c
                 push @B::C::static_free, $dest;
