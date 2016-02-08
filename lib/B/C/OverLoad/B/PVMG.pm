@@ -54,7 +54,8 @@ sub save {        # FIXME... savesym -> pvsym
         }
     }
 
-    if ( $sv->FLAGS & SVf_ROK ) {          # sv => sv->RV cannot be initialized static.
+    $sym = 'NULL' if $sym =~ /^hek/ and $static;    # cannot init static
+    if ( $sv->FLAGS & SVf_ROK ) {                   # sv => sv->RV cannot be initialized static.
         init()->add( sprintf( "SvRV_set(&sv_list[%d], (SV*)%s);", svsect()->index + 1, $savesym ) )
           if $savesym ne '';
         $savesym = 'NULL';
@@ -73,7 +74,7 @@ sub save {        # FIXME... savesym -> pvsym
         sprintf(
             "&xpvmg_list[%d], %Lu, 0x%x, {%s}",
             xpvmgsect()->index, $sv->REFCNT, $flags,
-            $savesym eq 'NULL'
+            $sym eq 'NULL'
             ? '0'
             : ( C99() ? ".svu_pv=(char*)" : "(char*)" ) . $savesym
         )
@@ -84,6 +85,9 @@ sub save {        # FIXME... savesym -> pvsym
     if ( !$static ) {    # do not overwrite RV slot (#273)
                          # XXX comppadnames need &PL_sv_undef instead of 0 (?? which testcase?)
         init()->add( savepvn( "$s.sv_u.svu_pv", $pv, $sv, $cur ) );
+    }
+    elsif ( $sym eq 'NULL' && $savesym =~ /^hek/ ) {
+        init()->add( sprintf( "%s.sv_u.svu_pv = %s.hek_key;", $s, $savesym ) );
     }
     $sym = savesym( $sv, "&" . $s );
     $sv->save_magic($fullname);
@@ -301,7 +305,7 @@ CODE1
                 (
                     $pmop
                     ? ( sprintf( "\t((OP**)mg->mg_ptr) [elements++] = (OP*)%s;", $pmsym ) )
-                    : ( defined $pmop_ptr ? sprintf( "\t((OP**)mg->mg_ptr) [elements++] = (OP*)\s\\_%x;", $pmop_ptr ) : '' )
+                    : ( defined $pmop_ptr ? sprintf( "\t((OP**)mg->mg_ptr) [elements++] = (OP*)s\\_%x;", $pmop_ptr ) : '' )
                 ),
                 "\tmg->mg_len = elements * sizeof(PMOP**);",
                 "}"

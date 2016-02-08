@@ -39,12 +39,14 @@ sub save {
         $flags &= ~0x01000000;
         debug( pv => "constpv turn off SVf_FAKE %s %s %s\n", $sym, cstring($pv), $fullname );
     }
+    $sym = $savesym;
+    $sym = q{NULL} if $shared_hek and $static;    # cannot init static
     xpvsect()->comment("stash, magic, cur, len");
     xpvsect()->add( sprintf( "Nullhv, {0}, %u, {%u}", $cur, $len ) );
     svsect()->comment("any, refcnt, flags, sv_u");
 
-    $savesym = $savesym eq 'NULL' ? '0' : ".svu_pv=(char*) $savesym";
-    svsect()->add( sprintf( '&xpv_list[%d], %Lu, 0x%x, {%s}', xpvsect()->index, $refcnt, $flags, $savesym ) );
+    my $savesym_s = $sym eq 'NULL' ? '0' : ".svu_pv=(char*) $savesym";
+    svsect()->add( sprintf( '&xpv_list[%d], %Lu, 0x%x, {%s}', xpvsect()->index, $refcnt, $flags, $savesym_s ) );
     my $svix = svsect()->index;
     if ( defined($pv) and !$static ) {
         if ($shared_hek) {
@@ -55,6 +57,9 @@ sub save {
         else {
             init()->add( savepvn( sprintf( "sv_list[%d].sv_u.svu_pv", $svix ), $pv, $sv, $cur ) );
         }
+    }
+    elsif ( $shared_hek and $static ) {
+        init()->add( sprintf( "sv_list[%d].sv_u.svu_pv = %s.hek_key;", $svix, $savesym ) );
     }
     if ( debug('flags') and DEBUG_LEAKING_SCALARS() ) {    # add sv_debug_file
         init()->add(

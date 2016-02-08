@@ -539,7 +539,7 @@ sub save {
         $xcv_outside = 0;    # just a placeholder for a run-time GV
     }
 
-    $pvsym = save_hek($pv);
+    $pvsym = save_hek( $pv, $fullname, 1 );
 
     # XXX issue 84: we need to check the cv->PV ptr not the value.
     # "" is different to NULL for prototypes
@@ -688,8 +688,8 @@ sub save {
         if ( USE_MULTIPLICITY() ) {
             init()->add( savepvn( "CvFILE($sym)", $cv->FILE ) );
         }
-        elsif ($B::C::const_strings && length $file) {
-            init()->add( sprintf( "CvFILE(%s) = (char *) %s;", $sym, constpv( $file ) ) );
+        elsif ( $B::C::const_strings && length $file ) {
+            init()->add( sprintf( "CvFILE(%s) = (char *) %s;", $sym, constpv($file) ) );
         }
         else {
             init()->add( sprintf( "CvFILE(%s) = %s;", $sym, cstring( $cv->FILE ) ) );

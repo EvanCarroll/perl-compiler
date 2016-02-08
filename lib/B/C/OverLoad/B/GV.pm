@@ -530,7 +530,7 @@ sub save {
                 # must save as a 'stub' so newXS() has a CV to populate
                 debug( gv => "save stub CvGV for $sym GP assignments $origname" );
                 init2()->add(
-                    sprintf( "if ((sv = (SV*)%s))",                                get_cv_string( $origname, "GV_ADD" ) ),
+                    sprintf( "if ((sv = (SV*)%s))", get_cv_string( $origname, "GV_ADD" ) ),
                     sprintf( "    GvCV_set(%s, (CV*)SvREFCNT_inc_simple_NN(sv));", $sym )
                 );
             }
@@ -661,7 +661,7 @@ sub save {
                 # he->shared_he_he.hent_hek == hek assertions (#46 with IO::Poll::)
             }
             else {
-                my $file = save_hek( $gv->FILE );
+                my $file = save_hek( $gv->FILE, $fullname, 1 );
                 init()->add( sprintf( "GvFILE_HEK(%s) = %s;", $sym, $file ) )
                   if $file ne 'NULL' and !$B::C::optimize_cop;
             }
