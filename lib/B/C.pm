@@ -389,7 +389,7 @@ sub save_pv_or_rv {
         }
 
         if ( $flags & 0x40008000 == 0x40008000 ) {    # SVpad_NAME
-            debug( pv => "static=0 for SVpad_NAME $fullname" );
+            debug( pv => "static=0 for SVpad_NAME " . ( $fullname || 'NoName') );
             $static = 0;
         }
 

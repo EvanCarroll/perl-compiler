@@ -54,7 +54,7 @@ sub save {
         }
     }
 
-    $sym = 'NULL' if $sym =~ /^hek/ and $static; # cannot init static
+    $sym = 'NULL' if defined $sym && $sym =~ /^hek/ and $static; # cannot init static
     if ( $sv->FLAGS & SVf_ROK ) {          # sv => sv->RV cannot be initialized static.
         init()->add( sprintf( "SvRV_set(&sv_list[%d], (SV*)%s);", svsect()->index + 1, $savesym ) )
           if $savesym ne '';
@@ -74,7 +74,7 @@ sub save {
         sprintf(
             "&xpvmg_list[%d], %Lu, 0x%x, {%s}",
             xpvmgsect()->index, $sv->REFCNT, $flags,
-            $sym eq 'NULL'
+            defined $sym && $sym eq 'NULL'
             ? '0'
             : ( C99() ? ".svu_pv=(char*)" : "(char*)" ) . $savesym
         )
@@ -85,7 +85,7 @@ sub save {
     if ( !$static ) {    # do not overwrite RV slot (#273)
                          # XXX comppadnames need &PL_sv_undef instead of 0 (?? which testcase?)
         init()->add( savepvn( "$s.sv_u.svu_pv", $pv, $sv, $cur ) );
-    } elsif ($sym eq 'NULL' && $savesym =~ /^hek/ ) {
+    } elsif (defined $sym && $sym eq 'NULL' && $savesym =~ /^hek/ ) {
       init()->add( sprintf("%s.sv_u.svu_pv = %s.hek_key;", $s, $savesym ));
     }
     $sym = savesym( $sv, "&" . $s );
