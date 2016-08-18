@@ -1643,6 +1643,7 @@ sub build_template_stash {
         'DEBUG_LEAKING_SCALARS'            => DEBUG_LEAKING_SCALARS(),
         'have_independent_comalloc'        => $B::C::Flags::have_independent_comalloc,
         'use_declare_independent_comalloc' => $B::C::Flags::use_declare_independent_comalloc,
+        'have_HEK_STATIC'                  => $B::C::Flags::have_HEK_STATIC,
         'av_init2'                         => $av_init2,
         'destruct'                         => $destruct,
         'static_ext'                       => $static_ext,
