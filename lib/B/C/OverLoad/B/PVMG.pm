@@ -22,10 +22,11 @@ sub save {
         return $sym;
     }
     my ( $savesym, $cur, $len, $pv, $static, $flags ) = B::C::save_pv_or_rv( $sv, $fullname );
-    # if ($static) {    # 242: e.g. $1
-    #     $static = 0;
-    #     $len = $cur + 1 unless $len;
-    # }
+
+    if ($static) {    # 242: e.g. $1 -- FIXME this is removed in master
+        $static = 0;
+        $len = $cur + 1 unless $len;
+    }
 
     my ( $ivx, $nvx );
 
