@@ -431,6 +431,11 @@ sub save_pv_or_rv {
                     $savesym = 'NULL';
                 }
 
+                # # align to next wordsize
+                # if ( $iscow and $cur ) {
+                #     $len = $cur + 2;
+                # }
+
                 if ($iscow) {
                     $flags |= SVf_IsCOW;
                 }
@@ -461,12 +466,11 @@ sub save_pv_or_rv {
         }
     }
 
-
-    # # QUESTION: should not it be done for any xpvsect ?
-    # if ($len) {    # COW logic
-    #     my $offset = $len % $Config{ptrsize};
-    #     $len += $Config{ptrsize} - $offset if $offset;
-    # }
+    # QUESTION: should not it be done for any xpvsect ?
+    if ($len && $iscow) {    # COW logic
+        my $offset = $len % $Config{ptrsize};
+        $len += $Config{ptrsize} - $offset if $offset;
+    }
 
     $fullname = '' if !defined $fullname;
     debug(
