@@ -88,14 +88,12 @@ sub save_hek {
         # But we need to randomize them to avoid run-time conflicts
         #   e.g. "Prototype mismatch: sub bytes::length (_) vs (_)"
 
-        # init()->add(
-        #     sprintf(
-        #         "%s = share_hek(%s, %d, %s);",
-        #         $sym, $cstr, $cur, '0'
-        #     )
-        # );
-
-        init()->add( sprintf( "%s = share_hek(%s, %d);", $sym, $cstr, $cur ) );
+        init()->add(
+            sprintf(
+                "%s = share_hek(%s, %d, %s);",
+                $sym, $cstr, $cur, '0'
+            )
+        );
     }
 
     return $sym;

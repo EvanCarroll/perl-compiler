@@ -404,7 +404,7 @@ sub save_pv_or_rv {
                 $len = 0;
                 if ($iscow) {                         # 5.18 COW logic
                                                       # B::C::Config::have_HEK_STATIC is a cperl only thing
-                    if ($B::C::Config::have_HEK_STATIC) {    ## cperl only # FIXME... ::Config namespace..
+                    if ($B::C::Flags::have_HEK_STATIC) { ## cperl only
                         $iscow      = 1;
                         $shared_hek = 1;
                         $savesym    = save_hek( $pv, $fullname, 0 );    ## check ??
@@ -460,6 +460,7 @@ sub save_pv_or_rv {
             $len = 0;
         }
     }
+
 
     # # QUESTION: should not it be done for any xpvsect ?
     # if ($len) {    # COW logic
