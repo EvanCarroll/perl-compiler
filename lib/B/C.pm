@@ -366,8 +366,7 @@ sub save_pv_or_rv {
                 ( $pv, $cur ) = ( "", 0 );
             }
         }
-        $shared_hek = ( ( $flags & 0x09000000 ) == 0x09000000 )
-          || IsCOW_hek($sv);
+        $shared_hek = ( ( $flags & 0x09000000 ) == 0x09000000 ) or IsCOW_hek($sv);
         $static = ( $B::C::const_strings or $iscow or ( $flags & SVf_READONLY ) ) ? 1 : 0;
         $static = 0
           if $shared_hek
@@ -388,10 +387,10 @@ sub save_pv_or_rv {
             $static = 0;
         }
 
-        if ( $flags & 0x40008000 == 0x40008000 ) {    # SVpad_NAME
-            debug( pv => "static=0 for SVpad_NAME " . ( $fullname || 'NoName') );
-            $static = 0;
-        }
+        # if ( $flags & 0x40008000 == 0x40008000 ) {    # SVpad_NAME
+        #     debug( pv => "static=0 for SVpad_NAME " . ( $fullname || 'NoName') );
+        #     $static = 0;
+        # }
 
         if ($pok) {
             my $s = "sv_list[" . ( svsect()->index + 1 ) . "]";
@@ -409,7 +408,7 @@ sub save_pv_or_rv {
                         $shared_hek = 1;
                         $savesym    = save_hek( $pv, $fullname, 0 );    ## check ??
                     }
-                    elsif ($B::C::cow) {
+                    elsif ($B::C::cow) { # FIXME... this is not set correctly ???
 
                         # wrong in many cases but saves a lot of memory, only do this with -O2
                         $len = $cur + 2;

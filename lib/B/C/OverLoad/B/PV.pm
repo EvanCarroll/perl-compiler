@@ -58,7 +58,7 @@ sub save {
             init()->add( savepvn( sprintf( "sv_list[%d].sv_u.svu_pv", $svix ), $pv, $sv, $cur ) );
         }
     }
-    elsif ( $shared_hek and $static ) {
+    elsif ( $shared_hek and $static and $savesym =~ qr{^hek} ) {
         init()->add( sprintf( "sv_list[%d].sv_u.svu_pv = %s.hek_key;", $svix, $savesym ) );
     }
     if ( debug('flags') and DEBUG_LEAKING_SCALARS() ) {    # add sv_debug_file

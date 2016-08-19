@@ -24,13 +24,51 @@
 #
 
 base/lex.t                   PLAN      BC issue #222 - Cannot use '<<' in regexp
+base/rs.t                    SIG       Exit signal is 11 SEGV
+cmd/for.t                    SIG       Exit signal is 11 SEGV
+cmd/subval.t                 SIG       Exit signal is 11 SEGV
+comp/colon.t                 SIG       Exit signal is 11 SEGV
 comp/final_line_num.t        COMPAT    This test is about BEGIN / file parse behavior so not relevant to B::C
+comp/fold.t                  SIG       Exit signal is 11 SEGV
+comp/form_scope.t            SIG       Exit signal is 11 SEGV
 comp/hints.t                 COMPAT    tests are using BEGIN block, do not ready for B::C
+comp/opsubs.t                SIG       Exit signal is 11 SEGV
+comp/our.t                   SIG       Exit signal is 11 SEGV
+comp/package.t               SIG       Exit signal is 11 SEGV
+comp/package_block.t         SIG       Exit signal is 11 SEGV
 comp/parser.t                COMPAT    We're not going to support ' as a package separator until we need to: https://github.com/rurban/perl-compiler/issues/217
-comp/require.t               TODO      No TODO tests passed + ?? BC issue #245 - Cannot reload XSLoader
+comp/proto.t                 SIG       Exit signal is 11 SEGV
+comp/require.t               PLAN      Plan was valid
+comp/retainedlines.t         SIG       Exit signal is 11 SEGV
+comp/uproto.t                TESTS     Test results:
+extra/file-close.t           PLAN      Plan was valid
+extra/pvlv.t                 SIG       Exit signal is 11 SEGV
+extra/unop_aux.t             SIG       Exit signal is 11 SEGV
+io/argv.t                    SIG       Exit signal is 11 SEGV
+io/binmode.t                 SIG       Exit signal is 11 SEGV
 io/bom.t                     COMPAT    BC issue 312 - BOM seems to be rejected by perlcc but really, who needs this?
+io/closepid.t                SIG       Exit signal is 11 SEGV
+io/crlf.t                    SIG       Exit signal is 11 SEGV
+io/data.t                    SIG       Exit signal is 11 SEGV
+io/defout.t                  SIG       Exit signal is 11 SEGV
+io/dup.t                     SIG       Exit signal is 11 SEGV
+io/eintr.t                   SIG       Exit signal is 11 SEGV
+io/eintr_print.t             SIG       Exit signal is 11 SEGV
+io/errno.t                   SIG       Exit signal is 11 SEGV
+io/errnosig.t                PLAN      Plan was valid
+io/fflush.t                  SIG       Exit signal is 11 SEGV
+io/fs.t                      SIG       Exit signal is 11 SEGV
+io/inplace.t                 PLAN      Plan was valid
+io/iofile.t                  SIG       Exit signal is 11 SEGV
+io/iprefix.t                 PLAN      Plan was valid
 io/layers.t                  SKIP      This is a known BC issue we've never cared about. use open doesn't work. See https://code.google.com/p/perl-compiler/issues/detail?id=203
-io/open.t                    TESTS     BC issue #219 (overload) - new tests in upstream since 5.14.4
+io/nargv.t                   SIG       Exit signal is 11 SEGV
+io/open.t                    SIG       Exit signal is 11 SEGV
+io/openpid.t                 SIG       Exit signal is 11 SEGV
+io/perlio.t                  SIG       Exit signal is 11 SEGV
+io/perlio_fail.t             SIG       Exit signal is 11 SEGV
+io/perlio_leaks.t            SIG       Exit signal is 11 SEGV
+io/perlio_open.t             SIG       Exit signal is 11 SEGV
 mro/c3_with_overload.t       TESTS     BC issue #219 - overload issue
 mro/c3_with_overload_utf8.t  TESTS     BC issue #219 - overload issue
 mro/overload_c3.t            TESTS     BC issue #219 - overload issue
