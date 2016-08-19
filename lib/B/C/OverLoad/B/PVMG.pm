@@ -11,7 +11,7 @@ use B::C::File qw/init init1 init2 svsect xpvmgsect xpvsect pmopsect/;
 use B::C::Helpers::Symtable qw/objsym savesym/;
 use B::C::Helpers qw/mark_package read_utf8_string/;
 
-sub save {        # FIXME... savesym -> pvsym
+sub save {
     my ( $sv, $fullname ) = @_;
     my $sym = objsym($sv);
     if ( defined $sym ) {
@@ -23,10 +23,10 @@ sub save {        # FIXME... savesym -> pvsym
     }
     my ( $savesym, $cur, $len, $pv, $static, $flags ) = B::C::save_pv_or_rv( $sv, $fullname );
 
-    # if ($static) {    # 242: e.g. $1
-    #     $static = 0;
-    #     $len = $cur + 1 unless $len;
-    # }
+    if ($static) {    # 242: e.g. $1 -- FIXME this is removed in master
+        $static = 0;
+        $len = $cur + 1 unless $len;
+    }
 
     my ( $ivx, $nvx );
 
@@ -54,8 +54,8 @@ sub save {        # FIXME... savesym -> pvsym
         }
     }
 
-    $sym = 'NULL' if $sym =~ /^hek/ and $static;    # cannot init static
-    if ( $sv->FLAGS & SVf_ROK ) {                   # sv => sv->RV cannot be initialized static.
+    $sym = 'NULL' if defined $sym && $sym =~ /^hek/ and $static; # cannot init static
+    if ( $sv->FLAGS & SVf_ROK ) {          # sv => sv->RV cannot be initialized static.
         init()->add( sprintf( "SvRV_set(&sv_list[%d], (SV*)%s);", svsect()->index + 1, $savesym ) )
           if $savesym ne '';
         $savesym = 'NULL';
@@ -74,7 +74,7 @@ sub save {        # FIXME... savesym -> pvsym
         sprintf(
             "&xpvmg_list[%d], %Lu, 0x%x, {%s}",
             xpvmgsect()->index, $sv->REFCNT, $flags,
-            $sym eq 'NULL'
+            defined $sym && $sym eq 'NULL'
             ? '0'
             : ".svu_pv=(char*)" . $savesym
         )
@@ -85,9 +85,8 @@ sub save {        # FIXME... savesym -> pvsym
     if ( !$static ) {    # do not overwrite RV slot (#273)
                          # XXX comppadnames need &PL_sv_undef instead of 0 (?? which testcase?)
         init()->add( savepvn( "$s.sv_u.svu_pv", $pv, $sv, $cur ) );
-    }
-    elsif ( $sym eq 'NULL' && $savesym =~ /^hek/ ) {
-        init()->add( sprintf( "%s.sv_u.svu_pv = %s.hek_key;", $s, $savesym ) );
+    } elsif (defined $sym && $sym eq 'NULL' && $savesym =~ /^hek/ ) {
+      init()->add( sprintf("%s.sv_u.svu_pv = %s.hek_key;", $s, $savesym ));
     }
     $sym = savesym( $sv, "&" . $s );
     $sv->save_magic($fullname);

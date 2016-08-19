@@ -316,7 +316,7 @@ sub svop_or_padop_pv {
 }
 
 sub IsCOW {
-    return ( $_[0]->FLAGS & 0x10000000 );    # since 5.22
+    return ( $_[0]->FLAGS & SVf_IsCOW );    # since 5.22
 }
 
 sub IsCOW_hek {
@@ -389,7 +389,7 @@ sub save_pv_or_rv {
         }
 
         if ( $flags & 0x40008000 == 0x40008000 ) {    # SVpad_NAME
-            debug( pv => "static=0 for SVpad_NAME $fullname" );
+            debug( pv => "static=0 for SVpad_NAME " . ( $fullname || 'NoName') );
             $static = 0;
         }
 
@@ -404,7 +404,7 @@ sub save_pv_or_rv {
                 $len = 0;
                 if ($iscow) {                         # 5.18 COW logic
                                                       # B::C::Config::have_HEK_STATIC is a cperl only thing
-                    if ($B::C::Config::have_HEK_STATIC) {    ## cperl only # FIXME... ::Config namespace..
+                    if ($B::C::Flags::have_HEK_STATIC) { ## cperl only
                         $iscow      = 1;
                         $shared_hek = 1;
                         $savesym    = save_hek( $pv, $fullname, 0 );    ## check ??
@@ -430,6 +430,11 @@ sub save_pv_or_rv {
                     $pv      = $savesym;
                     $savesym = 'NULL';
                 }
+
+                # # align to next wordsize
+                # if ( $iscow and $cur ) {
+                #     $len = $cur + 2;
+                # }
 
                 if ($iscow) {
                     $flags |= SVf_IsCOW;
@@ -461,11 +466,11 @@ sub save_pv_or_rv {
         }
     }
 
-    # # QUESTION: should not it be done for any xpvsect ?
-    # if ($len) {    # COW logic
-    #     my $offset = $len % $Config{ptrsize};
-    #     $len += $Config{ptrsize} - $offset if $offset;
-    # }
+    # QUESTION: should not it be done for any xpvsect ?
+    if ($len && $iscow) {    # COW logic
+        my $offset = $len % $Config{ptrsize};
+        $len += $Config{ptrsize} - $offset if $offset;
+    }
 
     $fullname = '' if !defined $fullname;
     debug(
@@ -1642,6 +1647,7 @@ sub build_template_stash {
         'DEBUG_LEAKING_SCALARS'            => DEBUG_LEAKING_SCALARS(),
         'have_independent_comalloc'        => $B::C::Flags::have_independent_comalloc,
         'use_declare_independent_comalloc' => $B::C::Flags::use_declare_independent_comalloc,
+        'have_HEK_STATIC'                  => $B::C::Flags::have_HEK_STATIC,
         'av_init2'                         => $av_init2,
         'destruct'                         => $destruct,
         'static_ext'                       => $static_ext,
