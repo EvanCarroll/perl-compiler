@@ -520,7 +520,7 @@ sub save {
     my $pvsym = 'NULL';
     my $cur   = defined $pv ? $cv->CUR : 0;
     my $len   = $cur + 1;
-    $len++ if B::C::IsCOW($cv);
+    $len++ if B::C::IsCOW($cv) and !$B::C::cow;
     $len = 0 if $B::C::const_strings;
 
     # need to survive cv_undef as there is no protection against static CVs
