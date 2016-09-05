@@ -5,7 +5,7 @@ use strict;
 use B qw/cstring/;
 use B::C::Config;
 use B::C::File qw/init copsect decl/;
-use B::C::Save qw/constpv savestashpv/;
+use B::C::Save qw/constpv savestashpv multicop/;
 use B::C::Decimal qw/get_integer_value/;
 use B::C::Helpers::Symtable qw/savesym objsym/;
 use B::C::Helpers qw/read_utf8_string strlen_flags/;
@@ -85,6 +85,16 @@ sub save {
         );
     }
     else {
+        my $file = "Nullgv";
+        if ($B::C::const_strings) {
+            my $constpv = constpv($file);
+            if ( !$copgvs{$constpv} ) {
+                $copgvs{$constpv} = B::GV::inc_index();
+                init()->add( sprintf( "gv_list[%d] = gv_fetchfile(%s);", $copgvs{$constpv}, $constpv ) );
+            }
+            $file = sprintf("(GV*) &gv_list[%d]", $copgvs{$constpv});
+            #init()->add( sprintf( "CopFILEGV_set(&cop_list[%d], gv_list[%d]); /* %s */", $ix, $copgvs{$constpv}, cstring($file) ) );
+        }
         # cop_label now in hints_hash (Change #33656)
         copsect()->comment_common("line, stash, file, hints, seq, warn_sv, hints_hash");
         copsect()->add(
@@ -187,17 +197,10 @@ sub save {
 
     if ( !$B::C::optimize_cop ) {
         my $stash = savestashpv( $op->stashpv );
-        init()->add( sprintf( "CopSTASH_set(&cop_list[%d], %s);", $ix, $stash ) );
+        multicop($ix,$stash);
+        #init()->add( sprintf( "CopSTASH_set(&cop_list[%d], %s);", $ix, $stash ) );
         if ( !USE_ITHREADS() ) {
-            if ($B::C::const_strings) {
-                my $constpv = constpv($file);
-                if ( !$copgvs{$constpv} ) {
-                    $copgvs{$constpv} = B::GV::inc_index();
-                    init()->add( sprintf( "gv_list[%d] = gv_fetchfile(%s);", $copgvs{$constpv}, $constpv ) );
-                }
-                init()->add( sprintf( "CopFILEGV_set(&cop_list[%d], gv_list[%d]); /* %s */", $ix, $copgvs{$constpv}, cstring($file) ) );
-            }
-            else {
+            if (!$B::C::const_strings) {
                 init()->add( sprintf( "CopFILE_set(&cop_list[%d], %s);", $ix, cstring($file) ) );
             }
         }

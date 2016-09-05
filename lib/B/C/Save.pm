@@ -2,17 +2,24 @@ package B::C::Save;
 
 use strict;
 
-use B qw(cstring svref_2object);
+use B qw(cstring svref_2object SVf_IsCOW);
 use B::C::Config;
 use B::C::File qw( xpvmgsect decl init );
 use B::C::Helpers qw/strlen_flags/;
 use B::C::Save::Hek qw/save_hek/;
+use B::C::File qw/xpvsect svsect/;
 
 use Exporter ();
 our @ISA = qw(Exporter);
 
-our @EXPORT_OK = qw/savepvn constpv savepv inc_pv_index set_max_string_len savestash_flags savestashpv/;
+our @EXPORT_OK = qw/savepvn constpv savepv inc_pv_index set_max_string_len savestash_flags savestashpv cowpv save_cow_pvs save_multicops multicop svop_sv save_multisvop_sv/;
 
+use constant COWPV     => 0;
+use constant COWREFCNT => 1;
+
+my %seencop;
+my %seencow;
+my %seensvop_sv;
 my %strtable;
 
 # Two different families of save functions
@@ -26,6 +33,65 @@ sub inc_pv_index {
 
 sub constpv {
     return savepv( shift, 1 );
+}
+
+sub multicop {
+    my($copix, $stash) = @_;
+
+    push @{$seencop{$stash}}, $copix;
+    return;
+}
+
+sub svop_sv {
+    my($svopix, $svsym) = @_;
+    push @{$seensvop_sv{$svsym}}, $svopix;
+    return;
+}
+
+# %seencow Lookslike
+# {
+#   'STRING' => [ [ pv%d, COUNT ] ], [ [ pv%d, COUNT ], .... ]
+# }
+sub cowpv {
+    my $pv = shift;
+
+    $seencow{$pv} ||= [];
+
+    if ( !$seencow{$pv}->[-1] || $seencow{$pv}->[-1]->[COWREFCNT] == 255 ) {
+        my $pvsym = sprintf( "pv%d", inc_pv_index() );
+        push @{ $seencow{$pv} }, [ $pvsym, 1 ];    # Always start at 1 so we have a refcount of 2 or higher to prevent free
+
+    }
+
+    $seencow{$pv}->[-1]->[COWREFCNT]++;
+
+    return $seencow{$pv}->[-1]->[COWPV];
+}
+
+sub save_multisvop_sv {
+    foreach my $svsym ( keys %seensvop_sv ) {
+        my @svops = @{$seensvop_sv{$svsym}};
+        my $svopcount = scalar @svops;
+        init()->add(  sprintf( "SVOP_multisetgv( (const int[]){%s}, %d, %s );", join(',', @{$seensvop_sv{$svsym}}), $svopcount, $svsym)   );
+    }
+
+}
+
+sub save_multicops {
+    foreach my $hv ( keys %seencop ) {
+        my @cops = @{$seencop{$hv}};
+        my $copcount = scalar @cops;
+        init()->add(  sprintf( "MULTICopHV( %s, (const int[]){%s}, %d );", $hv, join(',', @{$seencop{$hv}}), $copcount)   );
+    }
+}
+
+sub save_cow_pvs {
+    foreach my $pv ( keys %seencow ) {
+        foreach my $static_pvs ( @{ $seencow{$pv} } ) {
+            my ( $pvsym, $cowrefcnt ) = @{$static_pvs};
+            decl()->add( sprintf( "Static char %s[] = %s;", $pvsym, cstring( "$pv\0" . chr($cowrefcnt) ) ) );
+        }
+    }
 }
 
 my $max_string_len;
@@ -85,13 +151,13 @@ sub savepvn {
             }
         }
         else {
-            my $cstr = cstring($pv);
-            my $cur ||= ( $sv and ref($sv) and $sv->can('CUR') and ref($sv) ne 'B::GV' ) ? $sv->CUR : length( pack "a*", $pv );
-            if ( $sv and B::C::IsCOW($sv) ) {
-                $pv .= "\0\001";
-                $cstr = cstring($pv);
-                $cur += 2;
-            }
+            my ( $cstr, $len, $utf8 ) = strlen_flags($pv);
+            my $packed_length = length( pack "a*", $pv );
+            $cur ||= ( $sv and ref($sv) and $sv->can('CUR') and ref($sv) ne 'B::GV' ) ? $sv->CUR : $packed_length;
+
+            # We cannot COW anything except B::PV because other may store
+            # things after \0.  For example
+            # Boyer-Moore table is just after string and its safety-margin \0
             debug( sv => "Saving PV %s:%d to %s", $cstr, $cur, $dest );
             $cur = 0 if $cstr eq "" and $cur == 7;    # 317
             push @init, sprintf( "%s = savepvn(%s, %u);", $dest, $cstr, $cur );

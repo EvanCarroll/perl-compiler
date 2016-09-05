@@ -299,38 +299,32 @@ sub save {
     }
     my $gvflags = $gv->GvFLAGS;
 
-    init()->add(
-        sprintf(
-            "SvFLAGS(%s) = 0x%x;%s", $sym, $svflags,
-            debug('flags') ? " /* " . $gv->flagspv . " */" : ""
-        ),
-        sprintf(
-            "GvFLAGS(%s) = 0x%x; %s", $sym, $gvflags,
-            debug('flags') ? "/* " . $gv->flagspv(SVt_PVGV) . " */" : ""
-        )
-    );
-    init()->add(
-        sprintf(
-            'GvLINE(%s) = %d;',
-            $sym,
-            (
-                $gv->LINE > 2147483647    # S32 INT_MAX
-                ? 4294967294 - $gv->LINE
-                : $gv->LINE
-            )
-        )
-    ) unless $is_empty;
+    if ( debug('flags') ){
+        init()->add("/* SvFLAGS: " . $gv->flagspv . " */");
+        init()->add("/* GvFLAGS: " . $gv->flagspv(SVt_PVGV) . " */");
+    }
 
+    my $format_gvline = $is_empty ? -1 : $gv->LINE > 2147483647    # S32 INT_MAX
+                ? 4294967294 - $gv->LINE
+                : $gv->LINE;
+
+    my $format_svrefcnt = -1;
     # walksymtable creates an extra reference to the GV (#197)
     if ( $gv->REFCNT > 1 ) {
-        init()->add( sprintf( "SvREFCNT(%s) = %u;", $sym, $gv->REFCNT ) );
+        $format_svrefcnt = $gv->REFCNT;
     }
-    return $sym if $is_empty;
-
+    my $format_gvrefcnt = 0;
     my $gvrefcnt = $gv->GvREFCNT;
-    if ( $gvrefcnt > 1 ) {
-        init()->add( sprintf( "GvREFCNT(%s) += %u;", $sym, $gvrefcnt - 1 ) );
+    if ( !$is_empty && $gvrefcnt > 1 ) {
+        $format_gvrefcnt = $gvrefcnt - 1;
     }
+
+ my $gvsetup =       sprintf("GvSETUP(%s,0x%x,0x%x,%s,%s,%s);", $sym, $svflags, $gvflags, $format_gvline, $format_svrefcnt, $format_gvrefcnt);
+
+    # Templates/base.c.tt2: GvSETUP( gv, SvFLAGS, GvFLAGS, GvLINE, SvREFCNT, GvREFCNT)
+    init()->add($gvsetup);
+
+    return $sym if $is_empty;
 
     debug( gv => "check which savefields for \"$gvname\"" );
 
@@ -641,10 +635,7 @@ sub save {
             if ( $cvsym and $cvsym !~ /(get_cv|NULL|lexwarn)/ and $gv->MAGICAL ) {
                 my @magic = $gv->MAGIC;
                 foreach my $mg (@magic) {
-                    init()->add(
-                        "sv_magic((SV*)$sym, (SV*)$cvsym, '<', 0, 0);",
-                        "CvCVGV_RC_off($cvsym);"
-                    ) if $mg->TYPE eq '<';
+                    init()->add("GvMAGIC_BACKREF( (SV*)$sym, (SV*)$cvsym );") if $mg->TYPE eq '<';
                 }
             }
         }
