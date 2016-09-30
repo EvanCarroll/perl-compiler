@@ -70,23 +70,6 @@ static void dl_init (pTHX);
 void** dlindependent_comalloc(size_t, size_t*, void**);
 [% END %] 
 
-typedef struct shared_he SHARED_HE;
-
-#define IMMORTAL_PL_strtab 0x7ffffff
-
-#define STATIC_SHARED_HE_ALLOC(index, length_of_key, key_string, flags_byte) \
-    struct shared_he_struct_##index { HE *hent_next; HEK *hent_hek; union { SV *hent_val;  Size_t hent_refcount; } he_valu;  U32 hek_hash;  I32 hek_len;  char hek_key[ length_of_key + 1]; char flags; }; \
-    struct shared_he_struct_##index shared_he_##index = { NULL, NULL, { .hent_refcount = IMMORTAL_PL_strtab }, 0, length_of_key, key_string, flags_byte  };
-    
-/* sharedhe definitions using the STATIC_SHARED_HE_ALLOC macro */
-[% section.sharedhe.output( "%s\n" ) %]
-
-Static SHARED_HE* sharedhe_list[[% section.sharedhe.index + 1 %]] =  {
-[%- FOREACH num IN [ 0 .. section.sharedhe.index ] %]
-    (SHARED_HE*) &shared_he_[% num %],
-[%- END %]
-};
-
 [% IF ! destruct %]
 static int fast_perl_destruct( PerlInterpreter *my_perl );
 static void my_curse( pTHX_ SV* const sv );
@@ -157,6 +140,15 @@ struct my_padname_with_str {
 
 /* Missing type defs in perl so we'll make our own. */
 typedef struct my_padname_with_str MyPADNAME;
+/* Static HEs headers */
+typedef struct shared_he SHARED_HE;
+
+#define IMMORTAL_PL_strtab 0x7ffffff
+
+// can do a oneliner
+#define DEFINE_SHARED_HE_LEN(len) \
+    struct shared_he_struct_##len { HE *hent_next; HEK *hent_hek; union { SV *hent_val;  Size_t hent_refcount; } he_valu;  U32 hek_hash;  I32 hek_len;  char hek_key[ len + 1]; char flags; }; \
+    typedef struct shared_he_struct_##len SHAREDHE##len;
 
 /*
     Tricky hack for -fcog since 5.10 on !c99 compilers required. We need a char* as
@@ -175,11 +167,15 @@ Static GV *gv_list[[% gv_index %]];
 
 /* back in output_all() */
 
-[% FOREACH sect IN section_list %]
-[% lines = section.$sect.index + 1 %]
-[% NEXT IF lines == 0 %]
+/* <presections.output> */
+[% section.presections.output( "%s\n" ) -%]
+
+/* define all Static sections */
+[% FOREACH sect IN section_list.sort -%]
+[% lines = section.$sect.index + 1 -%]
+[% NEXT IF lines == 0 -%]
 Static [% section.$sect.typename() %] [% section.$sect.name() %]_list[[% lines %]];
-[% END %]
+[% END -%]
 
 /* hack for when Perl accesses PVX of GVs */
 Static const char emptystring[] = "\0";
@@ -201,24 +197,29 @@ TODO: REMOVE ME after 5.22.1 or 5.23.0 is released. */
 #undef PadlistNAMES
 #define PadlistNAMES(pl)       *((PADNAMELIST **)PadlistARRAY(pl))
 
-[% IF init2_remap.size and !HAVE_DLFCN_DLOPEN %]
+[% IF init2_remap.size and !HAVE_DLFCN_DLOPEN -%]
 XS(XS_DynaLoader_dl_load_file);
 XS(XS_DynaLoader_dl_find_symbol);
-[% END %]
+[% END -%]
 
-[% IF section.const.comment() %]
-    /* [% section.const.comment() %] */
-[% END %]
-/* <const.output> */
-[% section.const.output( "%s\n" ) %]
+/* <const.output> [% section.const.comment() -%] */
+[% section.const.output( "%s\n" ) -%]
 /* </const.output> */
 
-[% IF section.decl.comment() %]
-    /* [% section.decl.comment() %] */
-[% END %]
-/* <decl.output> */
-[% section.decl.output( "%s\n" ) %]
+/* <decl.output> [% section.decl.comment() -%] */
+[% section.decl.output( "%s\n" ) -%]
 /* </decl.output> */
+
+
+/* Static HEs definition */
+
+#define STATIC_SHARED_HE_ALLOC(len, key, flags) \
+    struct shared_he_struct_##len { NULL, NULL, { .hent_refcount = IMMORTAL_PL_strtab }, 0, len, key, flags  }
+
+/* sharedhe definitions using the STATIC_SHARED_HE_ALLOC macro */
+
+/* </static HEs>
+
 
 [% IF devel_peek_needed %]
 static void
@@ -273,44 +274,11 @@ Static [% section.$sect.typename() %] [% section.$sect.name() %]_list[[% lines %
 
 [% END %]
 
-static void perl_init0(pTHX) { /* fixup_ppaddr */
-    
-/* only init PL_strtab if we have content for it */
-[% IF section.sharedhe.index + 1 > 0 %]
-    
-    int pl_strtab_max = ((XPVHV*) SvANY(PL_strtab))->xhv_max;
-    {
-        int i;
-        HE   *entry;
-        HE  **oentry;
-        HEK  *hek_struct;
-
-        ((XPVHV*) SvANY(PL_strtab))->xhv_keys = [% section.sharedhe.index + 1 %];
-
-        for (i=0; i < [% section.sharedhe.index + 1 %]; i++) {
-            entry = &(sharedhe_list[i]->shared_he_he);
-            hek_struct = &(sharedhe_list[i]->shared_he_hek);
-
-            HeKEY_hek(entry) = hek_struct;
-            PERL_HASH (hek_struct->hek_hash,
-                       hek_struct->hek_key,
-                       hek_struct->hek_len);
-
-            /* Insert the hes */
-            oentry = &(HvARRAY (PL_strtab))[HEK_HASH(hek_struct) & (I32) pl_strtab_max ];
-            HeNEXT(entry) = *oentry;
-            *oentry = entry;
-        }
-    }
-
-[% END %]
-
-[% section.init0.output( "    %s\n" ) %]
+static void perl_init0(pTHX) { /* fixup_ppaddr */    
+    [% section.init0.output( "    %s\n" ) %]
 };
 
-[% IF section.init.comment() %]
-    /* [% section.init.comment() %] */
-[% END %]
+/* init sections: [% section.init.comment() -%] */
 [% section.init.output( "    %s\n", init_name ) %]
 
 /* deferred init1 of regexp */

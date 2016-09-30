@@ -201,10 +201,10 @@ sub save {
         );
 
         my @hash_elements;
-        {
+        {    # randomize the hash elements order to the buckets [ when colliding ]
             my $i = 0;
             my %hash_kv = ( map { $i++, $_ } @hash_content_to_save );
-            @hash_elements = values %hash_kv;    # randomize the hash eleement order to the buckets [ when coliding ]
+            @hash_elements = values %hash_kv;
         }
 
         # uncomment for saving hashes in a consistent order while debugging
@@ -228,7 +228,7 @@ EOS
 
             # lazy template
             my %macro = (
-                HEK_SYM => $hek_sym,
+                HEK_SYM => "((SHARED_HE*)&$hek_sym)",
                 VALUE   => $value,
                 SYM     => $sym,
                 MAX     => $max,

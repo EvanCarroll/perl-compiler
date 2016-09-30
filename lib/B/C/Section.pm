@@ -119,6 +119,13 @@ sub debug {
     return;
 }
 
+sub can_sort {
+    my $self = shift;
+
+    return unless my $name = $self->{name};
+    return 1 if $name eq 'presections';
+}
+
 sub output {
     my ( $self, $format ) = @_;
     my $sym     = $self->symtable;    # This should always be defined. see new
@@ -133,7 +140,10 @@ sub output {
 
     my $return_string = '';
 
-    foreach ( @{ $self->{'values'} } ) {
+    my @values = @{ $self->{'values'} };
+    @values = sort @values if $self->can_sort();
+
+    foreach (@values) {
         my $val = $_;                 # Copy so we don't overwrite on successive calls.
         my $dbg = "";
         my $ref = "";

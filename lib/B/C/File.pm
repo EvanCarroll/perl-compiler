@@ -36,15 +36,45 @@ our @ISA = qw(Exporter);
 # singleton
 my $self;
 
+sub singleton {
+    $self or die "Singleton not initialized";
+    return $self;
+}
+
 # The objects in quotes do not have any special logic.
 sub code_section_names {
-    return qw{const decl init0 free sym hek sharedhe}, struct_names(), op_sections();
+    return qw{const presections decl init0 free sym hek}, struct_names(), op_sections();
+}
+
+my @_structs;
+
+BEGIN {
+    @_structs = qw( xpv xpvav xpvhv xpvcv padlist
+      padname padnamelist xpviv xpvuv xpvnv
+      xpvmg xpvlv xrv xpvbm xpvio sv
+    );
 }
 
 # These objects will end up in an array of structs in the template and be auto-declared.
 sub struct_names {
-    return qw( xpv xpvav xpvhv xpvcv padlist padname padnamelist
-      xpviv xpvuv xpvnv xpvmg xpvlv xrv xpvbm xpvio sv);
+    return @_structs;
+}
+
+# used for shared_he_length
+sub add_dynamic_struct_section {
+    my $struct = shift;
+    return unless defined $struct;
+    $struct = lc($struct);
+    my $is_defined = grep { $_ eq $struct } @_structs;
+    return if $is_defined;
+
+    die unless ref $self;
+
+    # initialize the section
+    $self->{$struct} = B::C::Section->new( $struct, {}, 0 );    # get_symtable_ref() is useless there
+    push @_structs, $struct;
+
+    return 1;
 }
 
 # These populate the init sections and have a special header.
@@ -58,12 +88,27 @@ BEGIN {
     our @EXPORT_OK = map { ( $_, "${_}sect" ) } code_section_names();
     push @EXPORT_OK, init_section_names();
 
+    # exception for shared_he as it's a dynamic function
+    push @EXPORT_OK, qw{sharedhe};
 }
 
-sub re_initialize {
-    my $outfile = $self->{'c_file_name'};
-    $self = undef;
-    return new($outfile);
+sub sharedhe {    # not a single section but multiple ones per length
+    my $len = shift;
+
+    die "Len needs to be defined"   unless defined $len;
+    die "Singleton not initialized" unless ref $self;
+
+    my $sect = q{sharedhe} . $len;
+
+    # create shared_heX section on demand and define it once using the decl section
+    if ( !defined $self->{$sect} ) {
+        if ( add_dynamic_struct_section($sect) ) {
+            presections()->add( sprintf( q{DEFINE_SHARED_HE_LEN(%d)}, $len ) );
+        }
+    }
+    die "Section '$sect' is not defined" unless defined $self->{$sect};    # should never happen (created just above)
+
+    return $self->{$sect};
 }
 
 sub new {
@@ -109,9 +154,26 @@ sub AUTOLOAD {
 my $cfh;
 my %static_ext;
 
+my @hooks;
+
+sub add_prerendering_hook_once {
+    my $hook = shift;
+
+    my $exists = grep { scalar $hook eq scalar $_ } @hooks;
+    return 1 if $exists;
+
+    push @hooks, $hook;
+    return 1;
+}
+
 sub write {
     my $c_file_stash = shift or die;
     my $template_name_short = shift || 'base.c.tt2';
+
+    # Yet Another save_main_rest ... pre rendering actions
+    foreach my $hook (@hooks) {
+        $hook->();
+    }
 
     # Controls the rendering order of the sections.
     $c_file_stash->{section_list} = [
