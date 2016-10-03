@@ -5,9 +5,9 @@ use strict;
 use B qw/cstring svref_2object SVt_PVGV SVf_ROK SVf_UTF8/;
 
 use B::C::Config;
-use B::C::Save::Hek qw/save_hek/;
+use B::C::Save::Hek qw/save_hek save_shared_he/;
 use B::C::Packages qw/is_package_used/;
-use B::C::File qw/init init2/;
+use B::C::File qw/init init2 gvsect gpsect/;
 use B::C::Helpers qw/mark_package get_cv_string strlen_flags/;
 use B::C::Helpers::Symtable qw/objsym savesym/;
 use B::C::Optimizer::ForceHeavy qw/force_heavy/;
@@ -16,11 +16,11 @@ use B::C::Packages qw/mark_package_used/;
 my %gptable;
 
 sub get_index {
-    return $B::C::gv_index;
+    return $B::C::gv2_index;
 }
 
 sub inc_index {
-    return $B::C::gv_index++;
+    return $B::C::gv2_index++;
 }
 
 sub Save_HV()   { 1 }
@@ -104,7 +104,7 @@ sub save {
     }
     else {
         my $ix = inc_index();
-        $sym = savesym( $gv, "gv_list[$ix]" );
+        $sym = savesym( $gv, "gv2_list[$ix]" );
         debug( gv => "Saving GV 0x%x as $sym", ref $gv ? $$gv : 0 );
     }
 
@@ -649,11 +649,6 @@ sub save {
             }
         }
         if ($gp) {
-
-            # TODO implement heksect to place all heks at the beginning
-            #heksect()->add($gv->FILE);
-            #init()->add(sprintf("GvFILE_HEK($sym) = hek_list[%d];", heksect()->index));
-
             # XXX Maybe better leave it NULL or asis, than fighting broken
             if ( $B::C::stash and $fullname =~ /::$/ ) {
 
@@ -664,6 +659,11 @@ sub save {
                 my $file = save_hek( $gv->FILE );
                 init()->add( sprintf( "GvFILE_HEK(%s) = %s;", $sym, $file ) )
                   if $file ne 'NULL' and !$B::C::optimize_cop;
+
+                #gvlist()->comment('SV, gp_io, CV, gvgen, gp_refcount, HV, AV, CV, GV, line, flags, HEK* file');
+                #
+                #my $file = save_shared_he( $gv->FILE );
+                #gvlist()->add(sprintf("NULL, NULL, NULL, 0, 0, NULL NULL, NULL, NULL, 0, 0, %s", $file));
             }
 
             # init()->add(sprintf("GvNAME_HEK($sym) = %s;", save_hek($gv->NAME))) if $gv->NAME;

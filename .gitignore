@@ -4,7 +4,7 @@ MYMETA.yml
 *.bs
 *.o
 C.bs
-C.c
+*.c
 C.o
 Stash/Stash.c
 Makefile
@@ -79,3 +79,4 @@ nytprof/
 /t/v5.*/t/urkkk.pm
 .prove
 .gdb_history
+/test

@@ -76,7 +76,7 @@ use B::C::Packages qw/is_package_used mark_package_unused mark_package_used mark
 use B::C::Save qw(constpv savepv set_max_string_len savestashpv);
 use B::C::Save::Signals ();
 
-our $gv_index = 0;
+our $gv2_index = 0;
 
 # FIXME: this part can now be dynamic
 # exclude all not B::C:: prefixed subs
@@ -1482,7 +1482,7 @@ sub build_template_stash {
         'static_ext'                       => $static_ext,
         'stashxsubs'                       => $stashxsubs,
         'init_name'                        => $init_name || "perl_init",
-        'gv_index'                         => $gv_index,
+        'gv2_index'                         => $gv2_index,
         'MULTI'                            => USE_MULTIPLICITY(),
         'ITHREADS'                         => USE_ITHREADS(),
         'init2_remap'                      => \%init2_remap,
