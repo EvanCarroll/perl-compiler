@@ -649,21 +649,18 @@ sub save {
             }
         }
         if ($gp) {
-            # XXX Maybe better leave it NULL or asis, than fighting broken
-            if ( $B::C::stash and $fullname =~ /::$/ ) {
 
-                # ignore stash hek asserts when adding the stash
-                # he->shared_he_he.hent_hek == hek assertions (#46 with IO::Poll::)
-            }
-            else {
-                my $file = save_hek( $gv->FILE );
-                init()->add( sprintf( "GvFILE_HEK(%s) = %s;", $sym, $file ) )
+            if ( ! $B::C::stash or $fullname !~ /::$/ ) {
+                # GV
+                # XPVGV*  sv_any, 
+                # U32     sv_refcnt;
+                # U32     sv_flags
+                # union   { gp* } sv_u # gp*
+
+                require B::C::Save::Hek;
+                my $file = B::C::Save::Hek::save_shared_he( $gv->FILE );
+                init()->add( sprintf( "GvFILE_HEK(%s) = (HEK*) ( (char *) %s + sizeof(HE) ); /* XXXX */", $sym, $file ) )
                   if $file ne 'NULL' and !$B::C::optimize_cop;
-
-                #gvlist()->comment('SV, gp_io, CV, gvgen, gp_refcount, HV, AV, CV, GV, line, flags, HEK* file');
-                #
-                #my $file = save_shared_he( $gv->FILE );
-                #gvlist()->add(sprintf("NULL, NULL, NULL, 0, 0, NULL NULL, NULL, NULL, 0, 0, %s", $file));
             }
 
             # init()->add(sprintf("GvNAME_HEK($sym) = %s;", save_hek($gv->NAME))) if $gv->NAME;
