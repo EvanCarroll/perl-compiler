@@ -161,11 +161,13 @@ sub savegp_from_gv {
     # .... TODO save stuff there
     # ....
 
-    gpsect()->comment('SV, gp_io, CV, cvgen, gp_refcount, HV, AV, CV, GV, line, flags, HEK* file');
+    gpsect()->comment('SV, gp_io, CV, cvgen, gp_refcount, HV, AV, FORM, GV, line, flags, HEK* file');
 
     gpsect()->add(
         sprintf(
-            "%s, %s, %s, %d, %u, %s, %s, %s, %s, %u, %d, (HEK*) (&%s + sizeof(HE)) ",
+            #"%s, %s, %s, %d, %u, %s, %s, %s, %s, %u, %d, (HEK*) (&%s + sizeof(HE)) ",
+            # with some extra debug
+            "%s /*SV*/, %s /*gp_io*/, %s /*CV*/, %d /*cvgen*/, %u /*gp_refcount*/, %s /*HV*/, %s /*AV*/, (CV*) %s /*FORM*/, %s /*eGV*/, %u /*line*/, %d /*flags*/, (HEK*) (&%s + sizeof(HE))",
             $gp_sv,   $gp_io,    $gp_cv, $gp_cvgen, $gp_refcount, $gp_hv, $gp_av, $gp_form, $gp_egv,
             $gp_line, $gp_flags, $gp_file_hek
         )
@@ -395,7 +397,7 @@ sub save {
 
         save_gv_cv( $gv, $savefields, $fullname, $package, $sym, $gp, $gvname, $name );
 
-        save_gv_misc( $gp, $fullname, $gv, $sym, $savefields );
+        save_gv_format( $gp, $fullname, $gv, $sym, $savefields );
 
         save_gv_io( $gv, $fullname, $sym ) if $savefields & Save_IO;
 
@@ -791,7 +793,7 @@ sub save_gv_cv {
     }
 }
 
-sub save_gv_misc {
+sub save_gv_format {
     my ( $gp, $fullname, $gv, $sym, $savefields ) = @_;
 
     return unless $gp;
