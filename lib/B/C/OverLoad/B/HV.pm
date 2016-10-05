@@ -128,6 +128,15 @@ sub save {
         debug( hv => "Saving stash keys for HV \"$name\" from \"$fullname\"" );
     }
 
+    # protect against recursive self-reference
+    # i.e. with use Moose at stash Class::MOP::Class::Immutable::Trait
+    # value => rv => cv => ... => rv => same hash
+
+    my $sv_list_index = svsect()->add("FAKE_HV");
+    $sym = savesym( $hv, "(HV*)&sv_list[$sv_list_index]" ) unless $is_stash;
+
+    # could also simply use: savesym( $hv, sprintf( "s\\_%x", $$hv ) );
+
     # reduce the content
     # remove values from contents we are not going to save
     my @hash_content_to_save;
@@ -143,7 +152,9 @@ sub save {
             my $sv  = $contents[$i];
             my $value;
 
-            WARN( "HV recursion? with $fullname\{$key\} -> %s\n", $sv->RV ) if ref($sv) eq 'B::RV' and defined objsym($sv) and debug('hv');
+            if ( debug('hv') and ref($sv) eq 'B::RV' and defined objsym($sv) ) {
+                WARN( "HV recursion? with $fullname\{$key\} -> %s\n", $sv->RV );
+            }
 
             if ($is_stash) {
                 if ( ref($sv) eq "B::GV" and $sv->NAME =~ /::$/ ) {
@@ -153,7 +164,7 @@ sub save {
                 }
             }
             else {
-                debug( hv => "saving HV \$" . $fullname . '{' . $key . "}" );
+                debug( hv => "saving HV [ $i / len=$length ]\$" . $fullname . '{' . $key . "} 0x%0x", $sv );
                 $value = $sv->save( $fullname . '{' . $key . '}' );    # Turn the hash value into a symbol
             }
 
@@ -171,18 +182,15 @@ sub save {
 
     my $flags = $hv->FLAGS & ~SVf_READONLY & ~SVf_PROTECT;
 
-    svsect()->add(
+    # replace the previously saved svsect with some accurate content
+    svsect()->replace(
+        $sv_list_index,
         sprintf(
             "&xpvhv_list[%d], %Lu, 0x%x, {0}",
             xpvhvsect()->index, $hv->REFCNT, $flags
         )
     );
-    my $sv_list_index = svsect()->index;
 
-    # protect against recursive self-reference
-    # i.e. with use Moose at stash Class::MOP::Class::Immutable::Trait
-    # value => rv => cv => ... => rv => same hash
-    $sym = savesym( $hv, "(HV*)&sv_list[$sv_list_index]" ) unless $is_stash;
     push @B::C::static_free, $sym if $hv->FLAGS & SVs_OBJECT;
 
     {    # add hash content even if the hash is empty [ maybe only for %INC ??? ]

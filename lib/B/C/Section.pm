@@ -41,10 +41,22 @@ sub add {
         $list[-1] .= qq{\n} . $add if length $add;
     }
     push( @{ $self->{'values'} }, @list );
+
+    # return its position in the list (first one will be 0), avoid to call index just after in most cases
+    return $self->index();
+}
+
+sub replace {
+    my ( $self, $position, $updated_line, $void ) = @_;
+    die "Can only replace one single entry" if defined $void;
+    die "Element does not exists" if $position > $self->index;
+
+    $self->{'values'}->[$position] = $updated_line;
+
     return;
 }
 
-sub remove {
+sub remove {    # should be rename pop or remove last
     my $self = shift;
     pop @{ $self->{'values'} };
 }
