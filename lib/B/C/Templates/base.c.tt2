@@ -274,11 +274,14 @@ Static [% section.$sect.typename() %] [% section.$sect.name() %]_list[[% lines %
 
 [% END %]
 
-static void perl_init0(pTHX) { /* fixup_ppaddr */
-    
+static void init_pl_strtab(pTHX) {
+
 /* only init PL_strtab if we have content for it */
 [% IF section.sharedhe.index + 1 > 0 %]
-    
+    PL_strtab = newHV();
+    HvSHAREKEYS_off(PL_strtab); /* This is the only unshared hash in the code. */
+    hv_ksplit(PL_strtab, [% PL_strtab_max %]);
+
     int pl_strtab_max = ((XPVHV*) SvANY(PL_strtab))->xhv_max;
     {
         int i;
@@ -306,6 +309,8 @@ static void perl_init0(pTHX) { /* fixup_ppaddr */
 
 [% END %]
 
+}
+static void perl_init0(pTHX) { /* fixup_ppaddr */
 [% section.init0.output( "    %s\n" ) %]
 };
 
@@ -814,6 +819,7 @@ main(int argc, char **argv, char **env)
 #define PL_do_undump 0
 #endif
     if (!PL_do_undump) {
+    init_pl_strtab();
 	my_perl = perl_alloc();
 	if (!my_perl)
 	    exit(1);

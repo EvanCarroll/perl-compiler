@@ -78,11 +78,7 @@ sub save {
             init()->add(
                 "if (!SvOOK($sym)) {",    # hv_auxinit is not exported
                 "  HE **a;",
-                "#ifdef PERL_USE_LARGE_HV_ALLOC",
-                sprintf( "  Newxz(a, PERL_HV_ARRAY_ALLOC_BYTES(%d) + sizeof(struct xpvhv_aux), HE*);", $hv_max_plus_one ),
-                "#else",
                 sprintf( "  Newxz(a, %d + sizeof(struct xpvhv_aux), HE*);", $hv_max_plus_one ),
-                "#endif",
                 "  SvOOK_on($sym);",
                 "}",
                 "{",
@@ -271,10 +267,10 @@ EOS
 }
 
 sub get_max_hash_from_keys {
-    my $keys = shift;
+    my ( $keys, $default ) = @_;
+    $default ||= 7;
 
-    my $default = 7;
-    return $default unless $keys;    # default hash max value
+    return $default if !$keys or $keys <= $default;    # default hash max value
 
     return 2**( int( log($keys) / log(2) ) + 1 ) - 1;
 }
