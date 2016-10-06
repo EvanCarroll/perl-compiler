@@ -18,16 +18,18 @@ sub savepv {
     my ( $cstring, $cur, $len, $utf8 ) = cow_strlen_flags($pv);
 
     return @{ $strtable{$cstring} } if defined $strtable{$cstring};
-    my $pvsym = sprintf( "cowpv%d", const()->index + 1 );
+    
+    my $ix = const()->add('FAKE_CONST');
+    my $pvsym = sprintf( "cowpv%d", $ix );
 
     my $max_len = B::C::Save::get_max_string_len();
     if ( $max_len && $cur > $max_len ) {
         my $chars = join ', ', map { cchar $_ } split //, pack( "a*", $pv );
-        const()->add( sprintf( "Static const char %s[] = { %s };", $pvsym, $chars ) );
+        const()->replace( $ix, sprintf( "Static const char %s[] = { %s };", $pvsym, $chars ) );
         $strtable{$cstring} = [ $pvsym, $cur, $len ];
     }
     else {
-        const()->add( sprintf( "Static const char %s[] = %s;", $pvsym, $cstring ) );
+        const()->replace( $ix, sprintf( "Static const char %s[] = %s;", $pvsym, $cstring ) );
         $strtable{$cstring} = [ $pvsym, $cur, $len ];
     }
     return ( $pvsym, $cur, $len );    # NOTE: $cur is total size of the perl string. len would be the length of the C string.
