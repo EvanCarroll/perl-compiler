@@ -278,9 +278,12 @@ static void init_pl_strtab(pTHX) {
 
 /* only init PL_strtab if we have content for it */
 [% IF section.sharedhe.index + 1 > 0 %]
+
     PL_strtab = newHV();
+
+    char * array = Newxz (array, PERL_HV_ARRAY_ALLOC_BYTES ([% PL_strtab_max %]) + sizeof(struct xpvhv_aux), char);
+    HvARRAY (PL_strtab) = (HE **) array;
     HvSHAREKEYS_off(PL_strtab); /* This is the only unshared hash in the code. */
-    hv_ksplit(PL_strtab, [% PL_strtab_max %]);
 
     int pl_strtab_max = ((XPVHV*) SvANY(PL_strtab))->xhv_max;
     {
