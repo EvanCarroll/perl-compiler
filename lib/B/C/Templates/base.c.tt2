@@ -280,10 +280,9 @@ static void init_pl_strtab(pTHX) {
 [% IF section.sharedhe.index + 1 > 0 %]
 
     PL_strtab = newHV();
-
-    char * array = Newxz (array, PERL_HV_ARRAY_ALLOC_BYTES ([% PL_strtab_max %]) + sizeof(struct xpvhv_aux), char);
-    HvARRAY (PL_strtab) = (HE **) array;
-    HvSHAREKEYS_off(PL_strtab); /* This is the only unshared hash in the code. */
+    HvSHAREKEYS_off(PL_strtab);                        /* mandatory */
+    hv_ksplit(PL_strtab, [% PL_strtab_max %]);
+    SvOOK_on(PL_strtab);
 
     {
         int i;
@@ -291,7 +290,9 @@ static void init_pl_strtab(pTHX) {
         HE  **oentry;
         HEK  *hek_struct;
 
-        ((XPVHV*) SvANY(PL_strtab))->xhv_keys = [% section.sharedhe.index + 1 %];
+        HvMAX(PL_strtab) = [% PL_strtab_max - 1 %];
+        HvTOTALKEYS(PL_strtab) = [% section.sharedhe.index + 1 %];
+        SvREFCNT(PL_strtab) = 99999;
 
         for (i=0; i < [% section.sharedhe.index + 1 %]; i++) {
             entry = &(sharedhe_list[i]->shared_he_he);
