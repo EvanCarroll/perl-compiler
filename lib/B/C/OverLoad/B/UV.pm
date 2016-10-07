@@ -31,10 +31,22 @@ sub save {
         )
     );
 
-    init()->add( sprintf( "sv_list[%d].sv_any = (void*)&sv_list[%d] - STRUCT_OFFSET(XPVUV, xuv_uv);", $i, $i ) );
+    $sym = savesym( $sv, sprintf( "&sv_list[%d]", $i ) );
+
+    #32bit  - sizeof(void*), 64bit: - 2*ptrsize
+    if ( $B::C::Flags::Config{ptrsize} == 4 ) {
+        init()->add( sprintf( "SvANY(%s) = (void*)%s - sizeof(void*);", $sym, $sym ) );
+    }
+    else {
+        init()->add( sprintf( "SvANY(%s) = (char*)%s - %d;", $sym, $sym, 2 * $B::C::Flags::Config{ptrsize} ) );
+    }
+
+    # TODO: we would like to use sometghing like this, this is breaking op/64bitint.t
+    #init()->add( sprintf( "sv_list[%d].sv_any = (void*)&sv_list[%d] - STRUCT_OFFSET(XPVUV, xuv_uv);", $i, $i ) );
 
     svsect()->debug( $fullname, $sv );
-    savesym( $sv, sprintf( "&sv_list[%d]", $i ) );
+
+    return $sym;
 }
 
 1;
