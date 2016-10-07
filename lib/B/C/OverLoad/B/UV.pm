@@ -22,7 +22,6 @@ sub save {
     my $suff = 'U';
     $suff .= 'L' if $uvx > 2147483647;
 
-    # since 5.24 we need to point the xpvuv to the head
     my $u32fmt = u32fmt();
     my $i      = svsect()->add(
         sprintf(
@@ -33,6 +32,19 @@ sub save {
 
     $sym = savesym( $sv, sprintf( "&sv_list[%d]", $i ) );
 
+=pod
+    Since 5.24 we can access the IV/NV/UV value from either the union from the main SV body
+    or also from the SvANY of it...
+
+    As IV family do not need/have one SvANY we are going to cheat....
+    by setting a 'virtual' pointer to the SvANY to an unsignificant memory address
+    but once we try to access to the IV value of it... this will point to the
+    single location where it's store in the body of the main SV....
+
+    So two differents way to access to the same memory location.
+
+=cut
+
     #32bit  - sizeof(void*), 64bit: - 2*ptrsize
     if ( $B::C::Flags::Config{ptrsize} == 4 ) {
         init()->add( sprintf( "SvANY(%s) = (void*)%s - sizeof(void*);", $sym, $sym ) );
@@ -41,7 +53,7 @@ sub save {
         init()->add( sprintf( "SvANY(%s) = (char*)%s - %d;", $sym, $sym, 2 * $B::C::Flags::Config{ptrsize} ) );
     }
 
-    # TODO: we would like to use sometghing like this, this is breaking op/64bitint.t
+    # TODO: we would like to use something like this, this is breaking op/64bitint.t
     #init()->add( sprintf( "sv_list[%d].sv_any = (void*)&sv_list[%d] - STRUCT_OFFSET(XPVUV, xuv_uv);", $i, $i ) );
 
     svsect()->debug( $fullname, $sv );
