@@ -23,7 +23,7 @@
 #undef OP_MAPSTART
 #define OP_MAPSTART OP_GREPSTART
 
-
+ 
 
 #ifdef BROKEN_STATIC_REDECL
 #define Static extern
@@ -274,8 +274,16 @@ Static [% section.$sect.typename() %] [% section.$sect.name() %]_list[[% lines %
 
 [% END %]
 
-static void init_pl_strtab(pTHX) {
+/* switch from one to another one during devel */
+/*
+    -1 disable both init_pl_strtab
+    0 only do it at init0
+    1 or other do it before...
+*/
+#define PLSTRTAB_MALLOC -1 
 
+static void init_pl_strtab(pTHX) {
+#if PLSTRTAB_MALLOC > 0
 /* only init PL_strtab if we have content for it */
 [% IF section.sharedhe.index + 1 > 0 %]
 
@@ -311,9 +319,46 @@ static void init_pl_strtab(pTHX) {
     }
 
 [% END %]
-
+#endif
 }
+
+
+static void init_pl_strtab_init0(pTHX) {
+#ifdef PLSTRTAB_MALLOC == 0
+    /* only init PL_strtab if we have content for it */
+[% IF section.sharedhe.index + 1 > 0 %]
+
+    int pl_strtab_max = ((XPVHV*) SvANY(PL_strtab))->xhv_max;
+    {
+        int i;
+        HE   *entry;
+        HE  **oentry;
+        HEK  *hek_struct;
+
+        ((XPVHV*) SvANY(PL_strtab))->xhv_keys = [% section.sharedhe.index + 1 %];
+
+        for (i=0; i < [% section.sharedhe.index + 1 %]; i++) {
+            entry = &(sharedhe_list[i]->shared_he_he);
+            hek_struct = &(sharedhe_list[i]->shared_he_hek);
+
+            HeKEY_hek(entry) = hek_struct;
+            PERL_HASH (hek_struct->hek_hash,
+                       hek_struct->hek_key,
+                       hek_struct->hek_len);
+
+            /* Insert the hes */
+            oentry = &(HvARRAY (PL_strtab))[HEK_HASH(hek_struct) & (I32) pl_strtab_max ];
+            HeNEXT(entry) = *oentry;
+            *oentry = entry;
+        }
+    }
+
+[% END %]
+#endif
+}
+
 static void perl_init0(pTHX) { /* fixup_ppaddr */
+init_pl_strtab_init0();
 [% section.init0.output( "    %s\n" ) %]
 };
 
