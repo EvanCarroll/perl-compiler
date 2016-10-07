@@ -278,6 +278,11 @@ static void init_pl_strtab(pTHX) {
 /* only init PL_strtab if we have content for it */
 [% IF section.sharedhe.index + 1 > 0 %]
 
+    if (PL_hash_seed_set == FALSE) {
+        Perl_get_hash_seed(aTHX_ PL_hash_seed);
+        PL_hash_seed_set= TRUE;
+    }
+
     PL_strtab = newHV();
 
     hv_ksplit(PL_strtab, [% PL_strtab_max %]);
