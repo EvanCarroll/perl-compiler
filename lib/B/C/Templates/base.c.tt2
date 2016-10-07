@@ -280,7 +280,7 @@ Static [% section.$sect.typename() %] [% section.$sect.name() %]_list[[% lines %
     0 only do it at init0
     1 or other do it before...
 */
-#define PLSTRTAB_MALLOC -1 
+#define PLSTRTAB_MALLOC 0 
 
 static void init_pl_strtab(pTHX) {
 #if PLSTRTAB_MALLOC > 0
@@ -307,9 +307,7 @@ static void init_pl_strtab(pTHX) {
             hek_struct = &(sharedhe_list[i]->shared_he_hek);
 
             HeKEY_hek(entry) = hek_struct;
-            PERL_HASH (hek_struct->hek_hash,
-                       hek_struct->hek_key,
-                       hek_struct->hek_len);
+            PERL_HASH (HEK_HASH(hek_struct), HEK_KEY(hek_struct), HEK_LEN(hek_struct));
 
             /* Insert the hes */
             oentry = &(HvARRAY (PL_strtab))[HEK_HASH(hek_struct) & (I32) [% PL_strtab_max - 1 %]  ];
@@ -322,29 +320,26 @@ static void init_pl_strtab(pTHX) {
 #endif
 }
 
-
 static void init_pl_strtab_init0(pTHX) {
 #ifdef PLSTRTAB_MALLOC == 0
     /* only init PL_strtab if we have content for it */
 [% IF section.sharedhe.index + 1 > 0 %]
 
-    int pl_strtab_max = ((XPVHV*) SvANY(PL_strtab))->xhv_max;
+    int pl_strtab_max = HvMAX(PL_strtab);
     {
         int i;
         HE   *entry;
         HE  **oentry;
         HEK  *hek_struct;
 
-        ((XPVHV*) SvANY(PL_strtab))->xhv_keys = [% section.sharedhe.index + 1 %];
+        HvTOTALKEYS(PL_strtab) = [% section.sharedhe.index + 1 %];
 
         for (i=0; i < [% section.sharedhe.index + 1 %]; i++) {
             entry = &(sharedhe_list[i]->shared_he_he);
             hek_struct = &(sharedhe_list[i]->shared_he_hek);
 
             HeKEY_hek(entry) = hek_struct;
-            PERL_HASH (hek_struct->hek_hash,
-                       hek_struct->hek_key,
-                       hek_struct->hek_len);
+            PERL_HASH (HEK_HASH(hek_struct), HEK_KEY(hek_struct), HEK_LEN(hek_struct));
 
             /* Insert the hes */
             oentry = &(HvARRAY (PL_strtab))[HEK_HASH(hek_struct) & (I32) pl_strtab_max ];
