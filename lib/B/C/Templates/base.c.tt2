@@ -274,23 +274,15 @@ Static [% section.$sect.typename() %] [% section.$sect.name() %]_list[[% lines %
 
 [% END %]
 
-/* switch from one to another one during devel */
-/*
-    -1 disable both init_pl_strtab
-    0 only do it at init0
-    1 or other do it before...
-*/
-#define PLSTRTAB_MALLOC 0 
-
 static void init_pl_strtab(pTHX) {
-#if PLSTRTAB_MALLOC > 0
 /* only init PL_strtab if we have content for it */
 [% IF section.sharedhe.index + 1 > 0 %]
 
     PL_strtab = newHV();
-    HvSHAREKEYS_off(PL_strtab);                        /* mandatory */
+
     hv_ksplit(PL_strtab, [% PL_strtab_max %]);
-    SvOOK_on(PL_strtab);
+    HvSHAREKEYS_off(PL_strtab);                        /* mandatory */
+    //SvOOK_on(PL_strtab);
 
     {
         int i;
@@ -298,7 +290,7 @@ static void init_pl_strtab(pTHX) {
         HE  **oentry;
         HEK  *hek_struct;
 
-        HvMAX(PL_strtab) = [% PL_strtab_max - 1 %];
+        //HvMAX(PL_strtab) = [% PL_strtab_max - 1 %];
         HvTOTALKEYS(PL_strtab) = [% section.sharedhe.index + 1 %];
         SvREFCNT(PL_strtab) = 99999;
 
@@ -317,60 +309,9 @@ static void init_pl_strtab(pTHX) {
     }
 
 [% END %]
-#endif
-}
-/*
-handy.h:475:#define strNE(s1,s2) (strcmp(s1,s2))
-handy.h:476:#define strEQ(s1,s2) (!strcmp(s1,s2))
-handy.h:477:#define strLT(s1,s2) (strcmp(s1,s2) < 0)
-handy.h:478:#define strLE(s1,s2) (strcmp(s1,s2) <= 0)
-handy.h:479:#define strGT(s1,s2) (strcmp(s1,s2) > 0)
-handy.h:480:#define strGE(s1,s2) (strcmp(s1,s2) >= 0)
-*/
-
-static void init_pl_strtab_init0(pTHX) {
-#if PLSTRTAB_MALLOC == 0
-    /* only init PL_strtab if we have content for it */
-[% IF section.sharedhe.index + 1 > 0 %]
-
-    int pl_strtab_max = HvMAX(PL_strtab);
-    {
-        int i;
-        HE   *entry;
-        HE   **oentry;
-        HEK  *hek_struct;
-        HE   *search;
-
-        HvTOTALKEYS(PL_strtab) = [% section.sharedhe.index + 1 %];
-
-        for (i=0; i < [% section.sharedhe.index + 1 %]; i++) {
-            entry = &(sharedhe_list[i]->shared_he_he);
-            hek_struct = &(sharedhe_list[i]->shared_he_hek);
-
-            HeKEY_hek(entry) = hek_struct;
-            PERL_HASH (HEK_HASH(hek_struct), HEK_KEY(hek_struct), HEK_LEN(hek_struct));
-
-            /* need to check all oentry */
-            // for ( search = *oentry; search; search = HeNEXT(search) ) {
-            //     if ( strEQ(HeKEY(search), HeKEY(entry)) ) {
-            //         PerlIO_printf(Perl_debug_log, "==== FOUND %s\n" );    
-            //     }
-            //     PerlIO_printf(Perl_debug_log, "- k %s\n", HeKEY(search) );
-            // }
-
-            /* Insert the hes */
-            oentry = &(HvARRAY (PL_strtab))[HEK_HASH(hek_struct) & (I32) pl_strtab_max ];
-            HeNEXT(entry) = *oentry;
-            *oentry = entry;
-        }
-    }
-
-[% END %]
-#endif
 }
 
 static void perl_init0(pTHX) { /* fixup_ppaddr */
-init_pl_strtab_init0();
 [% section.init0.output( "    %s\n" ) %]
 };
 
