@@ -285,6 +285,12 @@ static void init_pl_strtab(pTHX) {
 
     PL_strtab = newHV();
 
+    /* manual malloc */    
+    //char * array;
+    //Newxz (array, PERL_HV_ARRAY_ALLOC_BYTES ([% PL_strtab_max %]) + sizeof(struct xpvhv_aux), char);
+    //HvARRAY (PL_strtab) = (HE **) array;
+    
+    /* automatic malloc */    
     hv_ksplit(PL_strtab, [% PL_strtab_max %]);
     HvSHAREKEYS_off(PL_strtab);                        /* mandatory */
     //SvOOK_on(PL_strtab);
