@@ -285,7 +285,6 @@ static void init_pl_strtab(pTHX) {
     HvARRAY (PL_strtab) = (HE **) array;
     HvSHAREKEYS_off(PL_strtab); /* This is the only unshared hash in the code. */
 
-    int pl_strtab_max = ((XPVHV*) SvANY(PL_strtab))->xhv_max;
     {
         int i;
         HE   *entry;
@@ -304,7 +303,7 @@ static void init_pl_strtab(pTHX) {
                        hek_struct->hek_len);
 
             /* Insert the hes */
-            oentry = &(HvARRAY (PL_strtab))[HEK_HASH(hek_struct) & (I32) pl_strtab_max ];
+            oentry = &(HvARRAY (PL_strtab))[HEK_HASH(hek_struct) & (I32) [% PL_strtab_max - 1 %]  ];
             HeNEXT(entry) = *oentry;
             *oentry = entry;
         }
