@@ -142,10 +142,11 @@ sub downgrade_pviv {
     my $iok = $sv->FLAGS & SVf_IOK;
     my $pok = $sv->FLAGS & SVf_POK;
 
+    #tidyoff
     if (  !$pok && $iok
         or $iok && $sv->PV =~ qr{^[0-9]+$}
         or $pok && !$iok && $sv->PV eq ( $sv->IVX || 0 ) ) {    # PVIV used as IV let's downgrade it as an IV
-        ddebug("downgrade PVIV to IV - case a");
+    	ddebug("downgrade PVIV to IV - case a");
 
         push @EXTRA, int get_integer_value( $sv->IVX );
         my $sviv = B::svref_2object( \$EXTRA[-1] );
@@ -169,6 +170,7 @@ sub downgrade_pviv {
     #     my $svpv = B::svref_2object( \$EXTRA[-1] );
     #     return B::PV::save( $svpv, $fullname );
     # }
+    #tidyon
 
     return;
 }
@@ -190,19 +192,14 @@ sub downgrade_pvnv {
     my $nok = $sv->FLAGS & SVf_NOK;
     my $pok = $sv->FLAGS & SVf_POK;
 
+    #tidyoff
     if (
-           $nok
-        && !$pok
-        && !$iok
-        && $sv->NV =~ qr{^[0-9]+$}
-        && length( $sv->NV ) <= 18
-
+           $nok && !$pok && !$iok && $sv->NV =~ qr{^[0-9]+$} && length( $sv->NV ) <= 18
         #or !$nok && $pok && !$iok && $sv->PV =~ qr{^[0-9]+$} && length( $sv->PV ) <= 18
 
         #or !$nok && $pok && $sv->PV eq ( $sv->NV || 0 )
       ) {    # PVNV used as IV let's downgrade it as an IV
-        ddebug( "downgrade PVNV to IV - case a ", $sv->FLAGS );
-
+        ddebug("downgrade PVNV to IV - case a ", $sv->FLAGS);
         #eval q{use Devel::Peek}; Dump($sv);
 
         push @EXTRA, int get_integer_value( $sv->NV );
@@ -224,6 +221,7 @@ sub downgrade_pvnv {
     #     my $svpv = B::svref_2object( \$EXTRA[-1] );
     #     return B::PV::save( $svpv, $fullname );
     # }
+    #tidyon
 
     return;
 }
