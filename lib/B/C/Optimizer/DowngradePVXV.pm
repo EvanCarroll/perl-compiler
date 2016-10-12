@@ -60,7 +60,7 @@ sub is_simple_pviv {
     return $flags == 0;
 }
 
-sub is_simple_pvnv {    # should factorized them
+sub is_simple_pvnv {    # should factorize this with the other is_simple funcion, once ready
     my $sv = shift;
 
     my $flags = $sv->FLAGS;
@@ -201,7 +201,7 @@ sub downgrade_pvnv {
 
         push @EXTRA, int $sv->NV;
         my $sviv = B::svref_2object( \$EXTRA[-1] );
-        do { ddebug("WARN: invalid B::IV when downgrading PVNV - case a"); return } unless ref $sviv eq 'B::IV';
+        do { ddebug("WARN: invalid B::IV when downgrading PVNV"); return } unless ref $sviv eq 'B::IV';
         return B::IV::save( $sviv, $fullname, { flags => custom_flags( $sv, SVt_IV() ), refcnt => $sv->REFCNT } );
     } elsif (
     	$pok && $sv->PV =~ qr{^[0-9]+$} && length( $sv->PV ) <= 18
@@ -209,7 +209,7 @@ sub downgrade_pvnv {
     	ddebug("downgrade PVNV to IV - case b");
         push @EXTRA, int( "" . $sv->PV );
         my $sviv = B::svref_2object( \$EXTRA[-1] );
-        do { ddebug("WARN: invalid B::IV when downgrading PVNV - case b"); return } unless ref $sviv eq 'B::IV';
+        do { ddebug("WARN: invalid B::IV when downgrading PVNV"); return } unless ref $sviv eq 'B::IV';
         return B::IV::save( $sviv, $fullname, { flags => custom_flags($sv, SVt_IV() ), refcnt => $sv->REFCNT } );
     } elsif ( $iok ) { # && $sv->IVX =~ qr{^[0-9]+$}
     	ddebug("downgrade PVNV to IV - case d");
@@ -221,7 +221,7 @@ sub downgrade_pvnv {
     	ddebug("downgrade PVNV to NV - case e", _sv_to_str($sv));
     	push @EXTRA, $sv->NV;
     	my $svnv = B::svref_2object( \$EXTRA[-1] );
-    	do { ddebug("WARN: invalid B::NV when downgrading PVNV - case b"); return } unless ref $svnv eq 'B::NV';
+    	do { ddebug("WARN: invalid B::NV when downgrading PVNV"); return } unless ref $svnv eq 'B::NV';
     	return B::NV::save( $svnv, $fullname, { flags => custom_flags($sv, SVt_IV() ), refcnt => $sv->REFCNT } );    	
     }
     else {
@@ -269,5 +269,11 @@ sub _sv_to_str {
 1;
 __END__
 broken:
-t/v5.24.1/C-COMPILED/io/through.t
-t/v5.24.1/C-COMPILED/io/utf8.t
+io/through.t
+io/utf8.t
+op/chars.t
+op/chr.t
+op/evalbytes.t
+op/goto.t
+op/infnan.t
+
