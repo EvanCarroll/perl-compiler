@@ -18,7 +18,7 @@ sub save {
     my $svflags = $sv->FLAGS;
     my $refcnt  = $sv->REFCNT;
 
-    if ( ref $custom ) {
+    if ( ref $custom ) { # used when downgrading a PVIV / PVNV to IV
         $svflags = $custom->{flags} if defined $custom->{flags};
         $refcnt = $custom->{refcnt} if defined $custom->{refcnt};
     }
