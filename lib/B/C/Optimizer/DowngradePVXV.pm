@@ -160,13 +160,16 @@ sub downgrade_pviv {
         my $sviv = B::svref_2object( \$EXTRA[-1] );
         return B::IV::save( $sviv, $fullname, { flags => custom_flags( $sv, SVt_IV() ), refcnt => $sv->REFCNT } );
     }
-    # elsif ($pok) {                                                            # maybe do not downgrade it to PV if the string is only 0-9 ??
-    #                                                                           # downgrade the PVIV as a regular PV
+    elsif ($pok) {                                                            # maybe do not downgrade it to PV if the string is only 0-9 ??
+		ddebug("downgrade the PVIV to a regular PV - TODO");
+		# downgrade the PVIV as a regular PV
     #     qx{echo '- downgrade PV' >> /tmp/flags};
     #     push @EXTRA, "" . $sv->PV;
     #     my $svpv = B::svref_2object( \$EXTRA[-1] );
     #     return B::PV::save( $svpv, $fullname );
-    # }
+    } else {
+    	ddebug( sprintf( "downgrade PVIV skipped ? %s", _sv_to_str($sv)));
+    }
 
     #tidyon
 
@@ -190,15 +193,21 @@ sub downgrade_pvnv {
     my $nok = $sv->FLAGS & SVf_NOK;
     my $pok = $sv->FLAGS & SVf_POK;
 
+    my $ppok = $sv->FLAGS & SVp_POK;
+
+    # if the PV is private abort..
+	return if $ppok;
+
     return unless $iok or $nok or $pok; # SVs_PADSTALE ?
 
     #tidyoff
     if (
            $nok && $sv->NV =~ qr{^[0-9]+$} && length( $sv->NV ) <= 18 # !$pok && !$iok &&
       ) {    # PVNV used as IV let's downgrade it as an IV
-        ddebug("downgrade PVNV to IV from NV - case a");
+        #return;
+        ddebug("downgrade PVNV to IV from NV - case a", _sv_to_str($sv));
         #eval q{use Devel::Peek}; Dump($sv);
-
+        return if $sv->NV == 0;
         push @EXTRA, int $sv->NV;
         my $sviv = B::svref_2object( \$EXTRA[-1] );
         do { ddebug("WARN: invalid B::IV when downgrading PVNV"); return } unless ref $sviv eq 'B::IV';
@@ -217,15 +226,15 @@ sub downgrade_pvnv {
         my $sviv = B::svref_2object( \$EXTRA[-1] );
         return B::IV::save( $sviv, $fullname, { flags => custom_flags($sv, SVt_IV() ), refcnt => $sv->REFCNT } );    	
     } elsif ( $nok ) {
-    	return if $sv->NV eq $]; # mmm special case, skip it for now - comp/use.t
     	ddebug("downgrade PVNV to NV - case e", _sv_to_str($sv));
     	push @EXTRA, $sv->NV;
     	my $svnv = B::svref_2object( \$EXTRA[-1] );
+    	#debug( "Value ?? %s", )
     	do { ddebug("WARN: invalid B::NV when downgrading PVNV"); return } unless ref $svnv eq 'B::NV';
-    	return B::NV::save( $svnv, $fullname, { flags => custom_flags($sv, SVt_IV() ), refcnt => $sv->REFCNT } );    	
+    	return B::NV::save( $svnv, $fullname, { flags => custom_flags($sv, SVt_NV() ), refcnt => $sv->REFCNT } );    	
     }
     else {
-     	ddebug( sprintf( "downgrade PVNV skipped case ? %s", _sv_to_str($sv)));
+     	ddebug( sprintf( "downgrade PVNV skipped ? %s", _sv_to_str($sv)));
     }
     # elsif ($pok) {                                                            # maybe do not downgrade it to PV if the string is only 0-9 ??
     #                                                                           # downgrade the PVIV as a regular PV
@@ -249,6 +258,7 @@ sub _sv_to_str {
 	my $iok = $sv->FLAGS & SVf_IOK;
     my $nok = $sv->FLAGS & SVf_NOK;
     my $pok = $sv->FLAGS & SVf_POK;
+    my $ppok = $sv->FLAGS & SVp_POK;
 
     if ( $iok ) {
 		$flags .= 'IOK ';
@@ -262,6 +272,7 @@ sub _sv_to_str {
 		$flags .= 'POK ';
 		$values .= 'PV: '. $sv->PV . ' '		    	
     }
+    $flags .= 'pPOK ' if $ppok;
 
     return sprintf( "SV is %s ; %s ; Flags 0x%x ", $flags, $values, $sv->FLAGS)
 }
@@ -276,4 +287,8 @@ op/chr.t
 op/evalbytes.t
 op/goto.t
 op/infnan.t
-
+op/magic.t
+op/pack.t
+op/sprintf.t
+op/utf8magic.t
+op/ver.t
