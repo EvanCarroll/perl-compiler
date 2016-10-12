@@ -19,6 +19,8 @@ my @EXTRA;
 sub SVt_IV   { 1 }
 sub SVt_NV   { 2 }
 sub SVt_PV   { 3 }
+sub SVt_PVIV { 5 }
+sub SVt_PVNV { 6 }
 sub SVt_MASK { 0xf }    # smallest bitmask that covers all types
 
 my $DEBUG = 1;
@@ -26,8 +28,11 @@ my $DEBUG = 1;
 sub ddebug {
     return unless $DEBUG;
     my (@what) = @_;
+
+    local %ENV;         # avoid error with taint from op/taint.t
     my $msg = join ' ', @what;
-    qx{echo '$msg' >> /tmp/flags};
+
+    qx{/usr/bin/echo '$msg' >> /tmp/flags};
     return 1;
 }
 
@@ -35,6 +40,9 @@ sub is_simple_pviv {
     my $sv = shift;
 
     my $flags = $sv->FLAGS;
+
+    return if $flags & SVf_ROK == SVf_ROK;
+    return if $flags & SVt_MASK != SVt_PVIV;
 
     # remove insignificant flags for us as a PVIV
     $flags &= ~SVf_IsCOW if $flags & SVp_POK;
@@ -57,6 +65,9 @@ sub is_simple_pvnv {    # should factorized them
 
     my $flags = $sv->FLAGS;
 
+    return if $flags & SVf_ROK == SVf_ROK;
+    return if $flags & SVt_MASK != SVt_PVNV;
+
     # remove insignificant flags for us as a PVIV
     $flags &= ~SVf_IsCOW if $flags & SVp_POK;
     $flags &= ~SVf_IOK;
@@ -65,6 +76,8 @@ sub is_simple_pvnv {    # should factorized them
     $flags &= ~SVp_IOK;
     $flags &= ~SVp_POK;
     $flags &= ~SVp_NOK;
+
+    # bonus ?
     $flags &= ~SVf_READONLY;
     $flags &= ~SVs_PADSTALE;
     $flags &= ~SVs_PADTMP;
@@ -173,18 +186,24 @@ sub downgrade_pvnv {
 
     return unless is_simple_pvnv($sv);
 
+    my $iok = $sv->FLAGS & SVf_IOK;
     my $nok = $sv->FLAGS & SVf_NOK;
     my $pok = $sv->FLAGS & SVf_POK;
 
     if (
-           $nok && !$pok && $sv->NV =~ qr{^[0-9]+$} && length( $sv->NV ) <= 18
-        or $pok
-        && $sv->PV =~ qr{^[0-9]+$}
-        && length( $sv->PV ) <= 18
+           $nok
+        && !$pok
+        && !$iok
+        && $sv->NV =~ qr{^[0-9]+$}
+        && length( $sv->NV ) <= 18
+
+        #or !$nok && $pok && !$iok && $sv->PV =~ qr{^[0-9]+$} && length( $sv->PV ) <= 18
 
         #or !$nok && $pok && $sv->PV eq ( $sv->NV || 0 )
       ) {    # PVNV used as IV let's downgrade it as an IV
-        ddebug("downgrade PVNV to IV - case a");
+        ddebug( "downgrade PVNV to IV - case a ", $sv->FLAGS );
+
+        #eval q{use Devel::Peek}; Dump($sv);
 
         push @EXTRA, int get_integer_value( $sv->NV );
         my $sviv = B::svref_2object( \$EXTRA[-1] );
