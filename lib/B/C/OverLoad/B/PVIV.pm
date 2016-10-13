@@ -21,8 +21,11 @@ sub save {
     }
 
     my $downgraded = downgrade_pviv( $sv, $fullname );
-    return $downgraded if defined $downgraded;
-
+    if ( defined $downgraded ) {
+        savesym( $sv, $downgraded );
+        return $downgraded;
+    }
+    
     # save the PVIV
 
     my ( $savesym, $cur, $len, $pv, $static, $flags ) = B::PV::save_pv_or_rv( $sv, $fullname );

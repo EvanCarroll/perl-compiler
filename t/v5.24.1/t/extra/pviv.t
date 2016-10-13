@@ -4,8 +4,6 @@ eval q{use Devel::Peek};
 
 print "1..14\n";
 
-#my ( $A, $B, $C, $D, $E, $F, $G, $H);
-
 {
     note("a - a simple IV");
     my $A;

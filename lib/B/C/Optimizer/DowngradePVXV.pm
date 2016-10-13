@@ -32,7 +32,7 @@ sub ddebug {
     local %ENV;         # avoid error with taint from op/taint.t
     my $msg = join ' ', @what;
 
-    qx{/usr/bin/echo '$msg' >> /tmp/flags};
+    qx{/usr/bin/echo '$msg' >> /tmp/downgrade};
     return 1;
 }
 
@@ -41,8 +41,8 @@ sub is_simple_pviv {
 
     my $flags = $sv->FLAGS;
 
-    return if $flags & SVf_ROK == SVf_ROK;
-    return if $flags & SVt_MASK != SVt_PVIV;
+    return if ($flags & SVf_ROK) == SVf_ROK;
+    return if ($flags & SVt_MASK) != SVt_PVIV();
 
     # remove insignificant flags for us as a PVIV
     $flags &= ~SVf_IsCOW if $flags & SVp_POK;
@@ -65,8 +65,8 @@ sub is_simple_pvnv {    # should factorize this with the other is_simple funcion
 
     my $flags = $sv->FLAGS;
 
-    return if $flags & SVf_ROK == SVf_ROK;
-    return if $flags & SVt_MASK != SVt_PVNV;
+    return if ($flags & SVf_ROK) == SVf_ROK;
+    return if ($flags & SVt_MASK) != SVt_PVNV();
 
     # remove insignificant flags for us as a PVIV
     $flags &= ~SVf_IsCOW if $flags & SVp_POK;
@@ -143,7 +143,7 @@ sub downgrade_pviv {
     #tidyoff
     if (  !$pok && $iok
         or $iok && $sv->PV =~ qr{^[0-9]+$}
-        or $pok && !$iok && $sv->PV eq ( $sv->IVX || 0 ) ) {    # PVIV used as IV let's downgrade it as an IV
+        or $pok && !$iok && $sv->PV eq ( $sv->IVX || 0 ) && length( $sv->PV ) <= 18 ) {    # PVIV used as IV let's downgrade it as an IV
     	ddebug("downgrade PVIV to IV - case a");
 
         push @EXTRA, int get_integer_value( $sv->IVX );
@@ -161,12 +161,10 @@ sub downgrade_pviv {
         return B::IV::save( $sviv, $fullname, { flags => custom_flags( $sv, SVt_IV() ), refcnt => $sv->REFCNT } );
     }
     elsif ($pok) {                                                            # maybe do not downgrade it to PV if the string is only 0-9 ??
-		ddebug("downgrade the PVIV to a regular PV - TODO");
-		# downgrade the PVIV as a regular PV
-    #     qx{echo '- downgrade PV' >> /tmp/flags};
-    #     push @EXTRA, "" . $sv->PV;
-    #     my $svpv = B::svref_2object( \$EXTRA[-1] );
-    #     return B::PV::save( $svpv, $fullname );
+        ddebug("downgrade the PVIV as a regular PV");
+        push @EXTRA, "" . $sv->PV;
+        my $svpv = B::svref_2object( \$EXTRA[-1] );
+        return B::PV::save( $svpv, $fullname, { flags => custom_flags( $sv, SVt_PV() ), refcnt => $sv->REFCNT } );
     } else {
     	ddebug( sprintf( "downgrade PVIV skipped ? %s", _sv_to_str($sv)));
     }
