@@ -2,7 +2,7 @@ package B::C::Optimizer::DowngradePVXV;
 
 use strict;
 
-use B::C::Decimal qw/get_integer_value/;
+use B::C::Decimal qw/get_integer_value intmax/;
 use B qw{SVf_NOK SVp_NOK SVs_OBJECT SVf_IOK SVf_ROK SVf_POK SVp_POK SVp_IOK SVf_IsCOW SVf_READONLY SVs_PADSTALE SVs_PADTMP SVf_PROTECT};
 
 use Exporter ();
@@ -20,7 +20,7 @@ sub SVt_PVIV { 5 }
 sub SVt_PVNV { 6 }
 sub SVt_MASK { 0xf }    # smallest bitmask that covers all types
 
-my $DEBUG = 1;
+my $DEBUG = 0;
 
 sub ddebug {
     return unless $DEBUG;
@@ -137,10 +137,10 @@ sub downgrade_pviv {
     my $iok  = $sv->FLAGS & SVf_IOK;
     my $pok  = $sv->FLAGS & SVf_POK;
     my $ppok = $sv->FLAGS & SVp_POK;
-    
+
     if ( $ppok && !$pok ) {
-    	ddebug("- PVIV downgrade skipped ", _sv_to_str($sv));
-    	return;	
+        ddebug( "- PVIV downgrade skipped ", _sv_to_str($sv) );
+        return;
     }
 
 	#tidyoff
@@ -189,10 +189,18 @@ sub downgrade_pvnv {
 
     my $ppok = $sv->FLAGS & SVp_POK;
 
-    # if the PV is private abort..
-    if ( $ppok ) {
-    	ddebug("- PVNV downgrade skipped ", _sv_to_str($sv));
-    	return;
+    # do not mess with large numbers
+    if ( $ppok && $nok && ( $sv->NV > intmax() or $sv->NV < -intmax() ) ) {
+
+        #ddebug("- XXX PVNV downgrade skipped ", _sv_to_str($sv), intmax() );
+        return;
+    }
+
+    # if the PV is private abort.. in some cases
+    if ( $ppok && !$pok or $ppok && ( $sv->FLAGS & SVf_IsCOW ) ) {
+
+        #ddebug("- PVNV downgrade skipped ", _sv_to_str($sv));
+        return;
     }
 
     return unless $iok or $nok or $pok;    # SVs_PADSTALE ?
