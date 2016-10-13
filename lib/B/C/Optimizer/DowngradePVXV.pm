@@ -139,11 +139,15 @@ sub downgrade_pviv {
 
     my $iok = $sv->FLAGS & SVf_IOK;
     my $pok = $sv->FLAGS & SVf_POK;
+    my $ppok = $sv->FLAGS & SVp_POK;
+
+    return if $ppok && !$pok;
 
     #tidyoff
     if (  !$pok && $iok
         or $iok && $sv->PV =~ qr{^[0-9]+$}
-        or $pok && !$iok && $sv->PV eq ( $sv->IVX || 0 ) && length( $sv->PV ) <= 18 ) {    # PVIV used as IV let's downgrade it as an IV
+        )
+        {    # PVIV used as IV let's downgrade it as an IV
     	ddebug("downgrade PVIV to IV - case a");
 
         push @EXTRA, int get_integer_value( $sv->IVX );
@@ -276,17 +280,3 @@ sub _sv_to_str {
 }
 
 1;
-__END__
-broken:
-io/through.t
-io/utf8.t
-op/chars.t
-op/chr.t
-op/evalbytes.t
-op/goto.t
-op/infnan.t
-op/magic.t
-op/pack.t
-op/sprintf.t
-op/utf8magic.t
-op/ver.t
