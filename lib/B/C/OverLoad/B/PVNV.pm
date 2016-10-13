@@ -24,7 +24,10 @@ sub save {
     }
 
     my $downgraded = downgrade_pvnv( $sv, $fullname );
-    return $downgraded if defined $downgraded;
+    if ( defined $downgraded ) {
+        savesym( $sv, $downgraded );
+        return $downgraded;
+    }
 
     my ( $savesym, $cur, $len, $pv, $static, $flags ) = B::PV::save_pv_or_rv( $sv, $fullname );
     my $nvx = '0.0';
