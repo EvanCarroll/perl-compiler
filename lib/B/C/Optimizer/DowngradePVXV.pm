@@ -2,9 +2,6 @@ package B::C::Optimizer::DowngradePVXV;
 
 use strict;
 
-# use B qw/svref_2object/;
-# use B::C::Config;
-# use B::C::Packages qw/is_package_used/;
 use B::C::Decimal qw/get_integer_value/;
 use B qw{SVf_NOK SVp_NOK SVs_OBJECT SVf_IOK SVf_ROK SVf_POK SVp_POK SVp_IOK SVf_IsCOW SVf_READONLY SVs_PADSTALE SVs_PADTMP SVf_PROTECT};
 
@@ -23,7 +20,7 @@ sub SVt_PVIV { 5 }
 sub SVt_PVNV { 6 }
 sub SVt_MASK { 0xf }    # smallest bitmask that covers all types
 
-my $DEBUG = 1;
+my $DEBUG = 0;
 
 sub ddebug {
     return unless $DEBUG;
@@ -41,8 +38,8 @@ sub is_simple_pviv {
 
     my $flags = $sv->FLAGS;
 
-    return if ($flags & SVf_ROK) == SVf_ROK;
-    return if ($flags & SVt_MASK) != SVt_PVIV();
+    return if ( $flags & SVf_ROK ) == SVf_ROK;
+    return if ( $flags & SVt_MASK ) != SVt_PVIV();
 
     # remove insignificant flags for us as a PVIV
     $flags &= ~SVf_IsCOW if $flags & SVp_POK;
@@ -65,8 +62,8 @@ sub is_simple_pvnv {    # should factorize this with the other is_simple funcion
 
     my $flags = $sv->FLAGS;
 
-    return if ($flags & SVf_ROK) == SVf_ROK;
-    return if ($flags & SVt_MASK) != SVt_PVNV();
+    return if ( $flags & SVf_ROK ) == SVf_ROK;
+    return if ( $flags & SVt_MASK ) != SVt_PVNV();
 
     # remove insignificant flags for us as a PVIV
     $flags &= ~SVf_IsCOW if $flags & SVp_POK;
@@ -137,8 +134,8 @@ sub downgrade_pviv {
 
     return unless is_simple_pviv($sv);
 
-    my $iok = $sv->FLAGS & SVf_IOK;
-    my $pok = $sv->FLAGS & SVf_POK;
+    my $iok  = $sv->FLAGS & SVf_IOK;
+    my $pok  = $sv->FLAGS & SVf_POK;
     my $ppok = $sv->FLAGS & SVp_POK;
 
     return if $ppok && !$pok;
@@ -178,14 +175,6 @@ sub downgrade_pviv {
     return;
 }
 
-# > perl -MDevel::Peek -e 'my $a = "aa"; $a += 42; Dump($a)'
-# SV = PVNV(0x7fbf488036b0) at 0x7fbf4882db90
-#   REFCNT = 1
-#   FLAGS = (NOK,pNOK)
-#   IV = 0
-#   NV = 42
-#   PV = 0
-
 sub downgrade_pvnv {
     my ( $sv, $fullname ) = @_;
 
@@ -198,9 +187,9 @@ sub downgrade_pvnv {
     my $ppok = $sv->FLAGS & SVp_POK;
 
     # if the PV is private abort..
-	return if $ppok;
+    return if $ppok;
 
-    return unless $iok or $nok or $pok; # SVs_PADSTALE ?
+    return unless $iok or $nok or $pok;    # SVs_PADSTALE ?
 
     #tidyoff
     if (
@@ -253,30 +242,30 @@ sub downgrade_pvnv {
 
 # debug helper
 sub _sv_to_str {
-	my $sv = shift;
+    my $sv = shift;
 
     my ( $flags, $values ) = ( '', '' );
-     
-	my $iok = $sv->FLAGS & SVf_IOK;
-    my $nok = $sv->FLAGS & SVf_NOK;
-    my $pok = $sv->FLAGS & SVf_POK;
+
+    my $iok  = $sv->FLAGS & SVf_IOK;
+    my $nok  = $sv->FLAGS & SVf_NOK;
+    my $pok  = $sv->FLAGS & SVf_POK;
     my $ppok = $sv->FLAGS & SVp_POK;
 
-    if ( $iok ) {
-		$flags .= 'IOK ';
-		$values .= 'IV: '. $sv->IVX . ' '		    	
+    if ($iok) {
+        $flags  .= 'IOK ';
+        $values .= 'IV: ' . $sv->IVX . ' ';
     }
-    if ( $nok ) {
-		$flags .= 'NOK ';
-		$values .= 'NV: '. $sv->NV . ' '		    	
+    if ($nok) {
+        $flags  .= 'NOK ';
+        $values .= 'NV: ' . $sv->NV . ' ';
     }
-    if ( $pok ) {
-		$flags .= 'POK ';
-		$values .= 'PV: '. $sv->PV . ' '		    	
+    if ($pok) {
+        $flags  .= 'POK ';
+        $values .= 'PV: ' . $sv->PV . ' ';
     }
     $flags .= 'pPOK ' if $ppok;
 
-    return sprintf( "SV is %s ; %s ; Flags 0x%x ", $flags, $values, $sv->FLAGS)
+    return sprintf( "SV is %s ; %s ; Flags 0x%x ", $flags, $values, $sv->FLAGS );
 }
 
 1;
