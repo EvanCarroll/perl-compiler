@@ -20,7 +20,7 @@ sub SVt_PVIV { 5 }
 sub SVt_PVNV { 6 }
 sub SVt_MASK { 0xf }    # smallest bitmask that covers all types
 
-my $DEBUG = 0;
+my $DEBUG = 1;
 
 sub ddebug {
     return unless $DEBUG;
@@ -137,8 +137,11 @@ sub downgrade_pviv {
     my $iok  = $sv->FLAGS & SVf_IOK;
     my $pok  = $sv->FLAGS & SVf_POK;
     my $ppok = $sv->FLAGS & SVp_POK;
-
-    return if $ppok && !$pok;
+    
+    if ( $ppok && !$pok ) {
+    	ddebug("- PVIV downgrade skipped ", _sv_to_str($sv));
+    	return;	
+    }
 
 	#tidyoff
 	if (  !$pok && $iok
@@ -187,7 +190,10 @@ sub downgrade_pvnv {
     my $ppok = $sv->FLAGS & SVp_POK;
 
     # if the PV is private abort..
-    return if $ppok;
+    if ( $ppok ) {
+    	ddebug("- PVNV downgrade skipped ", _sv_to_str($sv));
+    	return;
+    }
 
     return unless $iok or $nok or $pok;    # SVs_PADSTALE ?
 
