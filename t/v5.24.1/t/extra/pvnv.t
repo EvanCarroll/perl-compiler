@@ -22,12 +22,12 @@ print "1..10\n";
     my $dump = mydump($B);
 
     if ( is_compiled() ) {
-        like( $dump, qr{\bSV = IV\b},   "IV compiled" );
-        like( $dump, qr{IV = 42}, "value" );
+        like( $dump, qr{\bSV = IV\b}, "IV compiled" );
+        like( $dump, qr{IV = 42},     "value" );
     }
     else {
         like( $dump, qr{\bSV = PVNV\b}, "PVNV uncompiled" );
-        like( $dump, qr{NV = 42}, "value" );
+        like( $dump, qr{NV = 42},       "value" );
     }
 }
 
@@ -37,19 +37,19 @@ print "1..10\n";
 
     BEGIN {
         $C = 4.2;
-        $C = "wert"; # NV upgraded as PVNV
-        $C = 4.5;    # then go back to nOK
+        $C = "wert";    # NV upgraded as PVNV
+        $C = 4.5;       # then go back to nOK
     }
 
     my $dump = mydump($C);
 
     if ( is_compiled() ) {
-        like( $dump, qr{\bSV = NV\b},   "NV compiled" );
-        like( $dump, qr{NV = 4\.5}, "value" );
+        like( $dump, qr{\bSV = NV\b}, "NV compiled" );
+        like( $dump, qr{NV = 4\.5},   "value" );
     }
     else {
         like( $dump, qr{\bSV = PVNV\b}, "PVNV uncompiled" );
-        like( $dump, qr{NV = 4\.5}, "value" );
+        like( $dump, qr{NV = 4\.5},     "value" );
     }
 }
 
@@ -69,12 +69,12 @@ print "1..10\n";
 
     if ( is_compiled() ) {
 
-        like( $dump, qr{\bSV = NV\b},  "NV compiled" );
-        like( $dump, qr{NV = 4\.2}, "value" );
+        like( $dump, qr{\bSV = NV\b}, "NV compiled" );
+        like( $dump, qr{NV = 4\.2},   "value" );
     }
     else {
         like( $dump, qr{\bSV = PVNV\b}, "PVIV uncompiled" );
-        like( $dump, qr{NV = 4\.2}, "value" );
+        like( $dump, qr{NV = 4\.2},     "value" );
     }
 }
 
@@ -94,8 +94,9 @@ print "1..10\n";
     #     like( $dump, qr{NV = 1\.2345}, "value" );
     # }
     # else {
-        like( $dump, qr{\bSV = PVNV\b}, "PVNV uncompiled" );
-        like( $dump, qr{PV =.+"1\.2345"}, "value" );
+    like( $dump, qr{\bSV = PVNV\b},   "PVNV uncompiled" );
+    like( $dump, qr{PV =.+"1\.2345"}, "value" );
+
     #}
 }
 

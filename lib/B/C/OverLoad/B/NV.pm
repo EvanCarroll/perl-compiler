@@ -19,10 +19,10 @@ sub save {
     my $svflags = $sv->FLAGS;
     my $refcnt  = $sv->REFCNT;
 
-    if ( ref $custom ) { # used when downgrading a PVIV / PVNV to IV
-        $svflags = $custom->{flags} if defined $custom->{flags};
-        $refcnt = $custom->{refcnt} if defined $custom->{refcnt};
-    }    
+    if ( ref $custom ) {    # used when downgrading a PVIV / PVNV to IV
+        $svflags = $custom->{flags}  if defined $custom->{flags};
+        $refcnt  = $custom->{refcnt} if defined $custom->{refcnt};
+    }
 
     my $nv = get_double_value( $sv->NV );
     $nv .= '.00' if $nv =~ /^-?\d+$/;
