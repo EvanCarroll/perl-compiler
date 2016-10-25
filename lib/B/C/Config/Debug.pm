@@ -3,23 +3,23 @@ package B::C::Config::Debug;
 use strict;
 
 my %debug_map = (
-    'A' => 'av',
-    'c' => 'cops',
-    'C' => 'cv',
-    'f' => 'file',
-    'G' => 'gv',
-    'g' => 'signals',
-    'H' => 'hv',
-    'M' => 'mg',
-    'O' => 'op',
-    'p' => 'pkg',
-    'P' => 'pv',
-    'R' => 'rx',
-    's' => 'sub',
-    'S' => 'sv',
-    'u' => 'unused',
-    'v' => 'verbose',    # special case to consider verbose as a debug level
-    'W' => 'walk',
+    'A'     => 'av',
+    'c'     => 'cops',
+    'C'     => 'cv',
+    'f'     => 'file',
+    'G'     => 'gv',
+    'g'     => 'signals',
+    'H'     => 'hv',
+    'M'     => 'mg',
+    'O'     => 'op',
+    'p'     => 'pkg',
+    'P'     => 'pv',
+    'R'     => 'rx',
+    's'     => 'sub',
+    'S'     => 'sv',
+    'u'     => 'unused',
+    'v'     => 'verbose',     # special case to consider verbose as a debug level
+    'W'     => 'walk',
     'bench' => 'benchmark',
 );
 
@@ -107,7 +107,7 @@ sub verbose {
 
 # can be improved
 sub WARN { return verbose() && display_message( "[WARNING]", @_ ) }
-sub INFO { return verbose() && display_message( "[INFO]", @_ ) }
+sub INFO { return verbose() && display_message( "[INFO]",    @_ ) }
 sub FATAL { die display_message( "[FATAL]", @_ ) }
 
 my $logfh;
@@ -115,7 +115,6 @@ my $logfh;
 sub display_message {
     return unless scalar @_;
     my $txt = join( " ", map { defined $_ ? $_ : 'undef' } @_ );
-
 
     # just safety to avoid double \n
     chomp $txt;

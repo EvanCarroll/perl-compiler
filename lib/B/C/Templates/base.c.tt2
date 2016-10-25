@@ -1,12 +1,12 @@
 /* [% creator %] */
 
-[% IF debug.flags AND DEBUG_LEAKING_SCALARS %]
+[% IF debug.flags AND DEBUG_LEAKING_SCALARS -%]
 #define DEBUG_LEAKING_SCALARS 1
-[% END %]
+[% END -%]
 
-[% IF debug.benchmark %]
+[% IF debug.benchmark -%]
 #define DEBUG_BENCHMARK 1
-[% END %]
+[% END -%]
 
 [% IF have_independent_comalloc %]
 #ifdef NEED_MALLOC_283
