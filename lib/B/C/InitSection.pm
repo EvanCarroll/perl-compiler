@@ -12,12 +12,13 @@ sub new {
     my $class = shift;
     my $self  = $class->SUPER::new(@_);
 
-    $self->{'initav'}    = [];
-    $self->{'chunks'}    = [];
-    $self->{'nosplit'}   = 0;
-    $self->{'current'}   = [];
-    $self->{'count'}     = 0;
-    $self->{'max_lines'} = 10000;
+    $self->{'initav'}      = [];
+    $self->{'chunks'}      = [];
+    $self->{'nosplit'}     = 0;
+    $self->{'current'}     = [];
+    $self->{'count'}       = 0;
+    $self->{'max_lines'}   = 10000;
+    $self->{'last_caller'} = '';
 
     return $self;
 }
@@ -46,12 +47,28 @@ sub add {
     my $current = $self->{'current'};
     my $nosplit = $self->{'nosplit'};
 
+    my $ok = grep { $_ =~ m/\S/ } @_;
+    if ($ok) {
+
+        my $caller = "@{[(caller(1))[3]]}";
+        if ( $caller =~ m/InitSection/ ) {
+            $caller = "@{[(caller(2))[3]]}";
+        }
+
+        $caller =~ s/::[^:]+?$//;
+        $caller =~ s/^B:://;
+
+        if ( $self->{'last_caller'} ne $caller ) {
+            push @$current, sprintf( qq{update_time_here("%s"); /******************************  %s  ******************************************************/\n}, $self->{'last_caller'}, $self->{'last_caller'} ) if ( $self->{'last_caller'} );
+            $self->{'last_caller'} = $caller;
+        }
+    }
+
     push @$current, @_;
     $self->{'count'} += scalar(@_);
     my $add_stack = 'B::C::Save'->can('_caller_comment');
-    my @stack;
-    @stack = $add_stack->() if ref $add_stack;
-    push @$current, @stack if scalar @stack;
+
+    push @$current, $add_stack->() if( ref $add_stack );
 
     if ( !$nosplit && $self->{'count'} >= $self->{'max_lines'} ) {
         push @{ $self->{'chunks'} }, $current;
@@ -106,7 +123,9 @@ sub output {
         foreach my $j (@$i) {
             $j =~ s{(s\\_[0-9a-f]+)}
                    { exists($sym->{$1}) ? $sym->{$1} : $default; }ge;
+
             $return_string .= "    $j\n";
+
         }
         $return_string .= "\n}\n";
 
