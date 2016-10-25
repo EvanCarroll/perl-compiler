@@ -41,7 +41,7 @@ sub benchmark_time {
 
     my $str = '';
     if ( benchmark_enabled() ) {
-        $str .= sprintf( qq{\nupdate_time_here("%s");\n}, $label );
+        $str .= sprintf( qq{\nbenchmark_time("%s");\n}, $label );
     }
     $str .= sprintf( qq{\n/*%s %s %s*/\n}, '*' x 15, $next_label, '*' x 15 );
 
