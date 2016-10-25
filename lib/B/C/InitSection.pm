@@ -5,6 +5,8 @@ use warnings;
 # avoid use vars
 use parent 'B::C::Section';
 
+use B::C::Config::Debug ();
+
 # All objects inject into this shared variable.
 our @all_eval_pvs;
 
@@ -20,14 +22,19 @@ sub new {
     $self->{'max_lines'}   = 10000;
     $self->{'last_caller'} = '';
 
-    push @{ $self->{'current'} }, benchmark_time( 'START', 'START init' );
+    push @{$self->{'current'}}, benchmark_time('START', 'START init');
 
     return $self;
 }
 
-sub benchmark_enabled {
-    return $ENV{BC_BENCHMARK} ? 1 : 0;
+{
+    my $status;
+    sub benchmark_enabled {
+        $status = B::C::Config::Debug::debug('benchmark') || 0 unless defined $status;
+        return $status;
+    }    
 }
+
 
 sub benchmark_time {
     my ( $label, $next_label ) = @_;
@@ -36,7 +43,7 @@ sub benchmark_time {
     if ( benchmark_enabled() ) {
         $str .= sprintf( qq{\nupdate_time_here("%s");\n}, $label );
     }
-    $str .= sprintf( qq{\n/*%s %s %s*/\n}, '*' x 15, $next_label, '*' x 15 );
+    $str .= sprintf( qq{\n/*%s %s %s*/\n}, '*'x15, $next_label, '*'x15 );
 
     return $str;
 }
@@ -77,7 +84,7 @@ sub add {
         $caller =~ s/^B:://;
 
         if ( $self->{'last_caller'} ne $caller ) {
-            push @$current, benchmark_time( $self->{'last_caller'}, $caller ) if $self->{'last_caller'};
+            push @$current, benchmark_time($self->{'last_caller'}, $caller) if $self->{'last_caller'};
             $self->{'last_caller'} = $caller;
         }
     }
@@ -86,7 +93,7 @@ sub add {
     $self->{'count'} += scalar(@_);
     my $add_stack = 'B::C::Save'->can('_caller_comment');
 
-    push @$current, $add_stack->() if ( ref $add_stack );
+    push @$current, $add_stack->() if( ref $add_stack );
 
     if ( !$nosplit && $self->{'count'} >= $self->{'max_lines'} ) {
         push @{ $self->{'chunks'} }, $current;

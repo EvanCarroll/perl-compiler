@@ -4,6 +4,10 @@
 #define DEBUG_LEAKING_SCALARS 1
 [% END %]
 
+[% IF debug.benchmark %]
+#define DEBUG_BENCHMARK 1
+[% END %]
+
 [% IF have_independent_comalloc %]
 #ifdef NEED_MALLOC_283
 # include "malloc-2.8.3.h"
@@ -16,6 +20,8 @@
 #include "EXTERN.h" /* Embedded interface */
 #include "perl.h"   /* API interface */
 #include "XSUB.h"   /* XS interface */
+
+#ifdef DEBUG_BENCHMARK
 #include <sys/time.h>
 
 struct timespec start, end;
@@ -23,6 +29,9 @@ uint64_t delta_us;
 PerlIO * PIO_stdout;
 
 #define update_time_here(msg) clock_gettime(CLOCK_MONOTONIC_RAW, &end); delta_us = (end.tv_sec - start.tv_sec) * 1000000000 + (end.tv_nsec - start.tv_nsec); PerlIO_printf(PIO_stdout, "--USECONDS %lu == %s\n", delta_us, msg )
+#else
+#define update_time_here(msg) 
+#endif /* end of DEBUG_BENCHMARK */
 
 /* Workaround for mapstart: the only op which needs a different ppaddr */
 #undef Perl_pp_mapstart
@@ -905,8 +914,9 @@ main(int argc, char **argv, char **env)
     int options_count;
     PerlInterpreter *my_perl;
 
+#ifdef DEBUG_BENCHMARK
     clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-
+#endif
     PERL_SYS_INIT3(&argc,&argv,&env);
 
     assert(PL_do_undump == 0);
@@ -920,9 +930,10 @@ main(int argc, char **argv, char **env)
 	perl_construct( my_perl );
 	PL_perl_destruct_level = 0;
 
+#ifdef DEBUG_BENCHMARK
     PIO_stdout =  PerlIO_stdout();
     update_time_here("got stdio");
-
+#endif
     PL_exit_flags |= PERL_EXIT_DESTRUCT_END;
 
 /* perlmain.c sets PL_use_safe_putenv so we must do this

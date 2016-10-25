@@ -20,6 +20,7 @@ my %debug_map = (
     'u' => 'unused',
     'v' => 'verbose',    # special case to consider verbose as a debug level
     'W' => 'walk',
+    'bench' => 'benchmark',
 );
 
 my %reverse_map = reverse %debug_map;
@@ -87,6 +88,7 @@ sub enable_all {
     enable_verbose() unless verbose();
     foreach my $level ( sort keys %debug ) {
         next if $debug{$level};
+        next if $level =~ qr{^bench};
         enable_debug_level($level);
     }
     return;

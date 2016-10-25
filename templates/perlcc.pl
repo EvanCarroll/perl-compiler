@@ -246,12 +246,14 @@ sub parse_argv {
         'spawn!',           # --no-spawn (new since 2.12)
         'time',             # print benchmark timings (new since 2.08)
         'version',          # (new since 2.13)
-        'debug|D',          # alias for --Wb=-Dfull and -S to enable all debug and preserve source code
+        'debug|D|d=s',       # alias for --Wb=-Dfull and -S to enable all debug and preserve source code
     );
 
-    if ( $Options->{debug} ) {
+    if ( defined $Options->{debug} ) {       
+        $Options->{debug} =~ s{^=+}{};
+        $Options->{debug} = 'full' if !length $Options->{debug};
         $Options->{Wb} = $Options->{Wb} ? $Options->{Wb} . ',' : '';
-        $Options->{Wb} .= '-Dfull';
+        $Options->{Wb} .= '-D' . $Options->{debug};
         $Options->{S} = 1;
     }
 
