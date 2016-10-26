@@ -9,11 +9,11 @@ use B::C::Save qw/get_max_string_len/;
 use Exporter ();
 our @ISA = qw(Exporter);
 
-our @EXPORT_OK = qw/savepv/;
+our @EXPORT_OK = qw/savecowpv/;
 
 my %strtable;
 
-sub savepv {
+sub savecowpv {
     my $pv = shift;
     my ( $cstring, $cur, $len, $utf8 ) = cow_strlen_flags($pv);
 

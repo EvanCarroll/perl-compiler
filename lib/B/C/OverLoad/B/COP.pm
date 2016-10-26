@@ -9,7 +9,7 @@ use B::C::Save qw/savestashpv/;
 use B::C::Decimal qw/get_integer_value/;
 use B::C::Helpers::Symtable qw/savesym objsym/;
 use B::C::Helpers qw/read_utf8_string strlen_flags/;
-use B::C::SaveCOW qw/savepv/;
+use B::C::SaveCOW qw/savecowpv/;
 
 my %cophhtable;
 my %copgvtable;
@@ -146,7 +146,7 @@ sub save {
 
     {    # cache gv_fetchfile to avoid multiple CopFILE_set
 
-        my ($constpv) = savepv($file);
+        my ($constpv) = savecowpv($file);
 
         # need to save the GV from constpv which should be a cowpv
         if ( !$copgvtable{$constpv} ) {

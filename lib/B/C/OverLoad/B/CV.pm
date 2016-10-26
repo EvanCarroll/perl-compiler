@@ -9,7 +9,7 @@ use B::C::Config;
 use B::C::Decimal qw/get_integer_value/;
 use B::C::Packages qw/is_package_used/;
 use B::C::Save qw/savepvn/;
-use B::C::SaveCOW qw/savepv/;
+use B::C::SaveCOW qw/savecowpv/;
 use B::C::Save::Hek qw/save_shared_he/;
 use B::C::File qw/init init2 decl svsect xpvcvsect symsect/;
 use B::C::Helpers qw/get_cv_string strlen_flags set_curcv/;
@@ -689,7 +689,7 @@ sub save {
             init()->add( savepvn( "CvFILE($sym)", $cv->FILE ) );
         }
         elsif ( $B::C::const_strings && length $file ) {
-            my ($cowpv) = savepv($file);
+            my ($cowpv) = savecowpv($file);
             init()->add( sprintf( "CvFILE(%s) = (char *) %s;", $sym, $cowpv ) );
         }
         else {
