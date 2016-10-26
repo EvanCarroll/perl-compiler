@@ -176,7 +176,7 @@ sub save {
     copsect()->update(
         $ix,
         sprintf(
-            "%s, %u, %s, %s, %u, %s, %s, NULL",
+            "%s, %u, (HV*) %s, (GV*) %s, %u, %s, %s, NULL",
             $op->_save_common, $op->line,
 
             # we cannot store this static (attribute exit)
