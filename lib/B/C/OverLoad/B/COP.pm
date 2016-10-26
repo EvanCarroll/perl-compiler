@@ -5,10 +5,11 @@ use strict;
 use B qw/cstring/;
 use B::C::Config;
 use B::C::File qw/init copsect decl/;
-use B::C::Save qw/constpv savestashpv/;
+use B::C::Save qw/savestashpv/;
 use B::C::Decimal qw/get_integer_value/;
 use B::C::Helpers::Symtable qw/savesym objsym/;
 use B::C::Helpers qw/read_utf8_string strlen_flags/;
+use B::C::SaveCOW qw/savepv/;
 
 my %cophhtable;
 my %copgvtable;
@@ -143,13 +144,11 @@ sub save {
     my $stash = savestashpv( $op->stashpv );
     init()->add( sprintf( "CopSTASH_set(&cop_list[%d], %s);", $ix, $stash ) );
 
-    { # cache gv_fetchfile to avoid multiple CopFILE_set
-        use B::C::SaveCOW qw/savepv/;
+    {    # cache gv_fetchfile to avoid multiple CopFILE_set
 
-        #my $constpv = constpv($file);
-        my ($constpv) = B::C::SaveCOW::savepv($file);
+        my ($constpv) = savepv($file);
 
-        # need to save the GV from constpv which should be a cowpv        
+        # need to save the GV from constpv which should be a cowpv
         if ( !$copgvtable{$constpv} ) {
             $copgvtable{$constpv} = B::GV::inc_index();
             init()->add( sprintf( "gv_list[%d] = gv_fetchfile(%s);", $copgvtable{$constpv}, $constpv ) );
@@ -165,8 +164,9 @@ sub save {
                 "CopFILEGV_set(&cop_list[%d], gv_list[%d]); /* %s */",
                 $ix, $copgvtable{$constpv}, cstring($file)
             )
-        );        
+        );
     }
+
     # else {
     #     init()->add( sprintf( "CopFILE_set(&cop_list[%d], %s);", $ix, cstring($file) ) );
     # }

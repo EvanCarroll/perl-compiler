@@ -8,7 +8,8 @@ use B qw/cstring svref_2object CVf_ANON CVf_ANONCONST CVf_CONST main_cv SVf_ROK 
 use B::C::Config;
 use B::C::Decimal qw/get_integer_value/;
 use B::C::Packages qw/is_package_used/;
-use B::C::Save qw/savepvn constpv/;
+use B::C::Save qw/savepvn/;
+use B::C::SaveCOW qw/savepv/;
 use B::C::Save::Hek qw/save_shared_he/;
 use B::C::File qw/init init2 decl svsect xpvcvsect symsect/;
 use B::C::Helpers qw/get_cv_string strlen_flags set_curcv/;
@@ -198,7 +199,8 @@ sub save {
         and !is_phase_name($cvname)
         and !( $CvFLAGS & SVs_PADSTALE )
         and !( $CvFLAGS & CVf_WEAKOUTSIDE )
-        and !( $fullname && $fullname =~ qr{^File::Glob::GLOB} and ( $CvFLAGS & (CVf_ANONCONST|CVf_CONST) )  )
+        and !( $fullname && $fullname =~ qr{^File::Glob::GLOB} and ( $CvFLAGS & ( CVf_ANONCONST | CVf_CONST ) ) )
+
         # TODO: check if patch from e11e3a2 for B::SPECIAL is still required
         #    and ref($gv) ne 'B::SPECIAL'
       ) {    # skip const magic blocks (Attribute::Handlers)
@@ -538,7 +540,7 @@ sub save {
     elsif ( ref( $cv->OUTSIDE ) eq 'B::CV' ) {
         $xcv_outside = 0;    # just a placeholder for a run-time GV
     }
-    
+
     # XXX issue 84: we need to check the cv->PV ptr not the value.
     # "" is different to NULL for prototypes
     $len = $cur ? $cur + 1 : 0;
@@ -686,8 +688,9 @@ sub save {
         if ( USE_MULTIPLICITY() ) {
             init()->add( savepvn( "CvFILE($sym)", $cv->FILE ) );
         }
-        elsif ($B::C::const_strings && length $file) {
-            init()->add( sprintf( "CvFILE(%s) = (char *) %s;", $sym, constpv( $file ) ) );
+        elsif ( $B::C::const_strings && length $file ) {
+            my ($cowpv) = savepv($file);
+            init()->add( sprintf( "CvFILE(%s) = (char *) %s;", $sym, $cowpv ) );
         }
         else {
             init()->add( sprintf( "CvFILE(%s) = %s;", $sym, cstring( $cv->FILE ) ) );
@@ -701,6 +704,7 @@ sub save {
 
         # $sym fixed test 27
         init()->add( sprintf( "CvSTASH_set((CV*)%s, s\\_%x);", $sym, $$stash ) );
+
         #init()->add( sprintf( "SvREFCNT_inc(%s);", $sym) ); # fixes mro/basic.t and more
 
         # 5.18 bless does not inc sv_objcount anymore. broken by ddf23d4a1ae (#208)
@@ -731,6 +735,7 @@ sub save {
         $pvsym = save_shared_he($pv);
         if ($cur) {
             init()->add( sprintf( "SvPVX(&sv_list[%d]) = %s->shared_he_hek.hek_key;", $sv_ix, $pvsym ) );
+
             #define HEK_BASESIZE               STRUCT_OFFSET(HEK, hek_key[0])
         }
         elsif ( !$B::C::const_strings ) {    # not static, they are freed when redefined

@@ -11,7 +11,7 @@ use B::C::Save::Hek qw/save_shared_he/;
 use Exporter ();
 our @ISA = qw(Exporter);
 
-our @EXPORT_OK = qw/savepvn constpv savepv inc_pv_index set_max_string_len get_max_string_len savestash_flags savestashpv/;
+our @EXPORT_OK = qw/savepvn savepv inc_pv_index set_max_string_len get_max_string_len savestash_flags savestashpv/;
 
 my %strtable;
 
@@ -24,8 +24,6 @@ sub inc_pv_index {
     return ++$pv_index;
 }
 
-# use B::C::SaveCOW ();
-# *constpv = \&B::C::SaveCOW::savepv;
 sub constpv {
     return savepv( shift, 1 );
 }
