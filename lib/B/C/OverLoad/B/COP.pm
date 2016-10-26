@@ -143,11 +143,13 @@ sub save {
     my $stash = savestashpv( $op->stashpv );
     init()->add( sprintf( "CopSTASH_set(&cop_list[%d], %s);", $ix, $stash ) );
 
-    if ($B::C::const_strings) {
-        my $constpv = constpv($file);
+    { # cache gv_fetchfile to avoid multiple CopFILE_set
+        use B::C::SaveCOW qw/savepv/;
 
-        # define CopFILE_set(c,pv)     CopFILEGV_set((c), gv_fetchfile(pv))
-        # cache gv_fetchfile
+        #my $constpv = constpv($file);
+        my ($constpv) = B::C::SaveCOW::savepv($file);
+
+        # need to save the GV from constpv which should be a cowpv        
         if ( !$copgvtable{$constpv} ) {
             $copgvtable{$constpv} = B::GV::inc_index();
             init()->add( sprintf( "gv_list[%d] = gv_fetchfile(%s);", $copgvtable{$constpv}, $constpv ) );
@@ -158,10 +160,16 @@ sub save {
                 $ix, $copgvtable{$constpv}, cstring($file)
             )
         );
+        init()->add(
+            sprintf(
+                "CopFILEGV_set(&cop_list[%d], gv_list[%d]); /* %s */",
+                $ix, $copgvtable{$constpv}, cstring($file)
+            )
+        );        
     }
-    else {
-        init()->add( sprintf( "CopFILE_set(&cop_list[%d], %s);", $ix, cstring($file) ) );
-    }
+    # else {
+    #     init()->add( sprintf( "CopFILE_set(&cop_list[%d], %s);", $ix, cstring($file) ) );
+    # }
 
     # our root: store all packages from this file
     if ( !$B::C::mainfile ) {

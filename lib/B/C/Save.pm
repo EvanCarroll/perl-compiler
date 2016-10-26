@@ -24,6 +24,8 @@ sub inc_pv_index {
     return ++$pv_index;
 }
 
+# use B::C::SaveCOW ();
+# *constpv = \&B::C::SaveCOW::savepv;
 sub constpv {
     return savepv( shift, 1 );
 }
