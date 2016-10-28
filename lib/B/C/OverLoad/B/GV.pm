@@ -320,12 +320,12 @@ sub save_gv_with_gp {
     my $fullname = $gv->get_fullname();
 
     # Core syms don't have a GP?
-    return if $CORE_SYMS->{$fullname};
+    return if $gv->is_coresym;
 
     my $gvadd = $notqual ? "$notqual|GV_ADD" : "GV_ADD";
 
     if ( !$gv->isGV_with_GP ) {
-        init()->sadd( "$sym = " . gv_fetchpv_string( $name, $gvadd, 'SVt_PV' ) . ";" );
+        #init()->sadd( "$sym = " . gv_fetchpv_string( $name, $gvadd, 'SVt_PV' ) . ";" );
         return;
     }
 
@@ -353,6 +353,7 @@ sub save_gv_with_gp {
         debug( gv => "New GV for *%s 0x%x%s %s GP:0x%x", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $gv->FILE, $gp );
 
         # XXX !PERL510 and OPf_COP_TEMP we need to fake PL_curcop for gp_file hackery
+        
         init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, $gvadd, 'SVt_PV' ) );
     }
 
