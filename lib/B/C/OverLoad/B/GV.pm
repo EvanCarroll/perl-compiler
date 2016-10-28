@@ -155,7 +155,7 @@ sub save {
         my $gv_flags  = $gv->FLAGS;
 
         gvsect()->comment("XPVGV*  sv_any,  U32     sv_refcnt; U32     sv_flags; union   { gp* } sv_u # gp*");
-        gvsect()->add( sprintf( "&%s, %u, 0x%x, {.svu_gp=(GP*)%s}", $xpvgv, $gv_refcnt, $gv_flags, $gpsym ) );
+        gvsect()->sadd( "&%s, %u, 0x%x, {.svu_gp=(GP*)%s}", $xpvgv, $gv_refcnt, $gv_flags, $gpsym );
     }
 
     #my $gvsym = savesym( $gv, sprintf( '&gv_list[%d]', $gv_ix ) ); # final goal...
@@ -322,7 +322,7 @@ sub save_gv_with_gp {
     my $gvadd = $notqual ? "$notqual|GV_ADD" : "GV_ADD";
 
     my $gp     = $gv->GP;           # B limitation
-    my $egvsym = $gv->save_egv();
+    my $egvsym = $gv->save_egv();   # lazyness: reuse the cache from the previous save (save should not happen there)
     if ( defined($egvsym) && $egvsym !~ m/Null/ ) {
         debug( gv => "Shared GV alias for *%s 0x%x%s to %s", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $egvsym );
 
