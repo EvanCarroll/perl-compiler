@@ -150,17 +150,16 @@ sub save {
     );
     my $xpvgv = sprintf( 'xpvgv_list[%d]', xpvgvsect()->index );
 
-    my $gv_ix;
     {
         my $gv_refcnt = $gv->REFCNT;                       # TODO probably need more love for both refcnt (+1 ? extra flag immortal)
         my $gv_flags  = $gv->FLAGS;
 
         gvsect()->comment("XPVGV*  sv_any,  U32     sv_refcnt; U32     sv_flags; union   { gp* } sv_u # gp*");
-        $gv_ix = gvsect()->add( sprintf( "&%s, %u, 0x%x, {.svu_gp=(GP*)%s}", $xpvgv, $gv_refcnt, $gv_flags, $gpsym ) );
+        gvsect()->add( sprintf( "&%s, %u, 0x%x, {.svu_gp=(GP*)%s}", $xpvgv, $gv_refcnt, $gv_flags, $gpsym ) );
     }
 
-    #my $gvsym = savesym( $gv, sprintf( '&gv_list[%d]', $gv_ix ) );
-    my $gvsym = sprintf( '&gv_list[%d]', $gv_ix );
+    #my $gvsym = savesym( $gv, sprintf( '&gv_list[%d]', $gv_ix ) ); # final goal...
+    my $gvsym = sprintf( '&gv_list[%d]', gvsect()->index );
 
     return legacy_save( $gv, $filter, $gvsym );
 }
@@ -339,7 +338,7 @@ sub save_gv_with_gp {
     elsif ( $gp and !$is_empty ) {
         debug( gv => "New GV for *%s 0x%x%s %s GP:0x%x", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $gv->FILE, $gp );
 
-        # XXX !PERL510 and OPf_COP_TEMP we need to fake PL_curcop for gp_file hackery        
+        # XXX !PERL510 and OPf_COP_TEMP we need to fake PL_curcop for gp_file hackery
         init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, $gvadd, 'SVt_PV' ) ); # TODO ....
     }
 
