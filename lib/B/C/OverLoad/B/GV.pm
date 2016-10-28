@@ -134,6 +134,15 @@ sub save {
     my $gpsym      = 'NULL';
     my $is_coresym = $gv->is_coresym();
 
+    my $is_empty = $gv->is_empty;
+    my $gvname   = $gv->NAME();
+    my $fullname = $gv->get_fullname();
+
+    if ( !defined $gvname and $is_empty ) {                # 5.8 curpad name
+        die("We don't think this ever happens");
+        return q/(SV*)&PL_sv_undef/;
+    }
+
     $gv->mark_usage();
 
     if ( $gv->isGV_with_GP and !$is_coresym ) {
@@ -159,21 +168,11 @@ sub save {
 
     my $sym = savesym( $gv, sprintf( '&gv_list[%d]', gvsect()->index ) );
 
-    my $gvname = $gv->NAME();
-
-    my $fullname = $gv->get_fullname();
-
-    my $is_empty = $gv->is_empty;
-    if ( !defined $gvname and $is_empty ) {    # 5.8 curpad name
-        die("We don't think this ever happens");
-        return q/(SV*)&PL_sv_undef/;
-    }
-
     my $name = $package eq 'main' ? $gvname : $fullname;
 
     if ( my $newgv = force_heavy( $package, $fullname ) ) {
-        $gv = $newgv;                          # defer to run-time autoload, or compile it in?
-        $sym = savesym( $gv, $sym );           # override new gv ptr to sym
+        $gv = $newgv;                   # defer to run-time autoload, or compile it in?
+        $sym = savesym( $gv, $sym );    # override new gv ptr to sym
     }
 
     # Core syms are initialized by perl so we don't need to other than tracking the symbol itself see init_main_stash()
