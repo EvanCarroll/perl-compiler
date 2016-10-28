@@ -134,6 +134,8 @@ sub save {
     my $gpsym      = 'NULL';
     my $is_coresym = $gv->is_coresym();
 
+    $gv->mark_usage();
+
     if ( $gv->isGV_with_GP and !$is_coresym ) {
         $gpsym = savegp_from_gv( $gv, $filter );           # might be $gp->save( )
     }
@@ -158,13 +160,6 @@ sub save {
     my $sym = savesym( $gv, sprintf( '&gv_list[%d]', gvsect()->index ) );
 
     my $gvname = $gv->NAME();
-
-    # If we come across a stash hash, we therefore have code using it so we need to mark it was used so it won't be deleted.
-    if ( $gvname =~ m/::$/ ) {
-        my $pkg = $gvname;
-        $pkg =~ s/::$//;
-        mark_package_used($pkg);
-    }
 
     my $fullname = $gv->get_fullname();
 
@@ -217,20 +212,6 @@ sub save {
 
     debug( gv => "check which savefields for \"$gvname\"" );
 
-    # attributes::bootstrap is created in perl_parse.
-    # Saving it would overwrite it, because perl_init() is
-    # called after perl_parse(). But we need to xsload it.
-    if ( $fullname eq 'attributes::bootstrap' ) {
-        unless ( defined( &{ $package . '::bootstrap' } ) ) {
-            verbose("Forcing bootstrap of $package");
-            eval { $package->bootstrap };
-        }
-        mark_package( 'attributes', 1 );
-
-        $B::C::xsub{attributes} = 'Dynamic-' . $INC{'attributes.pm'};    # XSLoader
-        $B::C::use_xsloader = 1;
-    }
-
     my $savefields = get_savefields( $gv, $gvname, $fullname, $filter );
 
     # There's nothing to save if savefields were not returned.
@@ -257,6 +238,42 @@ sub save {
     # $gv->save_magic($fullname) if $PERL510;
     debug( gv => "GV::save *$fullname done" );
     return $sym;
+}
+
+sub mark_usage {
+    my $gv = shift or die;
+
+    my $gvname   = $gv->NAME();
+    my $fullname = $gv->get_fullname();
+    my $package  = $gv->get_package();
+
+    # If we come across a stash hash, we therefore have code using it so we need to mark it was used so it won't be deleted.
+    if ( $gvname =~ m/::$/ ) {
+        my $pkg = $gvname;
+        $pkg =~ s/::$//;
+        mark_package_used($pkg);
+    }
+
+    return if $gv->is_empty();
+    my $gp = $gv->GP;
+    return if $gp and exists $gptable{ 0 + $gp };
+
+    my $egvsym = $gv->save_egv();
+    return if ( defined($egvsym) && $egvsym !~ m/Null/ );
+
+    # attributes::bootstrap is created in perl_parse.
+    # Saving it would overwrite it, because perl_init() is
+    # called after perl_parse(). But we need to xsload it.
+    if ( $fullname eq 'attributes::bootstrap' ) {
+        unless ( defined( &{ $package . '::bootstrap' } ) ) {
+            verbose("Forcing bootstrap of $package");
+            eval { $package->bootstrap };
+        }
+        mark_package( 'attributes', 1 );
+
+        $B::C::xsub{attributes} = 'Dynamic-' . $INC{'attributes.pm'};    # XSLoader
+        $B::C::use_xsloader = 1;
+    }
 }
 
 sub save_special_gv {
@@ -329,7 +346,7 @@ sub save_gv_with_gp {
     my $was_emptied;
 
     if ( !$gv->isGV_with_GP ) {
-        init()->sadd( "%s = %s;", gvsym($sym), gv_fetchpv_string( $name, $gvadd, 'SVt_PV' ));
+        init()->sadd( "%s = %s;", gvsym($sym), gv_fetchpv_string( $name, $gvadd, 'SVt_PV' ) );
         return;
     }
 
@@ -844,7 +861,6 @@ sub normalize_filter {
 
     return $filter;
 }
-
 
 sub gvsym {
     my $sym = shift;
