@@ -324,6 +324,10 @@ sub save_gv_with_gp {
 
     my $gvadd = $notqual ? "$notqual|GV_ADD" : "GV_ADD";
 
+    # should be saved with the GV
+    init()->sadd( "SvREFCNT(%s) = %u;", $sym, $gv->REFCNT ) if $gv->REFCNT;    
+    init()->sadd( "GvREFCNT(%s) += %u;", $sym, $gv->GvREFCNT - 1 ) if $gv->GvREFCNT > 1;
+
     my $gp     = $gv->GP;           # B limitation
     my $egvsym = $gv->save_egv();   # lazyness: reuse the cache from the previous save (save should not happen there)
     if ( defined($egvsym) && $egvsym !~ m/Null/ ) {
