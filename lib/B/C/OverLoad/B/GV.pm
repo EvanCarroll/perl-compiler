@@ -340,6 +340,7 @@ sub save_gv_with_gp {
         return 1;
     }
     elsif ( $gp and exists $gptable{ 0 + $gp } ) {
+        die "ZZZZ";
         debug( gv => "Shared GvGP for *%s 0x%x%s %s GP:0x%x", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $gv->FILE, $gp );
         #init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, $notqual, 'SVt_PVGV' ) );
         init()->sadd( "GvGP_set(%s, %s);", $sym, $gptable{ 0 + $gp } );
