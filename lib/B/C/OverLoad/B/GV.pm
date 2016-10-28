@@ -76,8 +76,9 @@ sub savegp_from_gv {
 
     # no GP to save there...
     return 'NULL' unless $gv->isGV_with_GP and !$gv->is_coresym() and $gv->GP;
+
     # B limitation GP is just a number not a reference so we cannot use objsym / savesym
-    my $gp = $gv->GP;       
+    my $gp = $gv->GP;
     return $saved_gps{$gp} if defined $saved_gps{$gp};
 
     my $gvname   = $gv->NAME;
@@ -94,10 +95,11 @@ sub savegp_from_gv {
     # walksymtable creates an extra reference to the GV (#197)
     my $gp_refcount = $gv->GvREFCNT - 1;    # +1 for immortal ?
 
-    my $gp_line  = $gv->LINE;               # we want to use GvLINE from B.xs
+    my $gp_line = $gv->LINE;                # we want to use GvLINE from B.xs
                                             # present only in perl 5.22.0 and higher. this flag seems unused ( saving 0 for now should be similar )
 
     if ( !$gv->is_empty ) {
+
         # S32 INT_MAX
         $gp_line = $gp_line > 2147483647 ? 4294967294 - $gp_line : $gp_line;
     }
@@ -141,18 +143,18 @@ sub save {
     my $package = $gv->get_package();
     return q/(SV*)&PL_sv_undef/ if B::C::skip_pkg($package);
 
-    my $gpsym      = savegp_from_gv( $gv, $filter ); # might be $gp->save( )
+    my $gpsym = savegp_from_gv( $gv, $filter );            # might be $gp->save( )
 
     xpvgvsect()->comment("stash, magic, cur, len, xiv_u={.xivu_namehek=}, xnv_u={.xgv_stash=}");
     xpvgvsect()->sadd(
-            "Nullhv, {0}, 0, {.xpvlenu_len=0}, {.xivu_namehek=%s}, {.xgv_stash=%s}",
-            'NULL', 'Nullhv'
+        "Nullhv, {0}, 0, {.xpvlenu_len=0}, {.xivu_namehek=%s}, {.xgv_stash=%s}",
+        'NULL', 'Nullhv'
     );
     my $xpvgv = sprintf( 'xpvgv_list[%d]', xpvgvsect()->index );
 
     my $gv_ix;
     {
-        my $gv_refcnt = $gv->REFCNT;    # TODO probably need more love for both refcnt (+1 ? extra flag immortal)
+        my $gv_refcnt = $gv->REFCNT;                       # TODO probably need more love for both refcnt (+1 ? extra flag immortal)
         my $gv_flags  = $gv->FLAGS;
 
         gvsect()->comment("XPVGV*  sv_any,  U32     sv_refcnt; U32     sv_flags; union   { gp* } sv_u # gp*");
@@ -167,10 +169,10 @@ sub save {
 
 sub legacy_save {
     my ( $gv, $filter, $gvsym ) = @_;
-    
+
     # dynamic / legacy one
     my $sym = savesym( $gv, sprintf( "dynamic_gv_list[%s]", inc_index() ) );
-    init()->add( "$sym = $gvsym; "); # init the sym
+    init()->add("$sym = $gvsym; ");    # init the sym
 
     my $gvname = $gv->NAME();
 
