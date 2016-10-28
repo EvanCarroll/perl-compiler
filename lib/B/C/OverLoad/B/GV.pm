@@ -335,7 +335,7 @@ sub save_gv_with_gp {
         debug( gv => "Shared GV alias for *%s 0x%x%s to %s", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $egvsym );
 
         # Shared glob *foo = *bar
-        init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, "$gvadd|GV_ADDMULTI", 'SVt_PVGV' ) );
+        #init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, "$gvadd|GV_ADDMULTI", 'SVt_PVGV' ) );
         init()->sadd( "GvGP_set(%s, GvGP(%s));", $sym, $egvsym );
         return 1;
     }
