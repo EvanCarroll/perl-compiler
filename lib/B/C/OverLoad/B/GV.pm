@@ -167,9 +167,16 @@ sub save {
 sub legacy_save {
     my ( $gv, $filter, $gvsym ) = @_;
 
+    my $fullname = $gv->get_fullname();
+
     # dynamic / legacy one
     my $sym = savesym( $gv, sprintf( "dynamic_gv_list[%s]", inc_index() ) );
+    
     init()->add("$sym = $gvsym; ");    # init the sym
+
+    # Core syms are initialized by perl so we don't need to other than tracking the symbol itself see init_main_stash()
+    $sym = savesym( $gv, $CORE_SYMS->{$fullname} ) if $gv->is_coresym();
+    return $sym if $gv->save_special_gv($sym);
 
     my $gvname = $gv->NAME();
 
@@ -179,8 +186,6 @@ sub legacy_save {
         $pkg =~ s/::$//;
         mark_package_used($pkg);
     }
-
-    my $fullname = $gv->get_fullname();
 
     my $is_empty = $gv->is_empty;
     if ( !defined $gvname and $is_empty ) {    # 5.8 curpad name
@@ -195,11 +200,6 @@ sub legacy_save {
         $gv = $newgv;                          # defer to run-time autoload, or compile it in?
         $sym = savesym( $gv, $sym );           # override new gv ptr to sym
     }
-
-    # Core syms are initialized by perl so we don't need to other than tracking the symbol itself see init_main_stash()
-    $sym = savesym( $gv, $CORE_SYMS->{$fullname} ) if $gv->is_coresym();
-
-    return $sym if $gv->save_special_gv($sym);
 
     my $notqual = $package eq 'main' ? 'GV_NOTQUAL' : '0';
     my $was_emptied = save_gv_with_gp( $gv, $sym, $name, $notqual, $is_empty );
@@ -338,7 +338,7 @@ sub save_gv_with_gp {
     elsif ( $gp and !$is_empty ) {
         debug( gv => "New GV for *%s 0x%x%s %s GP:0x%x", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $gv->FILE, $gp );
 
-        # XXX !PERL510 and OPf_COP_TEMP we need to fake PL_curcop for gp_file hackery
+        # XXX !PERL510 and OPf_COP_TEMP we need to fake PL_curcop for gp_file hackery        
         init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, $gvadd, 'SVt_PV' ) ); # TODO ....
     }
 
