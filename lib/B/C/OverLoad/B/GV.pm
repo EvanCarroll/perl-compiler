@@ -324,6 +324,14 @@ sub save_gv_with_gp {
 
     my $gvadd = $notqual ? "$notqual|GV_ADD" : "GV_ADD";
 
+    my $gv_fetchpv_string = sub { # only used there... allow to read everything as a whole
+        my ( $flags, $type ) = @_;
+        my ( $cname, $cur, $utf8 ) = strlen_flags($name);
+
+        $flags .= length($flags) ? "|$utf8" : $utf8 if $utf8;
+        return "gv_fetchpvn_flags($cname, $cur, $flags, $type)";
+    };
+
     # should be saved with the GV
     init()->sadd( "SvREFCNT(%s) = %u;", $sym, $gv->REFCNT ) if $gv->REFCNT;    
     init()->sadd( "GvREFCNT(%s) += %u;", $sym, $gv->GvREFCNT - 1 ) if $gv->GvREFCNT > 1;
@@ -341,13 +349,13 @@ sub save_gv_with_gp {
     elsif ( $gp and !$is_empty and $gvname =~ /::$/ ) {
         # used by op/bless.t
         debug( gv => "Shared GvGP for stash %%%s 0x%x%s %s GP:0x%x", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $gv->FILE, $gp );
-        init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, 'GV_ADD', 'SVt_PVHV' ) );
+        init()->sadd( "%s = %s;", $sym, $gv_fetchpv_string->( 'GV_ADD', 'SVt_PVHV' ) );
     }
     elsif ( $gp and !$is_empty ) {
         debug( gv => "New GV for *%s 0x%x%s %s GP:0x%x", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $gv->FILE, $gp );
 
         # XXX !PERL510 and OPf_COP_TEMP we need to fake PL_curcop for gp_file hackery        
-        init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, $gvadd, 'SVt_PV' ) ); # TODO ....
+        init()->sadd( "%s = %s;", $sym, $gv_fetchpv_string->(  $gvadd, 'SVt_PV' ) ); # TODO ....
     }
 
     return;
@@ -664,16 +672,6 @@ sub save_gv_io {
     init()->sadd( "GvIOp(%s) = s\\_%x;", $sym, $$gvio );
 
     return;
-}
-
-sub gv_fetchpv_string {
-    my ( $name, $flags, $type ) = @_;
-    warn 'undefined flags' unless defined $flags;
-    warn 'undefined type'  unless defined $type;
-    my ( $cname, $cur, $utf8 ) = strlen_flags($name);
-
-    $flags .= length($flags) ? "|$utf8" : $utf8 if $utf8;
-    return "gv_fetchpvn_flags($cname, $cur, $flags, $type)";
 }
 
 sub savecv {
