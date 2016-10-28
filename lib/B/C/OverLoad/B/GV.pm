@@ -13,8 +13,6 @@ use B::C::Helpers::Symtable qw/objsym savesym/;
 use B::C::Optimizer::ForceHeavy qw/force_heavy/;
 use B::C::Packages qw/mark_package_used/;
 
-my %gptable;
-
 sub inc_index {
     return $B::C::gv_index++;
 }
@@ -320,14 +318,9 @@ sub save_gv_with_gp {
     my $fullname = $gv->get_fullname();
 
     # Core syms don't have a GP?
-    return if $gv->is_coresym;
+    return if $gv->is_coresym or !$gv->isGV_with_GP;
 
     my $gvadd = $notqual ? "$notqual|GV_ADD" : "GV_ADD";
-
-    if ( !$gv->isGV_with_GP ) {
-        #init()->sadd( "$sym = " . gv_fetchpv_string( $name, $gvadd, 'SVt_PV' ) . ";" );
-        return;
-    }
 
     my $gp     = $gv->GP;           # B limitation
     my $egvsym = $gv->save_egv();
@@ -339,13 +332,6 @@ sub save_gv_with_gp {
         init()->sadd( "GvGP_set(%s, GvGP(%s));", $sym, $egvsym );
         return 1;
     }
-    elsif ( $gp and exists $gptable{ 0 + $gp } ) {
-        die "ZZZZ";
-        debug( gv => "Shared GvGP for *%s 0x%x%s %s GP:0x%x", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $gv->FILE, $gp );
-        #init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, $notqual, 'SVt_PVGV' ) );
-        init()->sadd( "GvGP_set(%s, %s);", $sym, $gptable{ 0 + $gp } );
-        return 1;
-    }
     elsif ( $gp and !$is_empty and $gvname =~ /::$/ ) {
         debug( gv => "Shared GvGP for stash %%%s 0x%x%s %s GP:0x%x", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $gv->FILE, $gp );
         #init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, 'GV_ADD', 'SVt_PVHV' ) );
@@ -353,12 +339,9 @@ sub save_gv_with_gp {
     elsif ( $gp and !$is_empty ) {
         debug( gv => "New GV for *%s 0x%x%s %s GP:0x%x", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $gv->FILE, $gp );
 
-        # XXX !PERL510 and OPf_COP_TEMP we need to fake PL_curcop for gp_file hackery
-        
-        init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, $gvadd, 'SVt_PV' ) );
+        # XXX !PERL510 and OPf_COP_TEMP we need to fake PL_curcop for gp_file hackery        
+        init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, $gvadd, 'SVt_PV' ) ); # TODO ....
     }
-
-    $gptable{ 0 + $gp } = "GvGP($sym)";
 
     return;
 }
@@ -765,7 +748,7 @@ sub get_savefields {
     $savefields = 0 if $gv->is_empty();
 
     my $gp = $gv->GP;
-    $savefields = 0 if !$gp or !exists $gptable{ 0 + $gp };
+    $savefields = 0 if !$gp;
 
     # some non-alphabetic globs require some parts to be saved
     # ( ex. %!, but not $! )
