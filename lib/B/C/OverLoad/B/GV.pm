@@ -350,7 +350,7 @@ sub save_gv_with_gp {
     elsif ( $gp and !$is_empty and $gvname =~ /::$/ ) {
         debug( gv => "Shared GvGP for stash %%%s 0x%x%s %s GP:0x%x", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $gv->FILE, $gp );
         init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, 'GV_ADD', 'SVt_PVHV' ) );
-        $gptable{ 0 + $gp } = "GvGP($sym)" if 0 + $gp;
+        $gptable{ 0 + $gp } = "GvGP($sym)";
     }
     elsif ( $gp and !$is_empty ) {
         debug( gv => "New GV for *%s 0x%x%s %s GP:0x%x", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $gv->FILE, $gp );
@@ -359,9 +359,9 @@ sub save_gv_with_gp {
         init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, $gvadd, 'SVt_PV' ) );
         $gptable{ 0 + $gp } = "GvGP($sym)";
     }
-    else {
-        init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, $gvadd, 'SVt_PVGV' ) );
-    }
+    # else {
+    #     init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, $gvadd, 'SVt_PVGV' ) );
+    # }
 
     return $was_emptied;
 }
