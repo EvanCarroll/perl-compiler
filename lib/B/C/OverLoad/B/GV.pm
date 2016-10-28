@@ -135,16 +135,10 @@ sub save {
         return $cached_sym if defined $cached_sym;
     }
 
-    # GV $sym isa FBM
-    return B::BM::save($gv) if $gv->FLAGS & 0x40000000;    # SVpbm_VALID
-
-    my $package = $gv->get_package();
-    return q/(SV*)&PL_sv_undef/ if B::C::skip_pkg($package);
-
-    if ( my $sym_special = $gv->save_special_gv() ) {
-        savesym( $gv, $sym_special );
-        return $sym_special;
-    }
+    # return earlier for special cases
+    return B::BM::save($gv) if $gv->FLAGS & 0x40000000;    # SVpbm_VALID # GV $sym isa FBM
+    return q/(SV*)&PL_sv_undef/ if B::C::skip_pkg( $gv->get_package() );
+    return $gv->save_special_gv() if $gv->is_special_gv();
 
     my $gpsym = savegp_from_gv( $gv, $filter );            # might be $gp->save( )
 
@@ -262,8 +256,17 @@ sub legacy_save {
     return $sym;
 }
 
+sub is_special_gv {
+    my $gv = shift;
+
+    my $fullname = $gv->get_fullname();
+    return 1 if $fullname =~ /^main::std(in|out|err)$/; # same as uppercase above
+    return 1 if $fullname eq 'main::0'; # dollar_0 already handled before, so don't overwrite it
+    return;
+}
+
 sub save_special_gv {
-    my ( $gv ) = @_;
+    my $gv = shift;
 
     my $package  = $gv->get_package();
     my $gvname   = $gv->NAME();
@@ -272,23 +275,14 @@ sub save_special_gv {
     my $cname   = $package eq 'main' ? cstring($gvname) : cstring($fullname);
     my $notqual = $package eq 'main' ? 'GV_NOTQUAL'     : '0';
 
-    my $type;
-    if ( $fullname =~ /^main::std(in|out|err)$/ ) {    # same as uppercase above
-        $type = 'SVt_PVGV';
-    }
-    elsif ( $fullname eq 'main::0' ) {                 # dollar_0 already handled before, so don't overwrite it
-        $type = 'SVt_PV';
-    }
-    else {
-        return;
-    }
+    my $type = 'SVt_PVGV';
+    $type = 'SVt_PV' if $fullname eq 'main::0';
 
-    my $sym = $gv->set_dynamic_gv; # use a dynamic slot from there
+    my $sym = $gv->set_dynamic_gv; # use a dynamic slot from there + cache
     init()->sadd( '%s = gv_fetchpv(%s, %s, %s);', $sym, $cname, $notqual, $type );
     init()->sadd( "SvREFCNT(%s) = %u;", $sym, $gv->REFCNT );
 
     return $sym;
-
 }
 
 sub save_egv {
