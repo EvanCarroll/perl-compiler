@@ -339,8 +339,9 @@ sub save_gv_with_gp {
         return 1;
     }
     elsif ( $gp and !$is_empty and $gvname =~ /::$/ ) {
+        # used by op/bless.t
         debug( gv => "Shared GvGP for stash %%%s 0x%x%s %s GP:0x%x", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $gv->FILE, $gp );
-        #init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, 'GV_ADD', 'SVt_PVHV' ) );
+        init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, 'GV_ADD', 'SVt_PVHV' ) );
     }
     elsif ( $gp and !$is_empty ) {
         debug( gv => "New GV for *%s 0x%x%s %s GP:0x%x", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $gv->FILE, $gp );
