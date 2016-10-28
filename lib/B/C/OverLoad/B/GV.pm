@@ -268,12 +268,11 @@ sub is_special_gv {
 sub save_special_gv {
     my $gv = shift;
 
-    my $package  = $gv->get_package();
     my $gvname   = $gv->NAME();
     my $fullname = $gv->get_fullname();
-
-    my $cname   = $package eq 'main' ? cstring($gvname) : cstring($fullname);
-    my $notqual = $package eq 'main' ? 'GV_NOTQUAL'     : '0';
+    # package is main
+    my $cname   = cstring($gvname);
+    my $notqual = 'GV_NOTQUAL';
 
     my $type = 'SVt_PVGV';
     $type = 'SVt_PV' if $fullname eq 'main::0';
@@ -312,7 +311,7 @@ sub save_gv_file {
     return;
 }
 
-sub save_gv_with_gp {
+sub save_gv_with_gp { # save_gv_with_gp_dynamically
     my ( $gv, $sym, $name, $notqual, $is_empty ) = @_;
 
     my $gvname   = $gv->NAME();
