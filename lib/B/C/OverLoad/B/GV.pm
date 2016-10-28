@@ -171,13 +171,13 @@ sub legacy_save {
 
     # dynamic / legacy one
     my $sym = savesym( $gv, sprintf( "dynamic_gv_list[%s]", inc_index() ) );
+    my $dynsym = $sym; # only used for later 
     
-    init()->add("$sym = $gvsym; ");    # init the sym
-
     # Core syms are initialized by perl so we don't need to other than tracking the symbol itself see init_main_stash()
     $sym = savesym( $gv, $CORE_SYMS->{$fullname} ) if $gv->is_coresym();
     return $sym if $gv->save_special_gv($sym);
 
+init()->add("$dynsym = $gvsym; ");    # init the sym
     my $gvname = $gv->NAME();
 
     # If we come across a stash hash, we therefore have code using it so we need to mark it was used so it won't be deleted.
