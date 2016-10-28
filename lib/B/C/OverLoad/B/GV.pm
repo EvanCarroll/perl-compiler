@@ -47,10 +47,7 @@ my $CORE_SVS = {                       # special SV syms to assign to the right 
 sub get_package {
     my $gv = shift;
 
-    if ( ref( $gv->STASH ) eq 'B::SPECIAL' ) {
-        return '__ANON__';
-    }
-
+    return '__ANON__' if ref( $gv->STASH ) eq 'B::SPECIAL';
     return $gv->STASH->NAME;
 }
 
@@ -180,7 +177,7 @@ sub legacy_save {
     # Core syms are initialized by perl so we don't need to other than tracking the symbol itself see init_main_stash()
     $sym = savesym( $gv, $CORE_SYMS->{$fullname} ) if $gv->is_coresym();
 
-    my $gvname = $gv->NAME();
+    my $gvname  = $gv->NAME();
 
     # If we come across a stash hash, we therefore have code using it so we need to mark it was used so it won't be deleted.
     if ( $gvname =~ m/::$/ ) {
@@ -260,8 +257,8 @@ sub is_special_gv {
     my $gv = shift;
 
     my $fullname = $gv->get_fullname();
-    return 1 if $fullname =~ /^main::std(in|out|err)$/; # same as uppercase above
-    return 1 if $fullname eq 'main::0'; # dollar_0 already handled before, so don't overwrite it
+    return 1 if $fullname =~ /^main::std(in|out|err)$/;    # same as uppercase above
+    return 1 if $fullname eq 'main::0';                    # dollar_0 already handled before, so don't overwrite it
     return;
 }
 
@@ -278,6 +275,7 @@ sub save_special_gv {
     $type = 'SVt_PV' if $fullname eq 'main::0';
 
     my $sym = $gv->set_dynamic_gv; # use a dynamic slot from there + cache
+
     init()->sadd( '%s = gv_fetchpv(%s, %s, %s);', $sym, $cname, $notqual, $type );
     init()->sadd( "SvREFCNT(%s) = %u;", $sym, $gv->REFCNT );
 
