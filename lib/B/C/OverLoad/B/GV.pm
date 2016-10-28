@@ -324,8 +324,6 @@ sub save_gv_with_gp {
 
     my $gvadd = $notqual ? "$notqual|GV_ADD" : "GV_ADD";
 
-    my $was_emptied;
-
     if ( !$gv->isGV_with_GP ) {
         init()->sadd( "$sym = " . gv_fetchpv_string( $name, $gvadd, 'SVt_PV' ) . ";" );
         return;
@@ -339,31 +337,28 @@ sub save_gv_with_gp {
         # Shared glob *foo = *bar
         init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, "$gvadd|GV_ADDMULTI", 'SVt_PVGV' ) );
         init()->sadd( "GvGP_set(%s, GvGP(%s));", $sym, $egvsym );
-        $was_emptied = 1;
+        return 1;
     }
     elsif ( $gp and exists $gptable{ 0 + $gp } ) {
         debug( gv => "Shared GvGP for *%s 0x%x%s %s GP:0x%x", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $gv->FILE, $gp );
         init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, $notqual, 'SVt_PVGV' ) );
         init()->sadd( "GvGP_set(%s, %s);", $sym, $gptable{ 0 + $gp } );
-        $was_emptied = 1;
+        return 1;
     }
     elsif ( $gp and !$is_empty and $gvname =~ /::$/ ) {
         debug( gv => "Shared GvGP for stash %%%s 0x%x%s %s GP:0x%x", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $gv->FILE, $gp );
         init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, 'GV_ADD', 'SVt_PVHV' ) );
-        $gptable{ 0 + $gp } = "GvGP($sym)";
     }
     elsif ( $gp and !$is_empty ) {
         debug( gv => "New GV for *%s 0x%x%s %s GP:0x%x", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $gv->FILE, $gp );
 
         # XXX !PERL510 and OPf_COP_TEMP we need to fake PL_curcop for gp_file hackery
         init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, $gvadd, 'SVt_PV' ) );
-        $gptable{ 0 + $gp } = "GvGP($sym)";
     }
-    # else {
-    #     init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, $gvadd, 'SVt_PVGV' ) );
-    # }
 
-    return $was_emptied;
+    $gptable{ 0 + $gp } = "GvGP($sym)";
+
+    return;
 }
 
 sub save_gv_cv {
