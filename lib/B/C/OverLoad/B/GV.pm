@@ -141,6 +141,11 @@ sub save {
     my $package = $gv->get_package();
     return q/(SV*)&PL_sv_undef/ if B::C::skip_pkg($package);
 
+    if ( my $sym_special = $gv->save_special_gv() ) {
+        savesym( $gv, $sym_special );
+        return $sym_special;
+    }
+
     my $gpsym = savegp_from_gv( $gv, $filter );            # might be $gp->save( )
 
     xpvgvsect()->comment("stash, magic, cur, len, xiv_u={.xivu_namehek=}, xnv_u={.xgv_stash=}");
@@ -164,20 +169,23 @@ sub save {
     return legacy_save( $gv, $filter, $gvsym );
 }
 
+sub set_dynamic_gv {
+    my $gv = shift;
+    return savesym( $gv, sprintf( "dynamic_gv_list[%s]", inc_index() ) );
+}
+
 sub legacy_save {
     my ( $gv, $filter, $gvsym ) = @_;
 
     my $fullname = $gv->get_fullname();
-
-    # dynamic / legacy one
-    my $sym = savesym( $gv, sprintf( "dynamic_gv_list[%s]", inc_index() ) );
-    my $dynsym = $sym; # only used for later 
     
+    # dynamic / legacy one
+    my $sym = $gv->set_dynamic_gv; # savesym is happening there
+    init()->add("$sym = $gvsym; ");    # init the sym
+
     # Core syms are initialized by perl so we don't need to other than tracking the symbol itself see init_main_stash()
     $sym = savesym( $gv, $CORE_SYMS->{$fullname} ) if $gv->is_coresym();
-    return $sym if $gv->save_special_gv($sym);
 
-init()->add("$dynsym = $gvsym; ");    # init the sym
     my $gvname = $gv->NAME();
 
     # If we come across a stash hash, we therefore have code using it so we need to mark it was used so it won't be deleted.
@@ -255,7 +263,7 @@ init()->add("$dynsym = $gvsym; ");    # init the sym
 }
 
 sub save_special_gv {
-    my ( $gv, $sym ) = @_;
+    my ( $gv ) = @_;
 
     my $package  = $gv->get_package();
     my $gvname   = $gv->NAME();
@@ -272,13 +280,14 @@ sub save_special_gv {
         $type = 'SVt_PV';
     }
     else {
-        return 0;
+        return;
     }
 
+    my $sym = $gv->set_dynamic_gv; # use a dynamic slot from there
     init()->sadd( '%s = gv_fetchpv(%s, %s, %s);', $sym, $cname, $notqual, $type );
     init()->sadd( "SvREFCNT(%s) = %u;", $sym, $gv->REFCNT );
 
-    return 1;
+    return $sym;
 
 }
 
