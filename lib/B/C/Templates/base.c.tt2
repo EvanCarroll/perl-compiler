@@ -313,18 +313,15 @@ Static [% section.$sect.typename() %] [% section.$sect.name() %]_list[[% lines %
 
 
 #define bc_init_main_stash()	S_bc_init_main_stash(aTHX)
-
-
-/* We are assuming here the kernel will always give us zeroed out memory */
 PerlInterpreter BC_unthreaded_interpreter;
-
-STATIC void
-S_bc_init_main_stash(pTHX)
+STATIC void S_bc_init_main_stash(pTHX)
 {
     GV *gv;
 
     PL_curcop = &PL_compiling;
 
+    /* [% main_stash %] */
+    
     PL_curstash = PL_defstash = (HV *)SvREFCNT_inc_simple_NN(newHV());
     /* We know that the string "main" will be in the global shared string
        table, so it's a small saving to use it rather than allocate another

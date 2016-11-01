@@ -67,7 +67,7 @@ my %saved_gps;
 
 # FIXME todo and move later to B/GP.pm ?
 sub savegp_from_gv {
-    my ( $gv, $savefields ) = @_;
+    my ( $gv, $save_fields ) = @_;
 
     # no GP to save there...
     return 'NULL' unless $gv->isGV_with_GP and !$gv->is_coresym() and $gv->GP;
@@ -85,7 +85,7 @@ sub savegp_from_gv {
 
     # gp fields initializations
     # gp_cvgen: not set, no B api ( could be done in init section )
-    my ( $gp_sv, $gp_io, $gp_cv, $gp_cvgen, $gp_hv, $gp_av, $gp_form, $gp_egv ) = ( 'NULL', 'NULL', 'NULL', 0, 'NULL', 'NULL', 'NULL', 'NULL' );
+    my ( $gp_sv, $gp_io, $gp_cv, $gp_cvgen, $gp_hv, $gp_av, $gp_form, $gp_egv, $gp_file_hek ) = ( 'NULL', 'NULL', 'NULL', 0, 'NULL', 'NULL', 'NULL', 'NULL', 'NULL' );
 
     # walksymtable creates an extra reference to the GV (#197)
     my $gp_refcount = $gv->GvREFCNT - 1;    # +1 for immortal ?
@@ -103,15 +103,13 @@ sub savegp_from_gv {
     die("gp_flags seems used now ???") if $gp_flags;
 
     my $gp_file_hek = q{NULL};
-    if ( ( !$B::C::stash or $fullname !~ /::$/ ) and $gv->FILEGV ne 'NULL' ) {    # and !$B::C::optimize_cop
+    if ( $save_fields & Save_FILE && ( !$B::C::stash or $fullname !~ /::$/ ) and $gv->FILEGV ne 'NULL' ) {    # and !$B::C::optimize_cop
         $gp_file_hek = save_shared_he( $gv->FILEGV );                             # Reini was using FILE instead of FILEGV ?
     }
 
-    # .... TODO save stuff there
-    # ....
-    #$gp_av = save_gv_av( $gv, $fullname ) if $savefields & Save_AV;
-    # ....
-
+    $gp_hv = $gv->save_gv_hv( $fullname, $gvname ) if $save_fields & Save_HV;
+    $gp_file_hek = $gv->save_gv_file( ) if $save_fields & Save_FILE;
+    
     gpsect()->comment('SV, gp_io, CV, cvgen, gp_refcount, HV, AV, CV, GV, line, flags, HEK* file');
 
     gpsect()->sadd(
@@ -137,27 +135,35 @@ sub save {
     return q/(SV*)&PL_sv_undef/ if B::C::skip_pkg( $gv->get_package() );
     return $gv->save_special_gv() if $gv->is_special_gv();
 
-    my $gpsym = savegp_from_gv( $gv, $filter );            # might be $gp->save( )
+    my $gv_ix = gvsect()->add("fake"); # So nobody else grabs our index.
+    
+    my $gvsym;
+    if ($gv->is_coresym()) {
+        $gvsym = savesym( $gv, "&" . $CORE_SYMS->{$gv->get_fullname()} );
+    }
+    else {    
+        $gvsym = savesym( $gv, sprintf( '&gv_list[%d]', $gv_ix ) );
+    }
+    
+    my $save_fields = legacy_save( $gv, $filter, $gvsym );
+
+    my $gpsym = savegp_from_gv( $gv, $save_fields );
 
     xpvgvsect()->comment("stash, magic, cur, len, xiv_u={.xivu_namehek=}, xnv_u={.xgv_stash=}");
-    xpvgvsect()->sadd(
-        "Nullhv, {0}, 0, {.xpvlenu_len=0}, {.xivu_namehek=%s}, {.xgv_stash=%s}",
-        'NULL', 'Nullhv'
-    );
+    xpvgvsect()->sadd("Nullhv, {0}, 0x%x, {.xpvlenu_len=0}, {.xivu_namehek=%s}, {.xgv_stash=%s}", $gv->GvFLAGS, 'NULL', 'Nullhv');
+
     my $xpvgv = sprintf( 'xpvgv_list[%d]', xpvgvsect()->index );
 
     {
         my $gv_refcnt = $gv->REFCNT;                       # TODO probably need more love for both refcnt (+1 ? extra flag immortal)
         my $gv_flags  = $gv->FLAGS;
-
+        
         gvsect()->comment("XPVGV*  sv_any,  U32     sv_refcnt; U32     sv_flags; union   { gp* } sv_u # gp*");
-        gvsect()->sadd( "&%s, %u, 0x%x, {.svu_gp=(GP*)%s}", $xpvgv, $gv_refcnt, $gv_flags, $gpsym );
+        gvsect()->supdate( $gv_ix, "&%s, %u, 0x%x, {.svu_gp=(GP*)%s}", $xpvgv, $gv_refcnt, $gv_flags, $gpsym );
     }
 
-    #my $gvsym = savesym( $gv, sprintf( '&gv_list[%d]', $gv_ix ) ); # final goal...
-    my $gvsym = sprintf( '&gv_list[%d]', gvsect()->index );
-
-    return legacy_save( $gv, $filter, $gvsym );
+    # my $gvsym = sprintf( '&gv_list[%d]', gvsect()->index );
+    return $gvsym;
 }
 
 sub set_dynamic_gv {
@@ -166,16 +172,16 @@ sub set_dynamic_gv {
 }
 
 sub legacy_save {
-    my ( $gv, $filter, $gvsym ) = @_;
+    my ( $gv, $filter, $sym ) = @_;
+    $sym =~ s/^&//;
 
     my $fullname = $gv->get_fullname();
     
     # dynamic / legacy one
-    my $sym = $gv->set_dynamic_gv; # savesym is happening there
-    init()->add("$sym = $gvsym; ");    # init the sym
+    #my $sym = $gv->set_dynamic_gv; # savesym is happening there
+    #init()->add("$sym = $gvsym; ");    # init the sym
 
     # Core syms are initialized by perl so we don't need to other than tracking the symbol itself see init_main_stash()
-    $sym = savesym( $gv, $CORE_SYMS->{$fullname} ) if $gv->is_coresym();
 
     my $gvname  = $gv->NAME();
 
@@ -189,7 +195,7 @@ sub legacy_save {
     my $is_empty = $gv->is_empty;
     if ( !defined $gvname and $is_empty ) {    # 5.8 curpad name
         die("We don't think this ever happens");
-        return q/(SV*)&PL_sv_undef/;
+        # return q/(SV*)&PL_sv_undef/;
     }
 
     my $package = $gv->get_package();
@@ -204,12 +210,7 @@ sub legacy_save {
     my $was_emptied = save_gv_with_gp( $gv, $sym, $name, $notqual, $is_empty );
     $is_empty = 1 if ($was_emptied);
 
-    my $gvflags = $gv->GvFLAGS;
-    my $svflags = $gv->FLAGS;
-    init()->sadd( "SvFLAGS(%s) = 0x%x;%s",  $sym, $svflags, debug('flags') ? " /* " . $gv->flagspv . " */"          : "" );
-    init()->sadd( "GvFLAGS(%s) = 0x%x; %s", $sym, $gvflags, debug('flags') ? "/* " . $gv->flagspv(SVt_PVGV) . " */" : "" );
-
-    return $sym if $is_empty;
+    return 0 if $is_empty;
 
     # attributes::bootstrap is created in perl_parse.
     # Saving it would overwrite it, because perl_init() is
@@ -225,32 +226,26 @@ sub legacy_save {
         $B::C::use_xsloader = 1;
     }
 
-    my $savefields = get_savefields( $gv, $fullname, $filter );
-
-    # There's nothing to save if savefields were not returned.
-    return $sym unless $savefields;
+    my $save_fields = get_savefields( $gv, $fullname, $filter );
 
     # Don't save subfields of special GVs (*_, *1, *# and so on)
-    debug( gv => "GV::save saving subfields $savefields" );
+    debug( gv => "GV::save saving subfields $save_fields" );
 
-    $gv->save_gv_sv( $fullname, $sym, $package ) if $savefields & Save_SV;
+    $gv->save_gv_sv( $fullname, $sym, $package ) if $save_fields & Save_SV;
 
-    $gv->save_gv_av( $fullname, $sym ) if $savefields & Save_AV;
+    $gv->save_gv_av( $fullname, $sym ) if $save_fields & Save_AV;
+    
+    $gv->save_gv_cv( $fullname, $sym ) if $save_fields & Save_CV;
 
-    $gv->save_gv_hv( $fullname, $sym, $gvname ) if $savefields & Save_HV;
+    $gv->save_gv_format( $fullname, $sym ) if $save_fields & Save_FORM;
 
-    $gv->save_gv_cv( $fullname, $sym ) if $savefields & Save_CV;
-
-    $gv->save_gv_format( $fullname, $sym ) if $savefields & Save_FORM;
-
-    $gv->save_gv_io( $fullname, $sym ) if $savefields & Save_IO;
-
-    $gv->save_gv_file( $fullname, $sym ) if $savefields & Save_FILE;
-
+    $gv->save_gv_io( $fullname, $sym ) if $save_fields & Save_IO;
+    
+    
     # Shouldn't need to do save_magic since gv_fetchpv handles that. Esp. < and IO not
     # $gv->save_magic($fullname) if $PERL510;
     debug( gv => "GV::save *$fullname done" );
-    return $sym;
+    return $save_fields;
 }
 
 sub is_special_gv {
@@ -296,17 +291,14 @@ sub save_egv {
 }
 
 sub save_gv_file {
-    my ( $gv, $fullname, $sym ) = @_;
+    my ( $gv ) = @_;
 
-    return if $B::C::optimize_cop;
+    return 'NULL' if $B::C::optimize_cop;
 
     # XXX Maybe better leave it NULL or asis, than fighting broken
     my $file = save_shared_he( $gv->FILE );
-    return if ( !$file or $file eq 'NULL' );
-
-    init()->sadd( "GvFILE_HEK(%s) = &(%s->shared_he_hek);", $sym, $file );
-
-    return;
+    return 'NULL' if ( !$file or $file eq 'NULL' );
+    return $file;
 }
 
 sub save_gv_with_gp { # save_gv_with_gp_dynamically
@@ -321,17 +313,17 @@ sub save_gv_with_gp { # save_gv_with_gp_dynamically
 
     my $gvadd = $notqual ? "$notqual|GV_ADD" : "GV_ADD";
 
-    my $gv_fetchpv_string = sub { # only used there... allow to read everything as a whole
-        my ( $flags, $type ) = @_;
-        my ( $cname, $cur, $utf8 ) = strlen_flags($name);
-
-        $flags .= length($flags) ? "|$utf8" : $utf8 if $utf8;
-        return "gv_fetchpvn_flags($cname, $cur, $flags, $type)";
-    };
+    #my $gv_fetchpv_string = sub { # only used there... allow to read everything as a whole
+    #    my ( $flags, $type ) = @_;
+    #    my ( $cname, $cur, $utf8 ) = strlen_flags($name);
+    #
+    #    $flags .= length($flags) ? "|$utf8" : $utf8 if $utf8;
+    #    return "gv_fetchpvn_flags($cname, $cur, $flags, $type)";
+    #};
 
     # should be saved with the GV
-    init()->sadd( "SvREFCNT(%s) = %u;", $sym, $gv->REFCNT ) if $gv->REFCNT;    
-    init()->sadd( "GvREFCNT(%s) += %u;", $sym, $gv->GvREFCNT - 1 ) if $gv->GvREFCNT > 1;
+    init()->sadd( "SvREFCNT(&%s) = %u;", $sym, $gv->REFCNT ) if $gv->REFCNT;    
+    init()->sadd( "GvREFCNT(&%s) += %u;", $sym, $gv->GvREFCNT - 1 ) if $gv->GvREFCNT > 1;
 
     my $gp     = $gv->GP;           # B limitation
     my $egvsym = $gv->save_egv();   # lazyness: reuse the cache from the previous save (save should not happen there)
@@ -339,20 +331,20 @@ sub save_gv_with_gp { # save_gv_with_gp_dynamically
         debug( gv => "Shared GV alias for *%s 0x%x%s to %s", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $egvsym );
 
         # Shared glob *foo = *bar
-        #init()->sadd( "%s = %s;", $sym, gv_fetchpv_string( $name, "$gvadd|GV_ADDMULTI", 'SVt_PVGV' ) );
+        #init()->sadd( "%s = %s;", $sym, $gv_fetchpv_string->( "$gvadd|GV_ADDMULTI", 'SVt_PVGV' ) );
         init()->sadd( "GvGP_set(%s, GvGP(%s));", $sym, $egvsym );
         return 1;
     }
     elsif ( $gp and !$is_empty and $gvname =~ /::$/ ) {
         # used by op/bless.t
         debug( gv => "Shared GvGP for stash %%%s 0x%x%s %s GP:0x%x", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $gv->FILE, $gp );
-        init()->sadd( "%s = %s;", $sym, $gv_fetchpv_string->( 'GV_ADD', 'SVt_PVHV' ) );
+        #init()->sadd( "%s = %s;", $sym, $gv_fetchpv_string->( 'GV_ADD', 'SVt_PVHV' ) );
     }
     elsif ( $gp and !$is_empty ) {
         debug( gv => "New GV for *%s 0x%x%s %s GP:0x%x", $fullname, $svflags, debug('flags') ? "(" . $gv->flagspv . ")" : "", $gv->FILE, $gp );
 
         # XXX !PERL510 and OPf_COP_TEMP we need to fake PL_curcop for gp_file hackery        
-        init()->sadd( "%s = %s;", $sym, $gv_fetchpv_string->(  $gvadd, 'SVt_PV' ) ); # TODO ....
+        #init()->sadd( "%s = %s;", $sym, $gv_fetchpv_string->(  $gvadd, 'SVt_PV' ) ); # TODO ....
     }
 
     return;
@@ -411,7 +403,7 @@ sub save_gv_cv {
             # must save as a 'stub' so newXS() has a CV to populate
             debug( gv => "save stub CvGV for $sym GP assignments $origname" );
             init2()->sadd( "if ((sv = (SV*)%s))", get_cv_string( $origname, "GV_ADD" ) );
-            init2()->sadd( "    GvCV_set(%s, (CV*)SvREFCNT_inc_simple_NN(sv));", $sym );
+            init2()->sadd( "    GvCV_set(&%s, (CV*)SvREFCNT_inc_simple_NN(sv));", $sym );
         }
         elsif ($gp) {
             if ( $fullname eq 'Internals::V' ) {
@@ -438,19 +430,19 @@ sub save_gv_cv {
                             debug( gv => "removed $sym GP assignments $origname (core CV)" );
                         }
                     }
-                    init()->sadd( "GvCV_set(%s, (CV*)SvREFCNT_inc(%s));", $sym, $cvsym );
+                    init()->sadd( "GvCV_set(&%s, (CV*)SvREFCNT_inc(%s));", $sym, $cvsym );
                 }
                 elsif ( $B::C::xsub{$package} ) {
 
                     # must save as a 'stub' so newXS() has a CV to populate later in dl_init()
                     debug( gv => "save stub CvGV for $sym GP assignments $origname (XS CV)" );
                     my $get_cv = get_cv_string( $oname ne "__ANON__" ? $origname : $fullname, "GV_ADD" );
-                    init2()->sadd( "GvCV_set(%s, (CV*)SvREFCNT_inc_simple_NN(%s));", $sym, $get_cv );
+                    init2()->sadd( "GvCV_set(&%s, (CV*)SvREFCNT_inc_simple_NN(%s));", $sym, $get_cv );
                     init2()->sadd( "if ((sv = (SV*)%s))", $get_cv );
-                    init2()->sadd( "    GvCV_set(%s, (CV*)SvREFCNT_inc_simple_NN(sv));", $sym );
+                    init2()->sadd( "    GvCV_set(&%s, (CV*)SvREFCNT_inc_simple_NN(sv));", $sym );
                 }
                 else {
-                    init()->sadd( "GvCV_set(%s, (CV*)(%s));", $sym, $cvsym );
+                    init()->sadd( "GvCV_set(&%s, (CV*)(%s));", $sym, $cvsym );
                 }
 
                 if ( $gvcv->XSUBANY ) {
@@ -507,7 +499,7 @@ sub save_gv_cv {
                 }
             }
             elsif ( $cvsym =~ /^(cv|&sv_list)/ ) {
-                init()->sadd( "GvCV_set(%s, (CV*)(%s));", $sym, $cvsym );
+                init()->sadd( "GvCV_set(&%s, (CV*)(%s));", $sym, $cvsym );
             }
             else {
                 WARN("wrong CvGV for $sym $origname: $cvsym") if debug('gv') or verbose();
@@ -519,7 +511,7 @@ sub save_gv_cv {
             my @magic = $gv->MAGIC;
             foreach my $mg (@magic) {
                 next unless $mg->TYPE eq '<';
-                init()->sadd( "sv_magic((SV*)%s, (SV*)%s, '<', 0, 0);", $sym, $cvsym );
+                init()->sadd( "sv_magic((SV*)&%s, (SV*)%s, '<', 0, 0);", $sym, $cvsym );
                 init()->sadd( "CvCVGV_RC_off(%s);", $cvsym );
             }
         }
@@ -593,7 +585,7 @@ sub save_gv_av {
     return 'NULL' unless $gvav && $$gvav;
 
     $gvav->save($fullname);
-    init()->sadd( "GvAV(%s) = s\\_%x;", $sym, $$gvav );
+    init()->sadd( "GvAV(&%s) = s\\_%x;", $sym, $$gvav );
     if ( $fullname eq 'main::-' ) {
         init()->sadd( "AvFILLp(s\\_%x) = -1;", $$gvav );
         init()->sadd( "AvMAX(s\\_%x) = -1;",   $$gvav );
@@ -603,13 +595,13 @@ sub save_gv_av {
 }
 
 sub save_gv_hv {
-    my ( $gv, $fullname, $sym, $gvname ) = @_;
+    my ( $gv, $fullname, $gvname ) = @_;
 
     my $gvhv = $gv->HV;
-    return unless $gvhv && $$gvhv;
+    return 'NULL' unless $gvhv && $$gvhv;
 
     # Handle HV exceptions first...
-    return if $fullname eq 'main::ENV' or $fullname eq 'main::INC';    # do not save %ENV
+    return 'NULL' if $fullname eq 'main::ENV' or $fullname eq 'main::INC';    # do not save %ENV
 
     debug( gv => "GV::save \%$fullname" );
     if ( $fullname eq 'main::!' ) {                                    # force loading Errno
@@ -633,17 +625,14 @@ sub save_gv_hv {
             $Encode::Encoding{$k} = $tmp_Encode_Encoding{$k} if exists $tmp_Encode_Encoding{$k};
         }
         $gvhv->save($fullname);
-        init()->add("/* deferred some XS enc pointers for \%Encode::Encoding */");
-        init()->sadd( "GvHV(%s) = s\\_%x;", $sym, $$gvhv );
+        #init()->add("/* deferred some XS enc pointers for \%Encode::Encoding */");
+        #init()->sadd( "GvHV(%s) = s\\_%x;", $sym, $$gvhv );
 
         %Encode::Encoding = %tmp_Encode_Encoding;
-        return;
+        #return;
     }
 
-    $gvhv->save($fullname);
-    init()->sadd( "GvHV(%s) = s\\_%x;", $sym, $$gvhv );
-
-    return;
+    return $gvhv->save($fullname);
 }
 
 sub save_gv_io {
@@ -666,7 +655,7 @@ sub save_gv_io {
     }
 
     $gvio->save( $fullname, $is_data );
-    init()->sadd( "GvIOp(%s) = s\\_%x;", $sym, $$gvio );
+    init()->sadd( "GvIOp(&%s) = s\\_%x;", $sym, $$gvio );
 
     return;
 }
@@ -743,44 +732,44 @@ sub get_savefields {
     my $gvname = $gv->NAME;
 
     # default savefields
-    my $savefields = Save_HV | Save_AV | Save_SV | Save_CV | Save_FORM | Save_IO;
+    my $save_fields = Save_HV | Save_AV | Save_SV | Save_CV | Save_FORM | Save_IO;
 
-    $savefields = 0 if $gv->save_egv();
-    $savefields = 0 if $gvname =~ /::$/;
-    $savefields = 0 if $gv->is_empty();
+    $save_fields = 0 if $gv->save_egv();
+    $save_fields = 0 if $gvname =~ /::$/;
+    $save_fields = 0 if $gv->is_empty();
 
     my $gp = $gv->GP;
-    $savefields = 0 if !$gp;
+    $save_fields = 0 if !$gp;
 
     # some non-alphabetic globs require some parts to be saved
     # ( ex. %!, but not $! )
     if ( ref($gv) eq 'B::STASHGV' and $gvname !~ /::$/ ) {
 
         # https://code.google.com/archive/p/perl-compiler/issues/79 - Only save stashes for stashes.
-        $savefields = 0;
+        $save_fields = 0;
     }
     elsif ( $gvname !~ /^([^A-Za-z]|STDIN|STDOUT|STDERR|ARGV|SIG|ENV)$/ ) {
-        $savefields = Save_HV | Save_AV | Save_SV | Save_CV | Save_FORM | Save_IO;
+        $save_fields = Save_HV | Save_AV | Save_SV | Save_CV | Save_FORM | Save_IO;
     }
     elsif ( $fullname eq 'main::!' ) {    #Errno
-        $savefields = Save_HV | Save_SV | Save_CV;
+        $save_fields = Save_HV | Save_SV | Save_CV;
     }
     elsif ( $fullname eq 'main::ENV' or $fullname eq 'main::SIG' ) {
-        $savefields = Save_AV | Save_SV | Save_CV | Save_FORM | Save_IO;
+        $save_fields = Save_AV | Save_SV | Save_CV | Save_FORM | Save_IO;
     }
     elsif ( $fullname eq 'main::ARGV' ) {
-        $savefields = Save_HV | Save_SV | Save_CV | Save_FORM | Save_IO;
+        $save_fields = Save_HV | Save_SV | Save_CV | Save_FORM | Save_IO;
     }
     elsif ( $fullname =~ /^main::STD(IN|OUT|ERR)$/ ) {
-        $savefields = Save_FORM | Save_IO;
+        $save_fields = Save_FORM | Save_IO;
     }
     elsif ( $fullname eq 'main::_' or $fullname eq 'main::@' ) {
-        $savefields = 0;
+        $save_fields = 0;
     }
 
     # avoid overly dynamic POSIX redefinition warnings: GH #335, #345
     if ( $fullname =~ m/^POSIX::M/ or $fullname eq 'attributes::bootstrap' ) {
-        $savefields &= ~Save_CV;
+        $save_fields &= ~Save_CV;
     }
 
     # compute filter
@@ -788,21 +777,21 @@ sub get_savefields {
 
     # apply filter
     if ( $filter and $filter =~ qr{^[0-9]$} ) {
-        $savefields &= ~$filter;
+        $save_fields &= ~$filter;
     }
 
     my $is_gvgp    = $gv->isGV_with_GP;
     my $is_coresym = $gv->is_coresym();
     if ( !$is_gvgp or $is_coresym ) {
-        $savefields &= ~Save_FORM;
-        $savefields &= ~Save_IO;
+        $save_fields &= ~Save_FORM;
+        $save_fields &= ~Save_IO;
     }
 
-    $savefields |= Save_FILE if ( $is_gvgp and !$is_coresym && ( !$B::C::stash or $fullname !~ /::$/ ) );
+    $save_fields |= Save_FILE if ( $is_gvgp and !$is_coresym && ( !$B::C::stash or $fullname !~ /::$/ ) );
 
-    $savefields &= Save_SV if $gvname eq '\\';
+    $save_fields &= Save_SV if $gvname eq '\\';
 
-    return $savefields;
+    return $save_fields;
 }
 
 sub normalize_filter {

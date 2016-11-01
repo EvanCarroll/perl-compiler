@@ -31,7 +31,7 @@ sub swash_ToCf_value {    # NO idea what it s ??
 }
 
 sub save {
-    my ( $hv, $fullname ) = @_;
+    my ( $hv, $fullname, $save_main ) = @_;
 
     $fullname = '' unless $fullname;
     my $sym = objsym($hv);
@@ -40,21 +40,17 @@ sub save {
     my $is_stash = $name;
     my $magic;
 
+    # protect against recursive self-reference
+    # i.e. with use Moose at stash Class::MOP::Class::Immutable::Trait
+    # value => rv => cv => ... => rv => same hash
+
     if ($name) {
-
         # It's a stash. See issue 79 + test 46
-        debug(
-            hv => "Saving stash HV \"%s\" from \"$fullname\" 0x%x MAX=%d\n",
-            $name, $$hv, $hv->MAX
-        );
+        debug( hv => "Saving stash HV \"%s\" from \"$fullname\" 0x%x MAX=%d\n", $name, $$hv, $hv->MAX );
 
-        # A perl bug means HvPMROOT isn't altered when a PMOP is freed. Usually
-        # the only symptom is that sv_reset tries to reset the PMf_USED flag of
-        # a trashed op but we look at the trashed op_type and segfault.
-        my $no_gvadd = $name eq 'main' ? 1 : 0;
-
-        $sym = savestashpv( $name, $no_gvadd );    # inc hv_index
-        savesym( $hv, $sym );
+        #$sym =
+        savestashpv( $name );    # inc hv_index
+        #savesym( $hv, $sym );
 
         # fix overload stringify
         if ( $hv->FLAGS & SVf_AMAGIC and length($name) ) {
@@ -117,27 +113,26 @@ sub save {
                 # defer AMT magic of XS loaded hashes.
                 #init1()->add(qq[$sym = gv_stashpvn($cname, $len, GV_ADDWARN|GV_ADDMULTI);]);
             }
-            return $sym;
+            return $sym if ($name eq 'main' && !$save_main);
         }
-        return $sym if B::C::skip_pkg($name) or $name eq 'main';
+
+        return $sym if B::C::skip_pkg($name) or ($name eq 'main' && !$save_main);
         init()->add("SvREFCNT_inc($sym);");
         debug( hv => "Saving stash keys for HV \"$name\" from \"$fullname\"" );
     }
 
-    # protect against recursive self-reference
-    # i.e. with use Moose at stash Class::MOP::Class::Immutable::Trait
-    # value => rv => cv => ... => rv => same hash
-
-    my $sv_list_index = svsect()->add("FAKE_HV");
-    $sym = savesym( $hv, "(HV*)&sv_list[$sv_list_index]" ) unless $is_stash;
+    print STDERR "$name -- $save_main\n";
 
     # could also simply use: savesym( $hv, sprintf( "s\\_%x", $$hv ) );
+    my $sv_list_index = svsect()->add("FAKE_HV");
+    $sym = savesym( $hv, "(HV*)&sv_list[$sv_list_index]" );
 
     # reduce the content
     # remove values from contents we are not going to save
     my @hash_content_to_save;
     my @contents = $hv->ARRAY;
     if (@contents) {
+        @contents = munge_contents(@contents) if($name eq 'main');
         local $B::C::const_strings = $B::C::const_strings;
         my ( $i, $length );
         $length = scalar(@contents);
@@ -245,6 +240,37 @@ sub get_max_hash_from_keys {
     return $default if !$keys or $keys <= $default;    # default hash max value
 
     return 2**( int( log($keys) / log(2) ) + 1 ) - 1;
+}
+
+sub munge_contents {
+    my @contents = @_;
+
+    
+    
+    
+}
+
+*skip_package = *B::C::skip_package;
+sub should_skip_descend {
+    my $name = shift;
+    $name =~ s/:://;
+
+    return 1 if($name =~ qr/^(?:main|Internals|O)::/)
+    return 1 if $name eq '__ANON__';
+    if (
+        $package =~ /^(main::)?(Internals|O)::/
+
+        #or $package =~ /::::/ #  CORE/base/lex.t 54
+        or $package =~ /^B::C::/
+        or $package 
+        or index( $package, " " ) != -1    # XXX skip invalid package names
+        or index( $package, "(" ) != -1    # XXX this causes the compiler to abort
+        or index( $package, ")" ) != -1    # XXX this causes the compiler to abort
+        or exists $skip_package{$package} or ( $DB::deep and $package =~ /^(DB|Term::ReadLine)/ )
+      ) {
+        return 1;
+    }
+    return 0;
 }
 
 1;

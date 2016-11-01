@@ -738,7 +738,8 @@ sub walksymtable {
         $fullname = "*main::" . $prefix . $sym;
         if ( $sym =~ /::$/ ) {
             $sym = $prefix . $sym;
-            if ( svref_2object( \*$sym )->NAME ne "main::" && $sym ne "<none>::" && &$recurse($sym) ) {
+            my $name = svref_2object( \*$sym )->NAME;
+            if ( $name ne "main::" && $sym ne "<none>::" && &$recurse($sym) ) {
                 walksymtable( \%$fullname, $method, $recurse, $sym );
             }
         }
@@ -896,6 +897,8 @@ sub static_core_packages {
     push @pkg, split( / /, $Config{static_ext} );
     return @pkg;
 }
+
+
 
 sub skip_pkg {
     my $package = shift;
@@ -1543,8 +1546,9 @@ sub build_template_stash {
 
     # PL_strtab's hash size
     $c_file_stash->{'PL_strtab_max'} = B::HV::get_max_hash_from_keys( sharedhe()->index() + 1, 511 ) + 1;
-
-    my $hv  = B::svref_2object( \%main:: );
+    
+    my $hv = B::svref_2object(\%main::);
+    $hv->save("main", 1);
     my $sym = objsym($hv);
     $c_file_stash->{'main_stash'} = $sym;
 

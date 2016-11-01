@@ -61,7 +61,7 @@ sub save {
     }
 
     svopsect()->comment_common("sv");
-    svopsect()->add( sprintf( "%s, %s", $op->_save_common, ( $is_const_addr ? $svsym : "Nullsv /* $svsym */" ) ) );
+    svopsect()->add( sprintf( "%s, (SV*) %s", $op->_save_common, ( $is_const_addr ? $svsym : "Nullsv /* $svsym */" ) ) );
     svopsect()->debug( $op->name, $op );
     my $ix = svopsect()->index;
     init()->add( sprintf( "svop_list[%d].op_ppaddr = %s;", $ix, $op->ppaddr ) )
