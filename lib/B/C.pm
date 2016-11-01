@@ -1544,6 +1544,10 @@ sub build_template_stash {
     # PL_strtab's hash size
     $c_file_stash->{'PL_strtab_max'} = B::HV::get_max_hash_from_keys( sharedhe()->index() + 1, 511 ) + 1;
 
+    my $hv  = B::svref_2object( \%main:: );
+    my $sym = objsym($hv);
+    $c_file_stash->{'main_stash'} = $sym;
+
     return $c_file_stash;
 }
 
