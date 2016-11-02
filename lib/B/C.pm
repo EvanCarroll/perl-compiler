@@ -727,6 +727,7 @@ sub walksymtable {
             $b eq $v and return -1;
         }
 
+
         # reverse order for now to preserve original behavior before improved patch
         $b cmp $a
     } keys %$symref;
@@ -743,9 +744,14 @@ sub walksymtable {
             }
         }
         else {
+            # do not save B::C code..
+            return if $fullname =~ qr{^\Q*main::_<\E} && $fullname =~ qr{/B/}
+                && grep { $fullname =~ qr{$_/B/} } @INC ;
             svref_2object( \*$fullname )->$method();
         }
     }
+
+    return;
 }
 
 sub walk_syms {
