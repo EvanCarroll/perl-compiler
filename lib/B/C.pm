@@ -794,8 +794,7 @@ sub mark_package {
         my @IO = qw(IO::File IO::Handle IO::Socket IO::Seekable IO::Poll);
         mark_package('IO') if grep { $package eq $_ } @IO;
         mark_package("DynaLoader") if $package eq 'XSLoader';
-        $use_xsloader = 1 if $package =~ /^B|Carp$/;    # to help CC a bit (49)
-
+        
         # i.e. if force
         my $flag_as_unused = is_package_used($package);
         if (    defined $flag_as_unused
