@@ -73,7 +73,7 @@ use B::C::Optimizer::DynaLoader     ();
 use B::C::Optimizer::UnusedPackages ();
 use B::C::OverLoad                  ();
 use B::C::Packages qw/is_package_used mark_package_unused mark_package_used mark_package_removed get_all_packages_used/;
-use B::C::Save qw(constpv savepv set_max_string_len savestashpv);
+use B::C::Save qw(constpv savepv savestashpv);
 use B::C::Save::Signals ();
 
 our $gv_index = 0;
@@ -1627,18 +1627,13 @@ sub compile {
             $arg ||= shift @options;
             mark_skip($arg);
         }
-        elsif ( $opt eq "f" ) {
-            die "Invalid option -f";
-        }
-        elsif ( $opt eq "O" ) {
-            die "Invalid option -O";
-        }
         elsif ( $opt eq "e" ) {
             push @eval_at_startup, $arg;
         }
-        elsif ( $opt eq "l" ) {
-            set_max_string_len($arg);
+        else {
+            die "Invalid option $opt";   
         }
+
     }
 
     B::C::File::new($output_file);    # Singleton.
