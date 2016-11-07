@@ -26,18 +26,6 @@ our $gv_index = 0;
 
 our $const_strings = 1;      # TODO: This var needs to go away.
 
-our %all_bc_subs = map { $_ => 1 } qw(B::AV::save B::BINOP::save B::BM::save B::COP::save B::CV::save
-  B::FAKEOP::fake_ppaddr B::FAKEOP::flags B::FAKEOP::new B::FAKEOP::next
-  B::FAKEOP::ppaddr B::FAKEOP::private B::FAKEOP::save B::FAKEOP::sibling
-  B::FAKEOP::targ B::FAKEOP::type B::GV::save B::GV::savecv B::HV::save
-  B::IO::save B::IO::save_data B::IV::save B::LISTOP::save B::LOGOP::save
-  B::LOOP::save B::NULL::save B::NV::save B::OBJECT::save
-  B::OP::_save_common B::OP::fake_ppaddr B::OP::isa B::OP::save
-  B::PADLIST::save B::PADOP::save B::PMOP::save B::PV::save B::PVIV::save
-  B::PVLV::save B::PVMG::save B::PVMG::save_magic B::PVNV::save B::PVOP::save
-  B::REGEXP::save B::RV::save B::SPECIAL::save B::SPECIAL::savecv
-  B::SV::save B::SVOP::save B::UNOP::save B::UV::save B::REGEXP::EXTFLAGS);
-
 our $settings = {
     'signals'       => 1,
     'debug_options' => '',
@@ -73,12 +61,40 @@ sub compile {
     return \&build_c_file;
 }
 
+sub sub_was_compiled_in {
+    my $fullname = shift or die;
+
+    my @path = split( "::", $fullname );
+    shift @path if ( $path[0] eq 'main' );
+
+    my $subname = pop @path;
+    return 1 if ( !@path && $subname =~ tr/[]// );    # This doesn't appear to be a sub.
+                                                      #return 1 if($settings->{'needs_xs'} && $fullname =~ m/^XSLoader::/);
+
+    my $stash = $settings->{'starting_stash'};
+    while ( my $step = shift @path ) {
+        if ( !exists $stash->{"${step}::"} ) {
+            return 0;
+        }
+        $stash = $stash->{"${step}::"};
+    }
+
+    my $ret = $stash->{$subname} ? 1 : 0;
+
+    #print STDERR "**** REMOVE $fullname\n" if(!$ret);
+    return $ret;
+}
+
 # This sub captures state information about the compiled program before B::C is loaded and pollutes the stash.
 sub save_compile_state {
     $settings->{'needs_xs'}       = save_xsloader();
     $settings->{'starting_INC'}   = save_inc();
     $settings->{'starting_stash'} = save_stashes( $::{"main::"}, 1 );
 
+    delete $settings->{'starting_stash'}->{'B::'};
+    $settings->{'starting_stash'}->{'XSLoader::'}->{'load_file'} = 1 if $settings->{'needs_xs'};
+
+    #require Data::Dumper; print STDERR Data::Dumper::Dumper($settings->{'starting_stash'});
     return;
 }
 
