@@ -68,13 +68,14 @@ sub sub_was_compiled_in {
     shift @path if ( $path[0] eq 'main' );
 
     my $subname = pop @path;
-    return 1 if ( $subname =~ tr/[]{}()// );     # This doesn't appear to be a sub.
+    return 1 if ( $subname =~ tr/[]{}()// );                                    # This doesn't appear to be a sub.
     return 1 if ( $fullname =~ m/^DynaLoader::/ && $settings->{'needs_xs'} );
     return 1 if ( $fullname =~ /Config::[^:]+$/ );
     return 1 if ( $fullname =~ /Errno::[^:]+$/ );
     return 1 if ( $fullname =~ /NDBM_File::[^:]+$/ );
+
     #return 1 if ( $fullname =~ /utf8::[^:]+$/ );
-    #return 1 if ( $fullname =~ /re::[^:]+$/ );
+    #return 1 if $fullname =~ /re::[^:]+$/ and $settings->{'uses_re'};
 
     my $stash = $settings->{'starting_stash'};
     while ( my $step = shift @path ) {
@@ -92,8 +93,10 @@ sub sub_was_compiled_in {
 
 # This sub captures state information about the compiled program before B::C is loaded and pollutes the stash.
 sub save_compile_state {
-    $settings->{'needs_xs'}       = save_xsloader();
-    $settings->{'starting_INC'}   = save_inc();
+    $settings->{'so_files'} = save_xsloader();
+    $settings->{'needs_xs'} = scalar @{ $settings->{'so_files'} };
+    #$settings->{'uses_re'}  = scalar grep { m{\Q/re/re.so\E$} } @{ $settings->{'so_files'} };
+    $settings->{'starting_INC'} = save_inc();
     $settings->{'starting_stash'} = save_stashes( $::{"main::"}, 1 );
 
     delete $settings->{'starting_stash'}->{'B::'};
@@ -208,8 +211,7 @@ sub save_stashes {
 
 sub save_xsloader {
     my @DL = eval '@DynaLoader::dl_shared_objects';    # Quoted eval gets rid of no warnings once issue.
-    @DL = grep { $_ !~ m{/B/B\.so$} } @DL;
-    return scalar @DL;
+    return [ grep { $_ !~ m{/B/B\.so$} } @DL ];
 }
 
 1;
