@@ -80,7 +80,7 @@ sub sub_was_compiled_in {
     #return 1 if $fullname =~ /re::[^:]+$/ and $settings->{'uses_re'};
 
     my $stash = $settings->{'starting_stash'};
-    while ( my $step = shift @path ) {
+    foreach my $step ( @path ) { # note $step can be empty: a::::b
         if ( !exists $stash->{"${step}::"} ) {
             return 0;
         }
