@@ -88,7 +88,7 @@ sub sub_was_compiled_in {
 
     my $ret = $stash->{$subname} ? 1 : 0;
 
-    print STDERR "**** REMOVE $fullname\n" if ( !$ret );
+    #print STDERR "**** REMOVE $fullname\n" if ( !$ret );
     return $ret;
 }
 
