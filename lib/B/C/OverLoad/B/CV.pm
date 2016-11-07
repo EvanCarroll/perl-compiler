@@ -4,7 +4,7 @@ use strict;
 
 use B::C::Flags ();
 
-use B qw/cstring svref_2object CVf_ANON CVf_ANONCONST CVf_CONST main_cv SVf_ROK SVp_POK SVf_IOK SVf_UTF8 SVs_PADSTALE CVf_WEAKOUTSIDE/;
+use B qw/cstring svref_2object CVf_ANON CVf_ANONCONST CVf_LEXICAL CVf_CONST main_cv SVf_ROK SVp_POK SVf_IOK SVf_UTF8 SVs_PADSTALE CVf_WEAKOUTSIDE/;
 use B::C::Config;
 use B::C::Decimal qw/get_integer_value/;
 use B::C::Packages qw/is_package_used/;
@@ -85,7 +85,8 @@ sub save {
 
         # XXX not needed, we already loaded utf8_heavy
         #return if $fullname eq 'utf8::AUTOLOAD';
-        return '0' unless B::C::sub_was_compiled_in($fullname);
+        my $is_lexsub = $CvFLAGS & CVf_LEXICAL; # LEXICAL
+        return '0' if !$is_lexsub && !B::C::sub_was_compiled_in($fullname);
 
         $CvFLAGS &= ~0x400;    # no CVf_CVGV_RC otherwise we cannot set the GV
         B::C::mark_package( $cvstashname, 1 ) unless is_package_used($cvstashname);
