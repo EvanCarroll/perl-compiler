@@ -104,7 +104,7 @@ sub save_compile_state {
     delete $settings->{'starting_stash'}->{'B::'};
     $settings->{'starting_stash'}->{'XSLoader::'}->{'load_file'} = 1 if $settings->{'needs_xs'};
 
-    require Data::Dumper; print STDERR Data::Dumper::Dumper($settings->{'starting_INC'}, $settings->{'starting_stash'});
+    #require Data::Dumper; print STDERR Data::Dumper::Dumper($settings->{'starting_INC'}, $settings->{'starting_stash'});
     return;
 }
 
