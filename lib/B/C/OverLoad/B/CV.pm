@@ -33,8 +33,11 @@ sub is_phase_name {
 
 sub Dummy_initxs { }
 
+
+
 sub save {
     my ( $cv, $origname ) = @_;
+
     my $sym = objsym($cv);
     if ( defined($sym) ) {
         debug( cv => "CV 0x%x already saved as $sym\n", $$cv ) if $$cv;
@@ -59,8 +62,12 @@ sub save {
                 $cvname =~ s/^.*:://;
                 if ( $cvname =~ m/ :pad\[.*$/ ) {
                     $cvname =~ s/ :pad\[.*$//;
-                    $cvname = '__ANON__' if is_phase_name($cvname);
-                    $fullname = $cvstashname . '::' . $cvname;
+                    if ( is_phase_name($cvname) ) {
+                        $cvname = '__ANON__';    
+                        $fullname = $cvstashname . '::' . $cvname
+                    } elsif ( $cvstashname->can($cvname) ) {
+                        $fullname = $cvstashname . '::' . $cvname;    
+                    }
                 }
                 debug( cv => "empty -> %s", $cvname );
             }
