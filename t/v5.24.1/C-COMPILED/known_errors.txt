@@ -51,7 +51,6 @@ op/goto_xs.t                 COMPAT    needs XS::APItest
 op/lex.t                     COMPAT    Tests trigger errors at compilation time
 op/lexsub.t                  BC        BC issue #219 - overload issue
 op/lvref.t                   SIG       BC issue #304 - SIGABRT - assertion failures with lexical_sub feature
-op/magic.t                   TESTS     Test results:
 op/method.t                  PLAN      Plan was valid
 op/override.t                COMPAT    crazy test which override CORE::GLOBAL::require @BEGIN
 op/postfixderef.t            TESTS     BC issue #302 - quoted eval scope doesn't honor use feature.
