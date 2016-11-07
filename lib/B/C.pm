@@ -18,8 +18,6 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(mark_skip set_callback save_context svop_or_padop_pv inc_cleanup opsect_common fixup_ppaddr);
 
-our $caller = caller;        # So we know how we were invoked.
-
 # can be improved
 our $nullop_count     = 0;
 our $unresolved_count = 0;
@@ -60,12 +58,12 @@ sub load_heavy {
 # We want to capture stash and %INC information before we go and corrupt it!
 sub build_c_file {
     parse_options();    # Parses command line options and populates $settings where necessary
+    save_compile_state();
     load_heavy();       # Loads B::C_heavy.pl
     start_heavy();      # Invokes into B::C_heavy.pl
 }
 
-
-my @compile_options; # holds args passed to compile for use in build_c_file()
+my @compile_options;    # holds args passed to compile for use in build_c_file()
 
 # This is what is called when you do perl -MO=C,....
 # It tells O.pm what to invoke once the program completes the BEGIN state.
@@ -73,6 +71,15 @@ sub compile {
     @compile_options = @_;
     $DB::single = 1 if defined &DB::DB;
     return \&build_c_file;
+}
+
+# This sub captures state information about the compiled program before B::C is loaded and pollutes the stash.
+sub save_compile_state {
+    $settings->{'needs_xs'}       = save_xsloader();
+    $settings->{'starting_INC'}   = save_inc();
+    $settings->{'starting_stash'} = save_stashes( $::{"main::"}, 1 );
+
+    return;
 }
 
 # This parses the options passed to sub compile but not until build_c_file is invoked at the end of BEGIN.
@@ -142,6 +149,46 @@ sub parse_options {
     @compile_options and die("Used to call B::C::File::output_all but this sub has been gone for a while!");
 
     return;
+}
+
+sub save_inc {
+    my %compiled_INC = %INC;
+    delete $compiled_INC{"$_.pm"} foreach qw{B B/C O };
+    return \%compiled_INC;
+}
+
+my %seen;
+
+sub save_stashes {
+    my ( $stash, $in_main ) = @_;
+
+    $seen{"$stash"} = 1 if ($in_main);
+
+    my %hash;
+    foreach my $key ( sort keys %$stash ) {
+        if ( $key =~ m/::$/ ) {
+            my $goto = $stash->{$key};
+            $name = "$goto";
+            if ( !$seen{$name} ) {
+                $seen{$name} = 1;
+                $hash{$key}  = save_stashes($goto);
+            }
+            else {
+                die("duplicate stash detected!!! $key") unless ( $in_main && $key eq 'main::' );
+            }
+        }
+        else {
+            $hash{$key} = 1;
+        }
+    }
+
+    return \%hash;
+}
+
+sub save_xsloader {
+    my @DL = eval '@DynaLoader::dl_shared_objects';    # Quoted eval gets rid of no warnings once issue.
+    @DL = grep { $_ !~ m{/B/B\.so$} } @DL;
+    return scalar @DL;
 }
 
 1;
