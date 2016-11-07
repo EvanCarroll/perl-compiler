@@ -195,7 +195,7 @@ sub save_stashes {
                 $hash{$key}  = save_stashes($goto);
             }
             else {
-                die("duplicate stash detected!!! $key") unless ( $in_main && $key eq 'main::' );
+                $hash{$key} = 1 unless ( $in_main && $key eq 'main::' );
             }
         }
         else {
