@@ -13,11 +13,10 @@ package B::C;
 use strict;
 
 # From C.pm
-our (%Config, %all_bc_subs);
-our ($VERSION, $caller, $nullop_count, $unresolved_count, $gv_index, $settings );
-our (@ISA, @EXPORT_OK);
-our $const_strings = 1;      # TODO: This var needs to go away.
-
+our (%Config);
+our ( $VERSION, $caller, $nullop_count, $unresolved_count, $gv_index, $settings );
+our ( @ISA, @EXPORT_OK );
+our $const_strings = 1;    # TODO: This var needs to go away.
 
 BEGIN {
     use B::C::Flags ();
@@ -25,7 +24,7 @@ BEGIN {
 }
 
 use B::Flags;
-use B::C::Config;    # import everything
+use B::C::Config;          # import everything
 use B::C::Config::Debug ();    # used for setting debug levels from cmdline
 
 use B::C::File qw( init2 init0 init decl free
