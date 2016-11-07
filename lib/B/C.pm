@@ -64,6 +64,8 @@ sub compile {
 sub sub_was_compiled_in {
     my $fullname = shift or die;
 
+    return 1 if $fullname =~ qr{^::};
+
     my @path = split( "::", $fullname );
     shift @path if ( $path[0] eq 'main' );
 
@@ -95,6 +97,7 @@ sub sub_was_compiled_in {
 sub save_compile_state {
     $settings->{'so_files'} = save_xsloader();
     $settings->{'needs_xs'} = scalar @{ $settings->{'so_files'} };
+
     #$settings->{'uses_re'}  = scalar grep { m{\Q/re/re.so\E$} } @{ $settings->{'so_files'} };
     $settings->{'starting_INC'} = save_inc();
     $settings->{'starting_stash'} = save_stashes( $::{"main::"}, 1 );
