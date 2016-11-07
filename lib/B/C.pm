@@ -68,7 +68,7 @@ sub sub_was_compiled_in {
     shift @path if ( $path[0] eq 'main' );
 
     my $subname = pop @path;
-    return 1 if ( !@path                        && $subname =~ tr/[]{}()// );     # This doesn't appear to be a sub.
+    return 1 if ( $subname =~ tr/[]{}()// );     # This doesn't appear to be a sub.
     return 1 if ( $fullname =~ m/^DynaLoader::/ && $settings->{'needs_xs'} );
     return 1 if ( $fullname =~ /Config::[^:]+$/ );
     return 1 if ( $fullname =~ /Errno::[^:]+$/ );
