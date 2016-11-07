@@ -75,8 +75,7 @@ sub sub_was_compiled_in {
     return 1 if ( $fullname =~ /Config::[^:]+$/ );
     return 1 if ( $fullname =~ /Errno::[^:]+$/ );
     return 1 if ( $fullname =~ /NDBM_File::[^:]+$/ );
-
-    #return 1 if ( $fullname =~ /utf8::[^:]+$/ );
+    return 1 if ( $fullname =~ /utf8::[^:]+$/ );
     #return 1 if $fullname =~ /re::[^:]+$/ and $settings->{'uses_re'};
 
     my $stash = $settings->{'starting_stash'};
@@ -89,7 +88,7 @@ sub sub_was_compiled_in {
 
     my $ret = $stash->{$subname} ? 1 : 0;
 
-    #print STDERR "**** REMOVE $fullname\n" if ( !$ret );
+    print STDERR "**** REMOVE $fullname\n" if ( !$ret );
     return $ret;
 }
 
@@ -105,7 +104,7 @@ sub save_compile_state {
     delete $settings->{'starting_stash'}->{'B::'};
     $settings->{'starting_stash'}->{'XSLoader::'}->{'load_file'} = 1 if $settings->{'needs_xs'};
 
-    #require Data::Dumper; print STDERR Data::Dumper::Dumper($settings->{'starting_stash'});
+    require Data::Dumper; print STDERR Data::Dumper::Dumper($settings->{'starting_INC'}, $settings->{'starting_stash'});
     return;
 }
 
