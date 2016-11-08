@@ -38,6 +38,7 @@ mro/overload_c3_utf8.t       TESTS     BC issue #219 - overload issue
 mro/overload_dfs.t           TESTS     BC issue #219 - overload issue
 mro/package_aliases_utf8.t   SKIP      Runs REAALY slow and many of the failures are already reported. Waiting for other BC issues to clear before researching this one.
 op/attrhand.t                PLAN      BC issue #271 - Attribute::Handlers
+op/attrs.t                   PLAN      Plan was valid
 op/blocks.t                  COMPAT    check order of execution of special blocks ( BEGIN included )
 op/caller.t                  TESTS     Test results:
 op/closure.t                 TESTS     BC issue #278 - destruction issue
@@ -50,6 +51,7 @@ op/glob.t                    SKIP      Occasional Flapper. Waiting for more BC i
 op/goto_xs.t                 COMPAT    needs XS::APItest
 op/lex.t                     COMPAT    Tests trigger errors at compilation time
 op/lexsub.t                  BC        BC issue #219 - overload issue
+op/local.t                   PLAN      Plan was valid
 op/lvref.t                   SIG       BC issue #304 - SIGABRT - assertion failures with lexical_sub feature
 op/method.t                  PLAN      Plan was valid
 op/override.t                COMPAT    crazy test which override CORE::GLOBAL::require @BEGIN
