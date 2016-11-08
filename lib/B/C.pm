@@ -90,6 +90,7 @@ sub sub_was_compiled_in {
     my $ret = $stash->{$subname} ? 1 : 0;
 
     #print STDERR "**** REMOVE $fullname\n" unless $ret;
+    
     return $ret;
 }
 
@@ -123,7 +124,10 @@ sub save_compile_state {
 
     $settings->{'uses_re'}  = scalar grep { m{\Q/re/re.so\E$} } @{ $settings->{'so_files'} };
     $settings->{'starting_INC'} = save_inc();
+    $settings->{'starting_AINC'} = save_ainc();
     $settings->{'starting_stash'} = save_stashes( $::{"main::"}, 1 );
+
+
 
     delete $settings->{'starting_stash'}->{'B::'};
     $settings->{'starting_stash'}->{'XSLoader::'}->{'load_file'} = 1 if $settings->{'needs_xs'};
@@ -205,6 +209,10 @@ sub save_inc {
     my %compiled_INC = %INC;
     delete $compiled_INC{"$_.pm"} foreach qw{B B/C O };
     return \%compiled_INC;
+}
+
+sub save_ainc { # no cleanup for now
+    return \@INC;
 }
 
 my %seen;

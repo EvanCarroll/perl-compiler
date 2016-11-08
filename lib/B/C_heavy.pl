@@ -915,7 +915,7 @@ sub walkpackages {
 
 sub inc_cleanup {
     my $rec_cnt = shift;
-
+#return;
     # %INC sanity check issue 89:
     # omit unused, unsaved packages, so that at least run-time require will pull them in.
 
@@ -938,7 +938,7 @@ sub inc_cleanup {
             push @deleted_inc, $p;
         }
     }
-    if ( debug('pkg') and verbose() ) {
+    if ( debug('pkg') ) {
         debug( pkg => "\%include_package: " . join( " ", get_all_packages_used() ) );
         debug( pkg => "\%dumped_package:  " . join( " ", grep { $dumped_package{$_} } sort keys %dumped_package ) );
     }
@@ -969,6 +969,7 @@ sub inc_cleanup {
 
 ### ??? move to B::C::Optimizer::UnusedPackages
 sub dump_rest {
+   #return;
     my $again;
     verbose("dump_rest");
     for my $p ( get_all_packages_used() ) {
@@ -981,6 +982,11 @@ sub dump_rest {
                 delete_unsaved_hashINC('warnings::register');
                 next;
             }
+            if ( $p eq 'utf8_heavy.pl' ) {
+                delete_unsaved_hashINC('utf8_heavy.pl');
+                next;
+            }
+
             $again++;
             debug( [qw/verbose pkg/], "$p marked but not saved, save now" );
 
@@ -1070,11 +1076,18 @@ sub save_context {
         $curpad_sym = ( comppadlist->ARRAY )[1]->save('curpad_syms');
     }
     my ( $inc_hv, $inc_av );
+    
     {
         local $B::C::const_strings = 1;
         verbose("\%INC and \@INC:");
         init()->add('/* %INC */');
+        local %INC;
+        %INC = %{$settings->{'starting_INC'}};        
+        local @INC;
+        @INC = @{$settings->{'starting_AINC'}};
+
         inc_cleanup(0);
+        # .... inc...
         my $inc_gv = svref_2object( \*main::INC );
         $inc_hv = $inc_gv->HV->save('main::INC');
         init()->add('/* @INC */');
