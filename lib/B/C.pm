@@ -58,7 +58,7 @@ my @compile_options;    # holds args passed to compile for use in build_c_file()
 # It tells O.pm what to invoke once the program completes the BEGIN state.
 sub compile {
     @compile_options = @_;
-    $DB::single = 1 if defined &DB::DB;
+    do { $DB::single = $DB::single = 1 } if defined &DB::DB;
     return \&build_c_file;
 }
 
@@ -70,17 +70,21 @@ sub sub_was_compiled_in {
     my @path = split( "::", $fullname );
     shift @path if ( $path[0] eq 'main' );
 
+    my $stash = $settings->{'starting_stash'};
+
     my $subname = pop @path;
     return 1 if ( $subname =~ tr/[]{}()// );                                    # This doesn't appear to be a sub.
     return 1 if ( $fullname =~ m/^DynaLoader::/ && $settings->{'needs_xs'} );
-    #return 1 if ( $fullname =~ /Config::[^:]+$/ );
+    return 1 if $fullname =~ /^Config::(AUTOLOAD|DESTROY|TIEHASH|FETCH|import)$/ 
+        && exists $stash->{"Config::"}->{'Config'};
+    return 1 if $fullname =~ /Config::[^:]+$/ && exists $settings->{'starting_INC'}->{'Config_heavy.pl'};
     return 1 if ( $fullname =~ /Errno::[^:]+$/ );
     #return 1 if ( $fullname =~ /NDBM_File::[^:]+$/ );
     # save all utf8 functions if utf8_heavy is loaded
-    return 1 if $fullname =~ /utf8::[^:]+$/ && $stash->{"utf8::"}->{'SWASHNEW'};
+    return 1 if $fullname =~ /utf8::[^:]+$/ && exists $stash->{"utf8::"}->{'SWASHNEW'};
     return 1 if $fullname =~ /re::[^:]+$/ and $settings->{'uses_re'};
 
-    my $stash = $settings->{'starting_stash'};
+
     foreach my $step ( @path ) { # note $step can be empty: a::::b
         if ( !exists $stash->{"${step}::"} ) {
             return 0;
@@ -89,7 +93,7 @@ sub sub_was_compiled_in {
     }
     my $ret = $stash->{$subname} ? 1 : 0;
 
-    #print STDERR "**** REMOVE $fullname\n" unless $ret;
+    #print STDERR "**** REMOVE |$fullname|\n" unless $ret;
     
     return $ret;
 }
@@ -132,7 +136,7 @@ sub save_compile_state {
     delete $settings->{'starting_stash'}->{'B::'};
     $settings->{'starting_stash'}->{'XSLoader::'}->{'load_file'} = 1 if $settings->{'needs_xs'};
 
-    #require Data::Dumper; $Data::Dumper::Sortkeys = 1; print STDERR Data::Dumper::Dumper($settings->{'starting_INC'}, $settings->{'starting_stash'});
+    #require Data::Dumper; $Data::Dumper::Sortkeys = $Data::Dumper::Sortkeys = 1; print STDERR Data::Dumper::Dumper($settings->{'starting_INC'}, $settings->{'starting_stash'});
     return;
 }
 
@@ -226,7 +230,7 @@ sub save_stashes {
     foreach my $key ( sort keys %$stash ) {
         if ( $key =~ m/::$/ ) {
             my $goto = $stash->{$key};
-            $name = "$goto";
+            my $name = "$goto";
             if ( !$seen{$name} ) {
                 $seen{$name} = 1;
                 $hash{$key}  = save_stashes($goto);
