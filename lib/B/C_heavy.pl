@@ -1081,17 +1081,16 @@ sub save_context {
         local $B::C::const_strings = 1;
         verbose("\%INC and \@INC:");
         init()->add('/* %INC */');
-        local %INC;
-        %INC = %{$settings->{'starting_INC'}};        
-        local @INC;
-        @INC = @{$settings->{'starting_AINC'}};
-
+        my %saved_INC = %INC;
+        %INC = %{$settings->{'starting_INC'}};                
         inc_cleanup(0);
         # .... inc...
         my $inc_gv = svref_2object( \*main::INC );
         $inc_hv = $inc_gv->HV->save('main::INC');
         init()->add('/* @INC */');
         $inc_av = $inc_gv->AV->save('main::INC');
+
+        %INC = %saved_INC; # avoid using local %INC
     }
 
     # ensure all included @ISA's are stored (#308), and also assign c3 (#325)
