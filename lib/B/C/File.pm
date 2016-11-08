@@ -138,7 +138,7 @@ sub write {
         # Scoped no warnings without loading the module.
         local $^W;
         BEGIN { ${^WARNING_BITS} = 0; }
-        $template_dir = $B::C::savINC{'B/C.pm'};
+        $template_dir = $INC{'B/C.pm'};
     }
     $template_dir =~ s{\.pm$}{};
     $template_dir .= "/Templates";
