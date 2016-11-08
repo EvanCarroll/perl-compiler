@@ -40,6 +40,12 @@ sub mark_package_removed {
 #	need to check if this cannot be merged
 sub _mark_package {
     my ( $pkg, $val ) = @_;
+
+    return unless $val;
+    #print STDERR "MARK: $pkg => $val\n";
+    #print STDERR "XXX: sub_was_compiled_in($pkg) = " . B::C::package_was_compiled_in($pkg) . " / $val\n";
+    #print STDERR 'B::C::Save'->can('_caller_comment')->();
+
     $include_package{$pkg} = $val;
 
     return 1;

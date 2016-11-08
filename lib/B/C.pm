@@ -62,8 +62,17 @@ sub compile {
     return \&build_c_file;
 }
 
+sub package_was_compiled_in {
+    return was_compiled_in( shift, 0 );
+}
+
 sub sub_was_compiled_in {
+    return was_compiled_in( shift, 1 );
+}
+
+sub was_compiled_in {
     my $fullname = shift or die;
+    my $sub_check = shift;
 
     return 1 if $fullname =~ qr{^::};
 
@@ -72,7 +81,9 @@ sub sub_was_compiled_in {
 
     my $stash = $settings->{'starting_stash'};
 
-    my $subname = pop @path;
+    my $subname = '';
+    $subname = pop @path if $sub_check;
+
     return 1 if ( $subname =~ tr/[]{}()// );                                    # This doesn't appear to be a sub.
     return 1 if ( $fullname =~ m/^DynaLoader::/ && $settings->{'needs_xs'} );
     return 1 if $fullname =~ /^Config::(AUTOLOAD|DESTROY|TIEHASH|FETCH|import)$/ 
@@ -91,6 +102,10 @@ sub sub_was_compiled_in {
         }
         $stash = $stash->{"${step}::"};
     }
+
+       if ( $stash && !$sub_check ) {
+        return 1;
+    } 
     my $ret = $stash->{$subname} ? 1 : 0;
 
     #print STDERR "**** REMOVE |$fullname|\n" unless $ret;

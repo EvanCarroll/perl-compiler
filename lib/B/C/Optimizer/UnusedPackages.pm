@@ -177,7 +177,9 @@ sub should_save {
 
     # issue348: only drop B::C packages, not any from user code.
     if (   ( $package =~ /^DynaLoader|XSLoader$/ and $use_xsloader )
-        or ( !exists $B::C::all_bc_deps{$package} ) ) {
+        #or ( !exists $B::C::all_bc_deps{$package} ) 
+
+        ) {
         mark_package_used($package);
     }
 
@@ -255,10 +257,10 @@ sub should_save {
         debug( pkg => "Delete $package" );
         mark_package_unused($package);
     }
-    elsif ( !exists $B::C::all_bc_deps{$package} ) {    # and not in @deps
-        debug( pkg => "Keep $package" );
-        mark_package_used($package);
-    }
+    # elsif ( !exists $B::C::all_bc_deps{$package} ) {    # and not in @deps
+    #     debug( pkg => "Keep $package" );
+    #     mark_package_used($package);
+    # }
 
     return is_package_used($package);                   # 1 / 0 or undef
 }
