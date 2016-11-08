@@ -233,19 +233,19 @@ sub should_save {
             # 5.10 introduced version and Regexp::DESTROY, which we dont want automatically.
             # XXX TODO This logic here is wrong and unstable. Fixes lead to more failures.
             # The walker deserves a rewrite.
-            if ( $package->can($m) ) {
-                next if $package eq 'utf8'                              and $m eq 'DESTROY';    # utf8::DESTROY is empty
-                                                                                                # we load Errno by ourself to avoid double Config warnings [perl #]
-                                                                                                # and we have special logic to detect and include it
-                next if $package =~ /^(Errno|Tie::Hash::NamedCapture)$/ and $m eq 'TIEHASH';
+            next unless $package->can($m);
 
-                # XXX Config and FileHandle should not just return. If unneeded skip em.
-                return 0 if $package eq 'Config'                            and $m =~ /DESTROY|TIEHASH/;    # Config detected in GV
-                                                                                                            # IO::File|IO::Handle added for B::CC only
-                return 0 if $package =~ /^(FileHandle|IO::File|IO::Handle)/ and $m eq 'new';
-                debug( pkg => "$package has method $m: saving package" );
-                return mark_package($package);
-            }
+            next if $package eq 'utf8'                              and $m eq 'DESTROY';    # utf8::DESTROY is empty
+                                                                                            # we load Errno by ourself to avoid double Config warnings [perl #]
+                                                                                            # and we have special logic to detect and include it
+            next if $package =~ /^(Errno|Tie::Hash::NamedCapture)$/ and $m eq 'TIEHASH';
+
+            # XXX Config and FileHandle should not just return. If unneeded skip em.
+            return 0 if $package eq 'Config'                            and $m =~ /DESTROY|TIEHASH/;    # Config detected in GV
+                                                                                                        # IO::File|IO::Handle added for B::CC only
+            return 0 if $package =~ /^(FileHandle|IO::File|IO::Handle)/ and $m eq 'new';
+            debug( pkg => "$package has method $m: saving package" );
+            return mark_package($package);
         }
     }
     if ( $package !~ /^PerlIO/ and can_delete($package) ) {
