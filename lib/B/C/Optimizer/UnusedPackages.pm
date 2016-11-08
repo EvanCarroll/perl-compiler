@@ -11,6 +11,7 @@ use B::C::File qw/init2/;
 
 # imports from B::C
 # todo: check & move these to a better place
+*can_delete             = \&B::C::can_delete;
 *skip_pkg               = \&B::C::skip_pkg;
 *mark_package           = \&B::C::mark_package;
 *walkpackages           = \&B::C::walkpackages;
@@ -120,7 +121,7 @@ sub should_save {
     my $package = shift;
     $package =~ s/::$//;
     if ( skip_pkg($package) ) {
-        delete_unsaved_hashINC($package) if !B::C::package_was_compiled_in($package);
+        delete_unsaved_hashINC($package) if can_delete($package);
         return 0;
     }
     if ( $package =~ /::::/ ) {
@@ -216,7 +217,7 @@ sub should_save {
             debug( pkg => "Cached new $package is kept" );
         }
         elsif ( !$is_package_used ) {
-            delete_unsaved_hashINC($package) if !B::C::package_was_compiled_in($package);
+            delete_unsaved_hashINC($package) if can_delete($package);
             debug( pkg => "Cached $package is already deleted" );
         }
         else {
@@ -247,10 +248,10 @@ sub should_save {
             }
         }
     }
-    if ( $package !~ /^PerlIO/ and !B::C::package_was_compiled_in($package) ) {
+    if ( $package !~ /^PerlIO/ and can_delete($package) ) {
         delete_unsaved_hashINC($package);
     }
-    if ( !B::C::package_was_compiled_in($package) ) {
+    if ( can_delete($package) ) {
         debug( pkg => "Delete $package" );
         mark_package_unused($package);
     }
@@ -259,7 +260,7 @@ sub should_save {
         mark_package_used($package);
     }
 
-    return is_package_used($package);    # 1 / 0 or undef
+    return is_package_used($package);                   # 1 / 0 or undef
 }
 
 1;

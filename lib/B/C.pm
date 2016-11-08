@@ -111,7 +111,7 @@ sub was_compiled_in {
       if $fullname =~ /^Config::(AUTOLOAD|DESTROY|TIEHASH|FETCH|import)$/
       && exists $stash->{"Config::"}->{'Config'};
     return 1 if $fullname =~ /Config::[^:]+$/ && exists $settings->{'starting_INC'}->{'Config_heavy.pl'};
-    return 1 if ( $fullname =~ /Errno::[^:]+$/ );
+    return 1 if $fullname =~ /Errno::[^:]+$/;
 
     #return 1 if ( $fullname =~ /NDBM_File::[^:]+$/ );
     # save all utf8 functions if utf8_heavy is loaded
