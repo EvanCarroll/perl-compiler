@@ -47,12 +47,12 @@ sub load_heavy {
 sub build_c_file {
     parse_options();    # Parses command line options and populates $settings where necessary
     save_compile_state();
-    load_heavy();       # Loads B::C_heavy.pl
-    set_stashes_enames($settings->{'starting_stash'}); # needs B
-    start_heavy();      # Invokes into B::C_heavy.pl
+    load_heavy();                                           # Loads B::C_heavy.pl
+    set_stashes_enames( $settings->{'starting_stash'} );    # needs B
+    start_heavy();                                          # Invokes into B::C_heavy.pl
 }
 
-my @compile_options;    # holds args passed to compile for use in build_c_file()
+my @compile_options;                                        # holds args passed to compile for use in build_c_file()
 
 # This is what is called when you do perl -MO=C,....
 # It tells O.pm what to invoke once the program completes the BEGIN state.
@@ -62,8 +62,17 @@ sub compile {
     return \&build_c_file;
 }
 
+sub package_was_compiled_in {
+    return was_compiled_in( shift, 0 );
+}
+
 sub sub_was_compiled_in {
+    return was_compiled_in( shift, 1 );
+}
+
+sub was_compiled_in {
     my $fullname = shift or die;
+    my $sub_check = shift;
 
     return 1 if $fullname =~ qr{^::};
 
@@ -72,29 +81,36 @@ sub sub_was_compiled_in {
 
     my $stash = $settings->{'starting_stash'};
 
-    my $subname = pop @path;
+    my $subname = '';
+    $subname = pop @path if $sub_check;
+
     return 1 if ( $subname =~ tr/[]{}()// );                                    # This doesn't appear to be a sub.
     return 1 if ( $fullname =~ m/^DynaLoader::/ && $settings->{'needs_xs'} );
-    return 1 if $fullname =~ /^Config::(AUTOLOAD|DESTROY|TIEHASH|FETCH|import)$/ 
-        && exists $stash->{"Config::"}->{'Config'};
+    return 1
+      if $fullname =~ /^Config::(AUTOLOAD|DESTROY|TIEHASH|FETCH|import)$/
+      && exists $stash->{"Config::"}->{'Config'};
     return 1 if $fullname =~ /Config::[^:]+$/ && exists $settings->{'starting_INC'}->{'Config_heavy.pl'};
     return 1 if ( $fullname =~ /Errno::[^:]+$/ );
+
     #return 1 if ( $fullname =~ /NDBM_File::[^:]+$/ );
     # save all utf8 functions if utf8_heavy is loaded
     return 1 if $fullname =~ /utf8::[^:]+$/ && exists $stash->{"utf8::"}->{'SWASHNEW'};
     return 1 if $fullname =~ /re::[^:]+$/ and $settings->{'uses_re'};
 
-
-    foreach my $step ( @path ) { # note $step can be empty: a::::b
+    foreach my $step (@path) {    # note $step can be empty: a::::b
         if ( !exists $stash->{"${step}::"} ) {
             return 0;
         }
         $stash = $stash->{"${step}::"};
     }
+    if ( $stash && !$sub_check ) {
+        return 1;
+    }
+
     my $ret = $stash->{$subname} ? 1 : 0;
 
     #print STDERR "**** REMOVE |$fullname|\n" unless $ret;
-    
+
     return $ret;
 }
 
@@ -108,11 +124,13 @@ sub set_stashes_enames {
         my $stn = $name . $k;
         my $ename = eval { svref_2object( \*{"${stn}"} )->EGV->NAME };
         if ( $ename && $k ne $ename ) {
+
             # increase our white list to take into account the enames [could probably merge hashes recursively]
             if ( !exists $stash->{$ename} or !ref $stash->{$ename} ) {
-                $stash->{$ename} = { %{$stash->{$k}} };
-            } else {
-                $stash->{$ename} = { %{$stash->{$ename}}, %{$stash->{$k}} };
+                $stash->{$ename} = { %{ $stash->{$k} } };
+            }
+            else {
+                $stash->{$ename} = { %{ $stash->{$ename} }, %{ $stash->{$k} } };
             }
         }
         set_stashes_enames( $stash->{$k}, $stn );
@@ -126,12 +144,10 @@ sub save_compile_state {
     $settings->{'so_files'} = save_xsloader();
     $settings->{'needs_xs'} = scalar @{ $settings->{'so_files'} };
 
-    $settings->{'uses_re'}  = scalar grep { m{\Q/re/re.so\E$} } @{ $settings->{'so_files'} };
-    $settings->{'starting_INC'} = save_inc();
-    $settings->{'starting_AINC'} = save_ainc();
+    $settings->{'uses_re'}        = scalar grep { m{\Q/re/re.so\E$} } @{ $settings->{'so_files'} };
+    $settings->{'starting_INC'}   = save_inc();
+    $settings->{'starting_AINC'}  = save_ainc();
     $settings->{'starting_stash'} = save_stashes( $::{"main::"}, 1 );
-
-
 
     delete $settings->{'starting_stash'}->{'B::'};
     $settings->{'starting_stash'}->{'XSLoader::'}->{'load_file'} = 1 if $settings->{'needs_xs'};
@@ -215,7 +231,7 @@ sub save_inc {
     return \%compiled_INC;
 }
 
-sub save_ainc { # no cleanup for now
+sub save_ainc {    # no cleanup for now
     return \@INC;
 }
 
