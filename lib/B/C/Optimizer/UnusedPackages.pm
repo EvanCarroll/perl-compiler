@@ -177,9 +177,7 @@ sub should_save {
 
     # issue348: only drop B::C packages, not any from user code.
     if (   ( $package =~ /^DynaLoader|XSLoader$/ and $use_xsloader )
-        #or ( !exists $B::C::all_bc_deps{$package} ) 
-
-        ) {
+        or ( !exists $B::C::all_bc_deps{$package} ) ) {
         mark_package_used($package);
     }
 
