@@ -227,13 +227,13 @@ sub should_save {
     }
 
     # Now see if current package looks like an OO class. This is probably too strong.
-    if ( !can_delete($package) and $package !~ /^(B::C|version|Regexp|utf8|SelectSaver)$/) {
+    if ( !can_delete($package) and $package !~ /^(B::C|version|Regexp|utf8|SelectSaver)$/ ) {
         foreach my $m (qw(new DESTROY TIESCALAR TIEARRAY TIEHASH TIEHANDLE)) {
 
             # 5.10 introduced version and Regexp::DESTROY, which we dont want automatically.
             # XXX TODO This logic here is wrong and unstable. Fixes lead to more failures.
             # The walker deserves a rewrite.
-            if ( $package->can($m) ) ) {
+            if ( $package->can($m) ) {
                 next if $package eq 'utf8'                              and $m eq 'DESTROY';    # utf8::DESTROY is empty
                                                                                                 # we load Errno by ourself to avoid double Config warnings [perl #]
                                                                                                 # and we have special logic to detect and include it
@@ -260,7 +260,7 @@ sub should_save {
         mark_package_used($package);
     }
 
-    return is_package_used($package);                   # 1 / 0 or undef
+    return is_package_used($package);    # 1 / 0 or undef
 }
 
 1;
