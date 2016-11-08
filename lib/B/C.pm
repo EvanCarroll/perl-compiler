@@ -65,14 +65,16 @@ sub compile {
 sub can_delete {
     my $pkg          = shift;
     my $was_compiled = package_was_compiled_in($pkg);
-    my $alldeps      = exists $B::C::all_bc_deps{$pkg} ? 1 : 0;
+
+    my $alldeps = exists $B::C::all_bc_deps{$pkg} ? 1 : 0;
+    return $alldeps if $alldeps;
     if ( !$was_compiled ) {
 
-        #print STDERR "+++++++ can_delete $pkg ($alldeps)\n" if($alldeps == 0);
+        print STDERR "+++++++ can_delete $pkg ($alldeps)\n" if ( $alldeps == 0 );
         return 1;
     }
     else {
-        #print STDERR "+++++++ KEEP $pkg ($alldeps)\n"  if($alldeps == 1);
+        print STDERR "+++++++ KEEP $pkg ($alldeps)\n" if ( $alldeps == 1 );
         return 0;
     }
 
@@ -81,11 +83,6 @@ sub can_delete {
 
 sub package_was_compiled_in {
     my $package = shift;
-    return 0 if ( $package =~ m/^(?:O|B|CORE|CORE::GLOBAL|UNIVERSAL)$/ );
-
-    #return 0 if($package =~ m/^(?:utf8|re)$/);
-    #return 0 if($package =~ m/^(?:Exporter|Exporter::Heavy|IO|IO::File)$/);
-    return 0 if ( $package =~ m/^(?:Carp|DynaLoader|XSLoader|PerlIO|PerlIO::Layer|PerlIO::scalar)$/ );
 
     return was_compiled_in( $package, 0 );
 }
@@ -114,7 +111,7 @@ sub was_compiled_in {
       if $fullname =~ /^Config::(AUTOLOAD|DESTROY|TIEHASH|FETCH|import)$/
       && exists $stash->{"Config::"}->{'Config'};
     return 1 if $fullname =~ /Config::[^:]+$/ && exists $settings->{'starting_INC'}->{'Config_heavy.pl'};
-    return 1 if $fullname =~ /Errno::[^:]+$/;
+    return 1 if ( $fullname =~ /Errno::[^:]+$/ );
 
     #return 1 if ( $fullname =~ /NDBM_File::[^:]+$/ );
     # save all utf8 functions if utf8_heavy is loaded
