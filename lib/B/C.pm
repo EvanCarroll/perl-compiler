@@ -62,8 +62,32 @@ sub compile {
     return \&build_c_file;
 }
 
+sub can_delete {
+    my $pkg          = shift;
+    my $was_compiled = package_was_compiled_in($pkg);
+    my $alldeps      = exists $B::C::all_bc_deps{$pkg} ? 1 : 0;
+    if ( !$was_compiled ) {
+
+        #print STDERR "+++++++ can_delete $pkg ($alldeps)\n" if($alldeps == 0);
+        return 1;
+    }
+    else {
+        #print STDERR "+++++++ KEEP $pkg ($alldeps)\n"  if($alldeps == 1);
+        return 0;
+    }
+
+    return $was_compiled ? 0 : 1;
+}
+
 sub package_was_compiled_in {
-    return was_compiled_in( shift, 0 );
+    my $package = shift;
+    return 0 if ( $package =~ m/^(?:O|B|CORE|CORE::GLOBAL|UNIVERSAL)$/ );
+
+    #return 0 if($package =~ m/^(?:utf8|re)$/);
+    #return 0 if($package =~ m/^(?:Exporter|Exporter::Heavy|IO|IO::File)$/);
+    return 0 if ( $package =~ m/^(?:Carp|DynaLoader|XSLoader|PerlIO|PerlIO::Layer|PerlIO::scalar)$/ );
+
+    return was_compiled_in( $package, 0 );
 }
 
 sub sub_was_compiled_in {
@@ -103,8 +127,8 @@ sub was_compiled_in {
         }
         $stash = $stash->{"${step}::"};
     }
-    if ( $stash && !$sub_check ) {
-        return 1;
+    if ( !$sub_check ) {
+        return $stash ? 1 : 0;
     }
 
     my $ret = $stash->{$subname} ? 1 : 0;
