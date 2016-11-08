@@ -72,18 +72,6 @@ use B::C::Packages qw/is_package_used mark_package_unused mark_package_used mark
 use B::C::Save qw(constpv savepv savestashpv);
 use B::C::Save::Signals ();
 
-# FIXME: this part can now be dynamic
-# exclude all not B::C:: prefixed subs
-# used in CV
-our %all_bc_deps;
-
-BEGIN {
-    # track all internally used packages. all other may not be deleted automatically
-    # - hidden methods
-    # uses now @B::C::Flags::deps
-    %all_bc_deps = map { $_ => 1 } @B::C::Flags::deps;
-}
-
 our ( $package_pv, @package_pv );    # global stash for methods since 5.13
 our ( %xsub,       %init2_remap );
 our ( %dumped_package, %skip_package, %isa_cache );
@@ -658,7 +646,6 @@ sub walk_syms {
 }
 
 # simplified walk_syms
-# needed to populate @B::C::Flags::deps from Makefile.PL from within this %INC context
 sub walk_stashes {
     my ( $symref, $prefix, $dependencies ) = @_;
     no strict 'refs';
@@ -813,14 +800,6 @@ sub skip_pkg {
     return 0;
 }
 
-# Do not delete/ignore packages which were brought in from the script,
-# i.e. not defined in B::C or O. Just to be on the safe side.
-sub can_delete {
-    my $pkg = shift;
-    if ( exists $all_bc_deps{$pkg} ) { return 1 }
-    return undef;
-}
-
 sub inc_packname {
     my $package = shift;
 
@@ -915,7 +894,8 @@ sub walkpackages {
 
 sub inc_cleanup {
     my $rec_cnt = shift;
-#return;
+
+    #return;
     # %INC sanity check issue 89:
     # omit unused, unsaved packages, so that at least run-time require will pull them in.
 
@@ -969,7 +949,6 @@ sub inc_cleanup {
 
 ### ??? move to B::C::Optimizer::UnusedPackages
 sub dump_rest {
-   #return;
     my $again;
     verbose("dump_rest");
     for my $p ( get_all_packages_used() ) {
@@ -1076,21 +1055,22 @@ sub save_context {
         $curpad_sym = ( comppadlist->ARRAY )[1]->save('curpad_syms');
     }
     my ( $inc_hv, $inc_av );
-    
+
     {
         local $B::C::const_strings = 1;
         verbose("\%INC and \@INC:");
         init()->add('/* %INC */');
         my %saved_INC = %INC;
-        %INC = %{$settings->{'starting_INC'}};                
+        %INC = %{ $settings->{'starting_INC'} };
         inc_cleanup(0);
+
         # .... inc...
         my $inc_gv = svref_2object( \*main::INC );
         $inc_hv = $inc_gv->HV->save('main::INC');
         init()->add('/* @INC */');
         $inc_av = $inc_gv->AV->save('main::INC');
 
-        %INC = %saved_INC; # avoid using local %INC
+        %INC = %saved_INC;    # avoid using local %INC
     }
 
     # ensure all included @ISA's are stored (#308), and also assign c3 (#325)

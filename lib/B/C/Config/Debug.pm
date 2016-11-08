@@ -212,7 +212,6 @@ sub setup_debug {
         }
         elsif ( $level eq "F" ) {
             enable_debug_level('flags');
-            $B::C::all_bc_deps{'B::Flags'}++;
         }
         elsif ( $level eq "r" ) {
             enable_debug_level('runtime');
