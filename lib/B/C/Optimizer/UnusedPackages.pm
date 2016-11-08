@@ -11,6 +11,7 @@ use B::C::File qw/init2/;
 
 # imports from B::C
 # todo: check & move these to a better place
+*can_delete             = \&B::C::can_delete;
 *skip_pkg               = \&B::C::skip_pkg;
 *mark_package           = \&B::C::mark_package;
 *walkpackages           = \&B::C::walkpackages;
@@ -28,7 +29,7 @@ sub descend_marked_unused {
 
     foreach my $pack ( sort keys %INC ) {
         my $p = packname_inc($pack);
-        mark_package($p) if !skip_pkg($p) and B::C::package_was_compiled_in($p) and $pack !~ /(autosplit\.ix|\.al)$/;
+        mark_package($p) if !skip_pkg($p) and !$B::C::all_bc_deps{$p} and $pack !~ /(autosplit\.ix|\.al)$/;
     }
 
     if ( verbose() ) {
@@ -75,14 +76,14 @@ sub optimize {
     @dumped = grep { $B::C::dumped_package{$_} and $_ ne 'main' } sort keys %B::C::dumped_package;
     verbose( "old unused: %d, new: %d, dumped: %d", scalar @init_unused, scalar @unused, scalar @dumped );
 
-    my $done;
+        my $done;
 
-    do {
-        $done   = dump_rest();
-        @unused = get_all_packages_used();
-        @dumped = grep { $B::C::dumped_package{$_} and $_ ne 'main' } sort keys %B::C::dumped_package;
-    } while @unused > @dumped and $done;
-    last if $walkall_cnt++ > 3;
+        do {
+            $done   = dump_rest();
+            @unused = get_all_packages_used();
+            @dumped = grep { $B::C::dumped_package{$_} and $_ ne 'main' } sort keys %B::C::dumped_package;
+        } while @unused > @dumped and $done;
+        last if $walkall_cnt++ > 3;
 
     #} while @unused > @init_unused;
 
@@ -120,7 +121,7 @@ sub should_save {
     my $package = shift;
     $package =~ s/::$//;
     if ( skip_pkg($package) ) {
-        delete_unsaved_hashINC($package) if !B::C::package_was_compiled_in($package);
+        delete_unsaved_hashINC($package) if can_delete($package);
         return 0;
     }
     if ( $package =~ /::::/ ) {
@@ -152,7 +153,7 @@ sub should_save {
         B::C::mark_package( $package, 1 );
         return 1;
     }
-    if ( !B::C::package_was_compiled_in($package) ) {
+    if ( exists $B::C::all_bc_deps{$package} ) {
         foreach my $u ( get_all_packages_used() ) {
 
             # If this package is a prefix to something we are saving, traverse it
@@ -166,7 +167,7 @@ sub should_save {
 
     # Needed since 5.12.2: Check already if deleted
     my $incpack = inc_packname($package);
-    if (    !B::C::package_was_compiled_in($package)
+    if (    exists $B::C::all_bc_deps{$package}
         and !exists $B::C::curINC{$incpack}
         and $B::C::savINC{$incpack} ) {
         mark_package_unused($package);
@@ -176,7 +177,7 @@ sub should_save {
 
     # issue348: only drop B::C packages, not any from user code.
     if (   ( $package =~ /^DynaLoader|XSLoader$/ and $use_xsloader )
-        or ( B::C::package_was_compiled_in($package) ) ) {
+        or ( !exists $B::C::all_bc_deps{$package} ) ) {
         mark_package_used($package);
     }
 
@@ -210,13 +211,13 @@ sub should_save {
     # XXX Surely there must be a nicer way to do this.
     my $is_package_used = is_package_used($package);
     if ( defined $is_package_used ) {
-        if ( B::C::package_was_compiled_in($package) ) {
+        if ( !exists $B::C::all_bc_deps{$package} ) {
             mark_package_used($package);
             $B::C::curINC{$incpack} = $B::C::savINC{$incpack};
             debug( pkg => "Cached new $package is kept" );
         }
         elsif ( !$is_package_used ) {
-            delete_unsaved_hashINC($package) if !B::C::package_was_compiled_in($package);
+            delete_unsaved_hashINC($package) if can_delete($package);
             debug( pkg => "Cached $package is already deleted" );
         }
         else {
@@ -226,7 +227,7 @@ sub should_save {
     }
 
     # Now see if current package looks like an OO class. This is probably too strong.
-    if ( B::C::package_was_compiled_in($package) ) {
+    if ( !$B::C::all_bc_deps{$package} ) {
         foreach my $m (qw(new DESTROY TIESCALAR TIEARRAY TIEHASH TIEHANDLE)) {
 
             # 5.10 introduced version and Regexp::DESTROY, which we dont want automatically.
@@ -247,19 +248,19 @@ sub should_save {
             }
         }
     }
-    if ( $package !~ /^PerlIO/ and !B::C::package_was_compiled_in($package) ) {
+    if ( $package !~ /^PerlIO/ and can_delete($package) ) {
         delete_unsaved_hashINC($package);
     }
-    if ( !B::C::package_was_compiled_in($package) ) {
+    if ( can_delete($package) ) {
         debug( pkg => "Delete $package" );
         mark_package_unused($package);
     }
-    elsif ( B::C::package_was_compiled_in($package) ) {
+    elsif ( !exists $B::C::all_bc_deps{$package} ) {    # and not in @deps
         debug( pkg => "Keep $package" );
         mark_package_used($package);
     }
 
-    return is_package_used($package);    # 1 / 0 or undef
+    return is_package_used($package);                   # 1 / 0 or undef
 }
 
 1;
