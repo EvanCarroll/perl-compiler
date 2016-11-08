@@ -48,6 +48,7 @@ sub build_c_file {
     parse_options();    # Parses command line options and populates $settings where necessary
     save_compile_state();
     load_heavy();       # Loads B::C_heavy.pl
+    set_stashes_enames($settings->{'starting_stash'}); # needs B
     start_heavy();      # Invokes into B::C_heavy.pl
 }
 
@@ -85,11 +86,33 @@ sub sub_was_compiled_in {
         }
         $stash = $stash->{"${step}::"};
     }
-
     my $ret = $stash->{$subname} ? 1 : 0;
 
-    #print STDERR "**** REMOVE $fullname\n" if ( !$ret );
+    #print STDERR "**** REMOVE $fullname\n" unless $ret;
     return $ret;
+}
+
+sub set_stashes_enames {
+    my ( $stash, $name ) = @_;
+
+    return unless ref $stash;
+    $name = '' unless defined $name;
+    foreach my $k ( keys %$stash ) {
+        next unless $k =~ qr{::$};
+        my $stn = $name . $k;
+        my $ename = eval { svref_2object( \*{"${stn}"} )->EGV->NAME };
+        if ( $ename && $k ne $ename ) {
+            # increase our white list to take into account the enames [could probably merge hashes recursively]
+            if ( !exists $stash->{$ename} or !ref $stash->{$ename} ) {
+                $stash->{$ename} = { %{$stash->{$k}} };
+            } else {
+                $stash->{$ename} = { %{$stash->{$ename}}, %{$stash->{$k}} };
+            }
+        }
+        set_stashes_enames( $stash->{$k}, $stn );
+    }
+
+    return;
 }
 
 # This sub captures state information about the compiled program before B::C is loaded and pollutes the stash.
@@ -104,7 +127,7 @@ sub save_compile_state {
     delete $settings->{'starting_stash'}->{'B::'};
     $settings->{'starting_stash'}->{'XSLoader::'}->{'load_file'} = 1 if $settings->{'needs_xs'};
 
-    #require Data::Dumper; print STDERR Data::Dumper::Dumper($settings->{'starting_INC'}, $settings->{'starting_stash'});
+    #require Data::Dumper; $Data::Dumper::Sortkeys = 1; print STDERR Data::Dumper::Dumper($settings->{'starting_INC'}, $settings->{'starting_stash'});
     return;
 }
 
