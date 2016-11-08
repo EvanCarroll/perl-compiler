@@ -75,7 +75,7 @@ sub sub_was_compiled_in {
     return 1 if ( $fullname =~ m/^DynaLoader::/ && $settings->{'needs_xs'} );
     #return 1 if ( $fullname =~ /Config::[^:]+$/ );
     return 1 if ( $fullname =~ /Errno::[^:]+$/ );
-    return 1 if ( $fullname =~ /NDBM_File::[^:]+$/ );
+    #return 1 if ( $fullname =~ /NDBM_File::[^:]+$/ );
     # save all utf8 functions if utf8_heavy is loaded
     return 1 if $fullname =~ /utf8::[^:]+$/ && $stash->{"utf8::"}->{'SWASHNEW'};
     return 1 if $fullname =~ /re::[^:]+$/ and $settings->{'uses_re'};
