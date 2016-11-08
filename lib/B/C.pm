@@ -76,7 +76,7 @@ sub sub_was_compiled_in {
     return 1 if ( $fullname =~ /Errno::[^:]+$/ );
     return 1 if ( $fullname =~ /NDBM_File::[^:]+$/ );
     return 1 if ( $fullname =~ /utf8::[^:]+$/ );
-    #return 1 if $fullname =~ /re::[^:]+$/ and $settings->{'uses_re'};
+    return 1 if $fullname =~ /re::[^:]+$/ and $settings->{'uses_re'};
 
     my $stash = $settings->{'starting_stash'};
     foreach my $step ( @path ) { # note $step can be empty: a::::b
@@ -97,7 +97,7 @@ sub save_compile_state {
     $settings->{'so_files'} = save_xsloader();
     $settings->{'needs_xs'} = scalar @{ $settings->{'so_files'} };
 
-    #$settings->{'uses_re'}  = scalar grep { m{\Q/re/re.so\E$} } @{ $settings->{'so_files'} };
+    $settings->{'uses_re'}  = scalar grep { m{\Q/re/re.so\E$} } @{ $settings->{'so_files'} };
     $settings->{'starting_INC'} = save_inc();
     $settings->{'starting_stash'} = save_stashes( $::{"main::"}, 1 );
 
