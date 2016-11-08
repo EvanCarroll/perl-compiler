@@ -41,12 +41,17 @@ sub mark_package_removed {
 sub _mark_package {
     my ( $pkg, $val ) = @_;
 
-    return unless $val;
+    # if ( !$val ) {
+    #     print STDERR "DISABLE: $pkg => $val\n";
+    # }
+    #return unless $val;
     #print STDERR "MARK: $pkg => $val\n";
-    #print STDERR "XXX: sub_was_compiled_in($pkg) = " . B::C::package_was_compiled_in($pkg) . " / $val\n";
-    #print STDERR 'B::C::Save'->can('_caller_comment')->();
-
-    $include_package{$pkg} = $val;
+    #if ( $val ne B::C::package_was_compiled_in($pkg) ) {
+    #    print STDERR "XXX: sub_was_compiled_in($pkg) = " . B::C::package_was_compiled_in($pkg) . " / $val\n";    
+    #    print STDERR 'B::C::Save'->can('_caller_comment')->();
+    #}
+    
+    $include_package{$pkg} = $val or B::C::package_was_compiled_in($pkg);
 
     return 1;
 }
@@ -55,7 +60,8 @@ sub _mark_package {
 sub is_package_used {
     my $pkg = shift;
     return unless defined $pkg;
-    return $include_package{$pkg};
+    
+    return $include_package{$pkg};# && B::C::package_was_compiled_in($pkg);
 }
 
 sub get_all_packages_used {
