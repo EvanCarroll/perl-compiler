@@ -69,12 +69,9 @@ sub can_delete {
     my $alldeps = exists $B::C::all_bc_deps{$pkg} ? 1 : 0;
     return $alldeps if $alldeps;
     if ( !$was_compiled ) {
-
-        print STDERR "+++++++ can_delete $pkg ($alldeps)\n" if ( $alldeps == 0 );
         return 1;
     }
     else {
-        print STDERR "+++++++ KEEP $pkg ($alldeps)\n" if ( $alldeps == 1 );
         return 0;
     }
 
@@ -181,7 +178,7 @@ sub save_compile_state {
 # It is NOT SAFE to mess with anything outside of the %B::C:: stash
 
 sub parse_options {
-    my (@opts) = @_;
+    my (@opts) = @compile_options;
     my ( $option, $opt, $arg );
 
     while ( $option = shift @opts ) {
