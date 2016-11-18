@@ -181,39 +181,40 @@ sub save_compile_state {
 # It is NOT SAFE to mess with anything outside of the %B::C:: stash
 
 sub parse_options {
+    my (@opts) = @_;
     my ( $option, $opt, $arg );
 
-    while ( $option = shift @compile_options ) {
+    while ( $option = shift @opts ) {
         next unless length $option;    # fixes -O=C,,-v,...
         if ( $option =~ /^-(.)(.*)/ ) {
             $opt = $1;
             $arg = $2 || '';
         }
         else {
-            die( "Unexpected options passed to O=C: " . join( ",", @compile_options ) );
+            die( "Unexpected options passed to O=C: " . join( ",", @opts ) );
         }
 
         if ( $opt eq "-" && $arg eq "-" ) {
-            die( "Unexpected options passed to O=C: --" . join( ",", @compile_options ) );
+            die( "Unexpected options passed to O=C: --" . join( ",", @opts ) );
         }
 
         if ( $opt eq "w" ) {
             $settings->{'warn_undefined_syms'} = 1;
         }
         elsif ( $opt eq "D" ) {
-            $arg ||= shift @compile_options;
+            $arg ||= shift @opts;
             $arg =~ s{^=+}{};
             $settings->{'debug_options'} .= $arg;
         }
         elsif ( $opt eq "o" ) {
-            $arg ||= shift @compile_options;
+            $arg ||= shift @opts;
             $settings->{'output_file'} = $arg;
         }
         elsif ( $opt eq "s" and $arg eq "taticxs" ) {
             $settings->{'staticxs'} = 1;
         }
         elsif ( $opt eq "n" ) {
-            $arg ||= shift @compile_options;
+            $arg ||= shift @opts;
             $settings->{'init_name'} = $arg;
         }
         elsif ( $opt eq "m" ) {
@@ -223,7 +224,7 @@ sub parse_options {
             $settings->{'enable_verbose'} = 1;
         }
         elsif ( $opt eq "u" ) {
-            $arg ||= shift @compile_options;
+            $arg ||= shift @opts;
             if ( $arg =~ /\.p[lm]$/ ) {
                 eval "require(\"$arg\");";    # path as string
             }
@@ -233,7 +234,7 @@ sub parse_options {
             $settings->{'used_packages'}->{$arg} = 1;
         }
         elsif ( $opt eq "U" ) {
-            $arg ||= shift @compile_options;
+            $arg ||= shift @opts;
             $settings->{'skip_packages'}->{$arg} = 1;
         }
         else {
@@ -241,7 +242,7 @@ sub parse_options {
         }
     }
 
-    @compile_options and die("Used to call B::C::File::output_all but this sub has been gone for a while!");
+    @opts and die("Used to call B::C::File::output_all but this sub has been gone for a while!");
 
     return;
 }

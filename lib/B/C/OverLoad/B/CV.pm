@@ -33,8 +33,6 @@ sub is_phase_name {
 
 sub Dummy_initxs { }
 
-
-
 sub save {
     my ( $cv, $origname ) = @_;
 
@@ -63,10 +61,11 @@ sub save {
                 if ( $cvname =~ m/ :pad\[.*$/ ) {
                     $cvname =~ s/ :pad\[.*$//;
                     if ( is_phase_name($cvname) ) {
-                        $cvname = '__ANON__';    
-                        $fullname = $cvstashname . '::' . $cvname
-                    } elsif ( $cvstashname->can($cvname) ) {
-                        $fullname = $cvstashname . '::' . $cvname;    
+                        $cvname   = '__ANON__';
+                        $fullname = $cvstashname . '::' . $cvname;
+                    }
+                    elsif ( $cvstashname->can($cvname) ) {
+                        $fullname = $cvstashname . '::' . $cvname;
                     }
                 }
                 debug( cv => "empty -> %s", $cvname );
@@ -85,9 +84,7 @@ sub save {
 
         # XXX not needed, we already loaded utf8_heavy
         #return if $fullname eq 'utf8::AUTOLOAD';
-        my $is_lexsub = $CvFLAGS & CVf_LEXICAL; # LEXICAL
-        return '0' if !$is_lexsub && !B::C::sub_was_compiled_in($fullname);
-
+        return '0' if B::C::skip_pkg($cvstashname);
         $CvFLAGS &= ~0x400;    # no CVf_CVGV_RC otherwise we cannot set the GV
         B::C::mark_package( $cvstashname, 1 ) unless is_package_used($cvstashname);
     }

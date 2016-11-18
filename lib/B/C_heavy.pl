@@ -13,7 +13,7 @@ package B::C;
 use strict;
 
 # From C.pm
-our (%Config);
+our %Config;
 our ( $VERSION, $caller, $nullop_count, $unresolved_count, $gv_index, $settings );
 our ( @ISA, @EXPORT_OK );
 our $const_strings = 1;    # TODO: This var needs to go away.
@@ -84,8 +84,8 @@ BEGIN {
     %all_bc_deps = map { $_ => 1 } @B::C::Flags::deps;
 }
 
-our ( $package_pv, @package_pv );    # global stash for methods since 5.13
-our ( %xsub,       %init2_remap );
+our ( $package_pv,     @package_pv );                 # global stash for methods since 5.13
+our ( %xsub,           %init2_remap );
 our ( %dumped_package, %skip_package, %isa_cache );
 
 # fixme move to config
@@ -105,7 +105,7 @@ sub start_heavy {
     B::C::File::new( $settings->{'output_file'} );    # Singleton.
     B::C::Packages::new();                            # Singleton.
 
-    B::C::Config::Debug::setup_debug( $settings->{'debug_options'}, $settings->{'enable_verbose'} );
+    B::C::Debug::setup_debug( $settings->{'debug_options'}, $settings->{'enable_verbose'} );
 
     save_main();
 
@@ -915,7 +915,8 @@ sub walkpackages {
 
 sub inc_cleanup {
     my $rec_cnt = shift;
-#return;
+
+    #return;
     # %INC sanity check issue 89:
     # omit unused, unsaved packages, so that at least run-time require will pull them in.
 
@@ -969,7 +970,8 @@ sub inc_cleanup {
 
 ### ??? move to B::C::Optimizer::UnusedPackages
 sub dump_rest {
-   #return;
+
+    #return;
     my $again;
     verbose("dump_rest");
     for my $p ( get_all_packages_used() ) {
@@ -1076,21 +1078,22 @@ sub save_context {
         $curpad_sym = ( comppadlist->ARRAY )[1]->save('curpad_syms');
     }
     my ( $inc_hv, $inc_av );
-    
+
     {
         local $B::C::const_strings = 1;
         verbose("\%INC and \@INC:");
         init()->add('/* %INC */');
         my %saved_INC = %INC;
-        %INC = %{$settings->{'starting_INC'}};                
+        %INC = %{ $settings->{'starting_INC'} };
         inc_cleanup(0);
+
         # .... inc...
         my $inc_gv = svref_2object( \*main::INC );
         $inc_hv = $inc_gv->HV->save('main::INC');
         init()->add('/* @INC */');
         $inc_av = $inc_gv->AV->save('main::INC');
 
-        %INC = %saved_INC; # avoid using local %INC
+        %INC = %saved_INC;    # avoid using local %INC
     }
 
     # ensure all included @ISA's are stored (#308), and also assign c3 (#325)
@@ -1347,7 +1350,7 @@ sub build_template_stash {
 
     my $c_file_stash = {
         'verbose'               => verbose(),
-        'debug'                 => B::C::Config::Debug::save(),
+        'debug'                 => B::C::Debug::save(),
         'creator'               => "created at " . scalar localtime() . " with B::C $VERSION for $^X",
         'DEBUG_LEAKING_SCALARS' => DEBUG_LEAKING_SCALARS(),
         'static_ext'            => $static_ext,
