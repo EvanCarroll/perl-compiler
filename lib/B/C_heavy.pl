@@ -811,14 +811,6 @@ sub skip_pkg {
     return 0;
 }
 
-# Do not delete/ignore packages which were brought in from the script,
-# i.e. not defined in B::C or O. Just to be on the safe side.
-sub can_delete {
-    my $pkg = shift;
-    if ( exists $all_bc_deps{$pkg} ) { return 1 }
-    return undef;
-}
-
 sub inc_packname {
     my $package = shift;
 
