@@ -66,13 +66,14 @@ sub save_pv_or_rv {
     my $flags = $sv->FLAGS;
 
     my ( $static, $shared_hek ) = ( 0, is_shared_hek($sv) );
+    $static = 1 if !( ( $sv->FLAGS & ( SVp_SCREAM | SVpbm_VALID ) == ( SVp_SCREAM | SVpbm_VALID ) ) );
 
     if ( $shared_hek && !$static ) {
         my $savesym = 'NULL';
         my ( $is_utf8, $cur ) = read_utf8_string( $sv->PV );
-        my $len = 0;                                                                                     # hek should have len 0
+        my $len = 0;    # hek should have len 0
 
-        my $pv = $sv->PV;                                                                                # we know that a shared_hek as POK
+        my $pv = $sv->PV;    # we know that a shared_hek as POK
 
         return ( $savesym, $cur, $len, $pv, $static, $flags );
     }
