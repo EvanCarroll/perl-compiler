@@ -11,7 +11,12 @@ sub stash_fixup {
 
     delete $stash->{'B::'};    # What if they use B::Devel
 
-    die if scalar keys %{ $stash->{'O::'} } != 7;
+    my $o_stash_keys = 7;
+    my $got_o_keys   = scalar keys %{ $stash->{'O::'} };
+    if ( $got_o_keys != $o_stash_keys ) {
+        my $keys = join ', ', sort keys %{ $stash->{'O::'} };
+        die "*O:: should have $o_stash_keys keys got $got_o_keys: \n" . $keys;
+    }
     delete $stash->{'O::'};
 
     delete $stash->{'Carp::'}      if ( scalar keys %{ $stash->{'Carp::'} } == 1 );
