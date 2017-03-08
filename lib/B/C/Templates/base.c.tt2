@@ -866,7 +866,7 @@ main(int argc, char **argv, char **env)
 
     perl_construct( &BC_unthreaded_interpreter );
     PL_perl_destruct_level = 0;
-assert(0);
+//assert(0);
     //PL_curcop = &PL_compiling;
     // from S_init_main_stash
     //init_main_stash();
