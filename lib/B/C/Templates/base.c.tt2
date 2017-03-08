@@ -793,11 +793,17 @@ cxstack_ix = 0;
 PerlInterpreter BC_unthreaded_interpreter;
 
 STATIC void
- bcS_init_main_stash(pTHX)
+ bc_S_init_main_stash(pTHX)
  {
      GV *gv;
 
+     PL_curcop = &PL_compiling; /* PL_curcop need to be set when calling Perl_gv_fetchpvn_flags  */
+     /* we want to use our own PL_defstash but need to initialize stuff like INITAv */
+     /* some of the init code need to happen before perl_parse */
+     PL_curstash = PL_defstash;
+     /* FIXME */
      PL_curstash = PL_defstash = (HV *)SvREFCNT_inc_simple_NN(newHV());
+
      /* We know that the string "main" will be in the global shared string
         table, so it's a small saving to use it rather than allocate another
         8 bytes.  */
@@ -859,26 +865,23 @@ main(int argc, char **argv, char **env)
 
     assert(PL_do_undump == 0);
 
-    init_pl_strtab(); /* Initialize PL_Strtab on our own before perl gets to it in perl_alloc. This allows us to use immportal constant shared HEKs */
+    /*
+        Initialize PL_Strtab on our own before perl gets to it in perl_alloc.
+        This allows us to use immportal constant shared HEKs
+    */
+    init_pl_strtab();
 
     PL_defstash = [% PL_defstash %];
     perl_init_stashes();
 
+    bc_S_init_main_stash(aTHX);
+
     perl_construct( &BC_unthreaded_interpreter );
     PL_perl_destruct_level = 0;
-//assert(0);
-    //PL_curcop = &PL_compiling;
-    // from S_init_main_stash
-    //init_main_stash();
-    bcS_init_main_stash(aTHX);
-    // //IN_BYTES = 0;
 
     //PL_hintgv = gv_fetchpvs("\010", GV_ADD|GV_NOTQUAL, SVt_PV); /* ^H */
     // //SvREFCNT_inc_simple_void(PL_hintgv);
     //GvMULTI_on(PL_hintgv);
-
-	//perl_construct( &BC_unthreaded_interpreter );
-	//PL_perl_destruct_level = 0;
 
     /* our special compiled init */
     benchmark_time("init_assign");
@@ -932,6 +935,9 @@ main(int argc, char **argv, char **env)
 	fakeargv[i + options_count - 1] = argv[i];
     fakeargv[argc + options_count - 1] = 0;
 
+    /* we want several init stuff happening before parse */
+    //perl_init_preparse
+    //perl_init(aTHX);
     benchmark_time("pre perl_parse");
     exitstatus = perl_parse(&BC_unthreaded_interpreter, xs_init, argc + options_count - 1,
 			    fakeargv, env);
