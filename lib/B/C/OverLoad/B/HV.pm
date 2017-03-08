@@ -95,8 +95,10 @@ sub do_save {
     my $init = $stash_name ? init_stashes() : init();
     {    # add hash content even if the hash is empty [ maybe only for %INC ??? ]
         $init->no_split;
-        $init->sadd("/* STASH declaration for $stash_name */") if $stash_name;
-        $init->sadd( qq[{\n] . q{HvSETUP(%s, %d);}, $sym, $max + 1 );
+        my $comment = $stash_name ? "/* STASH declaration for $stash_name */" : '';
+        $init->sadd( '{ %s', $comment );
+        $init->indent(+1);
+        $init->sadd( q{HvSETUP(%s, %d);}, $sym, $max + 1 );
 
         foreach my $key ( sort keys %contents ) {
 
@@ -109,8 +111,8 @@ sub do_save {
 
         # save the iterator in hv_aux (and malloc it)
         $init->sadd( "HvRITER_set(%s, %d);", $sym, -1 );    # saved $hv->RITER
-
-        $init->add("}");
+        $init->indent(-1);
+        $init->add('}');
         $init->split;
     }
 
