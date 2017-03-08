@@ -46,7 +46,7 @@ sub descend_marked_unused {
 # previously known as sub save_unused_subs
 sub optimize {
     no strict qw(refs);
-
+    return;
     my $sav_debug;
     if ( debug('unused') ) {
         $sav_debug = B::C::Debug::save();
