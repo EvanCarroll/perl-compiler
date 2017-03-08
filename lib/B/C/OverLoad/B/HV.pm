@@ -185,9 +185,6 @@ sub do_save {
     );
 
     {    # add hash content even if the hash is empty [ maybe only for %INC ??? ]
-        init()->no_split;
-        init()->sadd( qq[{\n] . q{HvSETUP(%s, %d);}, $sym, $max + 1 );
-
         my @hash_elements;
         {
             my $i = 0;
@@ -197,6 +194,12 @@ sub do_save {
 
         # uncomment for saving hashes in a consistent order while debugging
         #@hash_elements = @hash_content_to_save;
+
+        init()->no_split;
+        my $comment = $name ? "/* STASH declaration for $name */" : '';
+        init()->sadd( '{ %s', $comment );
+        init()->indent(+1);
+        init()->sadd( q{HvSETUP(%s, %d);}, $sym, $max + 1 );
 
         foreach my $elt (@hash_elements) {
             my ( $key, $value ) = @$elt;
@@ -210,7 +213,7 @@ sub do_save {
 
         # save the iterator in hv_aux (and malloc it)
         init()->sadd( "HvRITER_set(%s, %d);", $sym, -1 );    # saved $hv->RITER
-
+        init()->indent(-1);
         init()->add("}");
         init()->split;
     }
