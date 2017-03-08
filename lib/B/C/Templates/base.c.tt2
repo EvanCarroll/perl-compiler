@@ -887,9 +887,6 @@ assert(0);
     benchmark_time("init_bodyless_ivs");
     init_bodyless_ivs(aTHX);
 
-    benchmark_time("preinit");
-    perl_init(aTHX);
-
 
 #ifdef DEBUG_BENCHMARK
     PIO_stdout =  PerlIO_stdout();
@@ -1029,6 +1026,9 @@ benchmark_time("pre global setup");
     PL_compcv = MUTABLE_CV(newSV_type(SVt_PVCV));
     CvUNIQUE_on(PL_compcv);
     CvPADLIST(PL_compcv) = pad_new(0);
+
+    benchmark_time("preinit");
+    perl_init(aTHX);
 
     benchmark_time("preinit1");
     perl_init1(aTHX);
