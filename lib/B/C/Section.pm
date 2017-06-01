@@ -40,6 +40,22 @@ sub add {
     return $self->index();
 }
 
+sub sort {    # used by shared_HE
+    my $self = shift;
+
+    my %line_to_int;
+    foreach my $l ( @{ $self->{'values'} } ) {
+        my $v = $l =~ qr{([0-9]+)} ? $1 : 0;
+        $line_to_int{$l} = $v;
+    }
+
+    my @sorted = sort { $line_to_int{$a} <=> $line_to_int{$b} } @{ $self->{'values'} };
+
+    $self->{'values'} = \@sorted;
+
+    return;
+}
+
 # simple add using sprintf: avoid boilerplates
 sub sadd {
     my ( $self, $pattern, @args ) = @_;
