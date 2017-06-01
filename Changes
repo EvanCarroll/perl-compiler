@@ -1,7 +1,8 @@
 -*- change-log -*-
-	Started on CPAN with B-C-1.04_12
-	The Perl compiler was in CORE from alpha4 until Perl 5.9.4
-	and worked quite fine with Perl 5.6 and 5.8.
+
+5.024014 20170-01-06 Nicolas R.
+        Use a single shared_he struct for each size
+        Use a single CowPV for all PVs
 
 1.55 2016-05-?? rurban
         Support 5.24 and 5.24c
