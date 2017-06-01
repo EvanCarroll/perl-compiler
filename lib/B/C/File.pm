@@ -44,12 +44,12 @@ sub singleton {
 
 # The objects in quotes do not have any special logic.
 sub code_section_names {
-    return qw{const decl init0 free sym hek sharedhe}, struct_names(), op_sections();
+    return qw{cowpv const decl init0 free sym hek sharedhe}, struct_names(), op_sections();
 }
 
 # These objects will end up in an array of structs in the template and be auto-declared.
 sub struct_names {
-    return qw( xpv xpvav xpvhv xpvcv padlist padname padnamelist
+    return qw(xpv xpvav xpvhv xpvcv padlist padname padnamelist
       xpviv xpvuv xpvnv xpvmg xpvlv xrv xpvbm xpvio sv), assign_sections();
 }
 

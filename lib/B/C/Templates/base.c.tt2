@@ -200,6 +200,10 @@ XS(XS_DynaLoader_dl_load_file);
 XS(XS_DynaLoader_dl_find_symbol);
 [% END %]
 
+/* START cowpvs */
+[% section.cowpv.output( "%s\n" ) %]
+/* END cowpvs */
+
 [% IF section.const.comment() %]
     /* [% section.const.comment() %] */
 [% END %]

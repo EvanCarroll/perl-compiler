@@ -4,7 +4,7 @@ use strict;
 
 use B qw(cstring svref_2object);
 use B::C::Config;
-use B::C::File qw( xpvmgsect decl init const );
+use B::C::File qw( xpvmgsect decl init const cowpv );
 use B::C::Helpers qw/strlen_flags is_shared_hek cstring_cow cow_strlen_flags/;
 use B::C::Save::Hek qw/save_shared_he/;
 
@@ -27,23 +27,46 @@ sub inc_pv_index {
 
 sub savecowpv {
     my $pv = shift;
-    my ( $cstring, $cur, $len, $utf8 ) = cow_strlen_flags($pv);
 
+    my ( $cstring, $cur, $len, $utf8 ) = cow_strlen_flags($pv);
     return @{ $cowtable{$cstring} } if defined $cowtable{$cstring};
 
-    my $ix = const()->add('FAKE_CONST');
-    my $pvsym = sprintf( "cowpv%d", $ix );
+    if ( cowpv->index <= 0 ) {
 
-    my $max_len = 0;
-    if ( $max_len && $cur > $max_len ) {
-        my $chars = join ', ', map { cchar $_ } split //, pack( "a*", $pv );
-        const()->update( $ix, sprintf( "Static const char %s[] = { %s };", $pvsym, $chars ) );
-        $cowtable{$cstring} = [ $pvsym, $cur, $len ];
+        # the 0 entry is special
+        cowpv->add(q{Static const char allCOWPVs[] = "~NEXTCOWPV~";});
+        cowpv()->{_total_len} = 0;
     }
-    else {
-        const()->update( $ix, sprintf( "Static const char %s[] = %s;", $pvsym, $cstring ) );
-        $cowtable{$cstring} = [ $pvsym, $cur, $len ];
+
+    {    # append our string to the declaration of strings
+        my $declaration    = cowpv->get(0);
+        my $noquotecstring = $cstring;
+        $noquotecstring =~ s{^"}{};
+        $noquotecstring =~ s{"$}{};
+
+        # we are playing here with the limits with very long strings
+        #   but we can easily split them as part of a next iteration
+        #   by having multiple allCOWPVs strings
+        $declaration =~ s{~NEXTCOWPV~}{$noquotecstring~NEXTCOWPV~};
+        cowpv->update( 0, $declaration );
     }
+
+    my $ix = cowpv->index();    # not really exact
+
+    {
+        my $comment_str = $cstring;
+        $comment_str =~ s{\Q/*\E}{??}g;
+        $comment_str =~ s{\Q*/\E}{??}g;
+        cowpv->sadd( q{#define COWPV%d (char*) allCOWPVs + %d /* %s */}, $ix, cowpv()->{_total_len}, $comment_str );
+    }
+
+    # increase the total length of our master string (only after having use it)
+    cowpv()->{_total_len} += $len;
+
+    my $pvsym = sprintf( q{COWPV%d}, $ix );
+
+    $cowtable{$cstring} = [ $pvsym, $cur, $len ];
+
     return ( $pvsym, $cur, $len );    # NOTE: $cur is total size of the perl string. len would be the length of the C string.
 }
 
