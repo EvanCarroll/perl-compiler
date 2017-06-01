@@ -213,6 +213,15 @@ XS(XS_DynaLoader_dl_load_file);
 XS(XS_DynaLoader_dl_find_symbol);
 [% END %]
 
+/************************************************************************************************************
+*
+*       start COWPVs
+*
+*************************************************************************************************************/
+
+[% section.cowpv.output( "%s\n" ) %]
+/* end COWPVs */
+
 [% IF section.const.comment() %]
     /* [% section.const.comment() %] */
 [% END %]
