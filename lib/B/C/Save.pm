@@ -34,20 +34,22 @@ sub savecowpv {
     if ( cowpv->index <= 0 ) {
 
         # the 0 entry is special
-        cowpv->add(q{Static const char allCOWPVs[] = "~NEXTCOWPV~";});
+        cowpv->add(qq{Static const char allCOWPVs[] = "";\n});    # ";\n -> 3
         cowpv()->{_total_len} = 0;
     }
 
-    {    # append our string to the declaration of strings
+    {                                                             # append our string to the declaration of strings
         my $declaration    = cowpv->get(0);
         my $noquotecstring = $cstring;
         $noquotecstring =~ s{^"}{};
         $noquotecstring =~ s{"$}{};
 
+        my $end = qq{";\n};
+
         # we are playing here with the limits with very long strings
         #   but we can easily split them as part of a next iteration
         #   by having multiple allCOWPVs strings
-        $declaration =~ s{~NEXTCOWPV~}{$noquotecstring~NEXTCOWPV~};
+        $declaration =~ s[^(.+)(\Q$end\E)$][$1${noquotecstring}$2]m;
         cowpv->update( 0, $declaration );
     }
 
@@ -57,7 +59,8 @@ sub savecowpv {
         my $comment_str = $cstring;
         $comment_str =~ s{\Q/*\E}{??}g;
         $comment_str =~ s{\Q*/\E}{??}g;
-        cowpv->sadd( q{#define COWPV%d (char*) allCOWPVs + %d /* %s */}, $ix, cowpv()->{_total_len}, $comment_str );
+        $comment_str =~ s{\Q\000\377\E"$}{"};    # remove the cow part
+        cowpv->sadd( q{#define COWPV%d (char*) allCOWPVs+%d /* %s */}, $ix, cowpv()->{_total_len}, $comment_str );
     }
 
     # increase the total length of our master string (only after having use it)
@@ -67,10 +70,10 @@ sub savecowpv {
 
     $cowtable{$cstring} = [ $pvsym, $cur, $len ];
 
-    return ( $pvsym, $cur, $len );    # NOTE: $cur is total size of the perl string. len would be the length of the C string.
+    return ( $pvsym, $cur, $len );               # NOTE: $cur is total size of the perl string. len would be the length of the C string.
 }
 
-sub constpv {                         # could also safely use a cowpv
+sub constpv {                                    # could also safely use a cowpv
     return savepv( shift, 1 );
 }
 
