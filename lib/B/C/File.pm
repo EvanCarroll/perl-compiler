@@ -127,6 +127,8 @@ sub write {
         op_sections(),
     ];
 
+    $self->{'sharedhestructs'}->sort();    # sort them for human readability
+
     foreach my $section ( code_section_names(), init_section_names() ) {
         $c_file_stash->{'section'}->{$section} = $self->{$section};
     }

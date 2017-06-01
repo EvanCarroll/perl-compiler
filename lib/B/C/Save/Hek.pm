@@ -30,9 +30,10 @@ sub save_shared_he {
     #$cur *= -1 if $utf8;
 
     my $index = sharedhe()->index() + 1;
-    sharedhe()->sadd( "ALLOC_sHe(%d, %d, %s, %d);", $index, $cur, $cstr, $utf8 ? 1 : 0 );
+    sharedhe()->sadd( "ALLOC_sHe(%d, %d, %s, %d); /* sHe%d */", $index, $cur, $cstr, $utf8 ? 1 : 0, $index );
 
     return $saved_shared_hash{$key} = sprintf( q{sharedhe_list[%d]}, $index );    # FIXME change to sHe
+                                                                                  #return $saved_shared_hash{$key} = sprintf( q{(SHARED_HE*) &sHe%d}, $index );
 }
 
 1;
