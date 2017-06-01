@@ -32,8 +32,8 @@ sub save_shared_he {
     my $index = sharedhe()->index() + 1;
     sharedhe()->sadd( "ALLOC_sHe(%d, %d, %s, %d); /* sHe%d */", $index, $cur, $cstr, $utf8 ? 1 : 0, $index );
 
-    return $saved_shared_hash{$key} = sprintf( q{sharedhe_list[%d]}, $index );    # FIXME change to sHe
-                                                                                  #return $saved_shared_hash{$key} = sprintf( q{(SHARED_HE*) &sHe%d}, $index );
+    # cannot use sHe$ix directly as sharedhe_list is used in by init_pl_strtab and init_assign
+    return $saved_shared_hash{$key} = sprintf( q{sharedhe_list[%d]}, $index );
 }
 
 1;

@@ -72,6 +72,29 @@ typedef struct shared_he SHARED_HE;
 
 #define IMMORTAL_PL_strtab 0x7ffffff
 
+static int fast_perl_destruct( PerlInterpreter *my_perl );
+static void my_curse( pTHX_ SV* const sv );
+
+/* TODO: Not provided in perl core? */
+#ifndef dVAR
+# ifdef PERL_GLOBAL_STRUCT
+#  define dVAR		pVAR    = (struct perl_vars*)PERL_GET_VARS()
+# else
+#  define dVAR		dNOOP
+# endif
+#endif
+
+[%# Add static modules like " Win32CORE". This data comes from $Config{static_ext} %]
+[% FOREACH xsub IN stashxsubs %]
+EXTERN_C void boot_[% xsub %] (pTHX_ CV* cv);
+[% END %]
+
+/************************************************************************************************************
+*
+*       Static shared HE
+*
+*************************************************************************************************************/
+
 /* macro to ceate the struct (can be protected in C to define it once) */
 #define DEFINE_STATIC_SHARED_HE_STRUCT(len) \
     struct _sHeS_##len { HE *hent_next; HEK *hent_hek; union { SV *hent_val;  Size_t hent_refcount; } he_valu;  U32 hek_hash;  I32 hek_len;  char hek_key[ len + 1]; char flags; };
@@ -91,23 +114,6 @@ Static SHARED_HE* sharedhe_list[[% section.sharedhe.index + 1 %]] =  {
     (SHARED_HE*) &sHe[% num %],
 [%- END %]
 };
-
-static int fast_perl_destruct( PerlInterpreter *my_perl );
-static void my_curse( pTHX_ SV* const sv );
-
-/* TODO: Not provided in perl core? */
-#ifndef dVAR
-# ifdef PERL_GLOBAL_STRUCT
-#  define dVAR		pVAR    = (struct perl_vars*)PERL_GET_VARS()
-# else
-#  define dVAR		dNOOP
-# endif
-#endif
-
-[%# Add static modules like " Win32CORE". This data comes from $Config{static_ext} %]
-[% FOREACH xsub IN stashxsubs %]
-EXTERN_C void boot_[% xsub %] (pTHX_ CV* cv);
-[% END %]
 
 /************************************************************************************************************
 *
