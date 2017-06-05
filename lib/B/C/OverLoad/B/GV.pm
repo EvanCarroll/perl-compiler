@@ -118,8 +118,6 @@ sub get_sHe_HEK {
 
     return q{NULL} if !defined $shared_he or $shared_he eq 'NULL';
 
-    #warn "### $shared_he";
-
     my $sharedhe_ix;
     if ( $shared_he =~ qr{^sharedhe_list\[([0-9]+)\]$} ) {
         $sharedhe_ix = $1;
@@ -128,9 +126,7 @@ sub get_sHe_HEK {
     die unless defined $sharedhe_ix;
     my $se = q{sHe} . $sharedhe_ix;
 
-    return sprintf( q{get_sHe_HEK(%s)}, $se );
-
-    #$gp_file_hek eq 'NULL' ? 'NULL' : qq{(HEK*) ((void*)&$gp_file_hek + sizeof(HE))}
+    return sprintf( q{get_sHe_HEK(%s)}, $se );    # (HEK*) ( (void*) &sHe + 3 * sizeof(void*) )
 }
 
 sub get_package {
@@ -235,7 +231,7 @@ sub savegp_from_gv {
         "%s"       => $gp_egv,
         "%u"       => $gp_line,
         "0x%x"     => $gp_flags,
-        "%s"       => $gp_file_hek eq 'NULL' ? 'NULL' : qq{(HEK*) ((void*)&$gp_file_hek + sizeof(HE))},
+        "%s"       => get_sHe_HEK($gp_file_hek),
     );
     $saved_gps{$gp} = sprintf( "&gp_list[%d]", $gp_ix );
 
