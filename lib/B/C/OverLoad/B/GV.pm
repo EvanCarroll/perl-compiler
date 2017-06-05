@@ -95,26 +95,42 @@ sub do_save {
     # STATIC_HV: Is there a way to do this up on the xpvgvsect()->sadd line ??
     if ( my $gvname = $gv->NAME ) {
         my $shared_he = save_shared_he($gvname);    # ,....
-
-        if ( $shared_he ne 'NULL' ) {
+        my $hek       = get_sHe_HEK($shared_he);
+        if ( $hek ne q{NULL} ) {
 
             # plug the shared_he HEK to xpvgv: GvNAME_HEK($gvsym) =~(similar to) $xpvgv.xiv_u.xivu_namehek
             # This is the static version of
             #  init()->sadd( "GvNAME_HEK(%s) = (HEK*) &(( (SHARED_HE*) %s)->shared_he_hek);", $gvsym, $shared_he );
             # sharedhe_list[68] => shared_he_68
-            my $sharedhe_ix;
-            $sharedhe_ix = $1 if $shared_he =~ qr{\[([0-9]+)\]};
-            die unless defined $sharedhe_ix;
-            my $se = q{sHe} . $sharedhe_ix;
 
             # Note: the namehek here is the HEK and not the hek_key
-            xpvgvsect->supdate_field( $xpvg_ix, GV_IX_NAMEHEK(), qq[ {.xivu_namehek=get_sHe_HEK(%s) } /* %s */ ], $se, $gvname );
+            xpvgvsect->supdate_field( $xpvg_ix, GV_IX_NAMEHEK(), qq[ {.xivu_namehek=%s } /* %s */ ], $hek, $gvname );
 
             1;
         }
     }
 
     return $gvsym;
+}
+
+sub get_sHe_HEK {
+    my ($shared_he) = @_;
+
+    return q{NULL} if !defined $shared_he or $shared_he eq 'NULL';
+
+    #warn "### $shared_he";
+
+    my $sharedhe_ix;
+    if ( $shared_he =~ qr{^sharedhe_list\[([0-9]+)\]$} ) {
+        $sharedhe_ix = $1;
+    }
+
+    die unless defined $sharedhe_ix;
+    my $se = q{sHe} . $sharedhe_ix;
+
+    return sprintf( q{get_sHe_HEK(%s)}, $se );
+
+    #$gp_file_hek eq 'NULL' ? 'NULL' : qq{(HEK*) ((void*)&$gp_file_hek + sizeof(HE))}
 }
 
 sub get_package {
