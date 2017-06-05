@@ -49,7 +49,7 @@ sub get_sHe_HEK {
     die unless defined $sharedhe_ix;
     my $se = q{sHe} . $sharedhe_ix;
 
-    return sprintf( q{get_sHe_HEK(%s)}, $se );    # (HEK*) ( (void*) &sHe + 3 * sizeof(void*) )
+    return sprintf( q{get_sHe_HEK(%s)}, $se );
 }
 
 1;

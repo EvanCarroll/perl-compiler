@@ -94,6 +94,10 @@ EXTERN_C void boot_[% xsub %] (pTHX_ CV* cv);
 *************************************************************************************************************/
 
 /* get a HEK* from a shared_he */
+//      (HEK*) ( (void*) &sHe + 3 * sizeof(void*) )
+// or maybe
+//      (HEK*) &(( (SHARED_HE*) &sHe)->shared_he_hek);"
+
 #define get_sHe_HEK(sHe) (HEK*) ( (void*) &sHe + 3 * sizeof(void*) )
 
 /* macro to ceate the struct (can be protected in C to define it once) */
