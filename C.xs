@@ -411,6 +411,85 @@ U32
 RX_EXTFLAGS(rx)
 	  B::REGEXP rx
 
+#define rx_SVp		0x00000
+#define rx_STRLENp	0x30000
+#define rx_U32p		0x40000
+#define rx_SSize_tp	0x90000
+#define rx_pre_prefix 0xA0000
+
+#define PVRE_mother_re_ix        rx_SVp  | STRUCT_OFFSET(struct regexp, mother_re)
+#define PVRE_paren_names_ix      rx_SVp  | STRUCT_OFFSET(struct regexp, paren_names)
+#define PVRE_extflags_ix         rx_U32p | STRUCT_OFFSET(struct regexp, extflags)
+#define PVRE_minlen_ix           rx_SSize_tp | STRUCT_OFFSET(struct regexp, minlen)
+#define PVRE_minlenret_ix        rx_SSize_tp | STRUCT_OFFSET(struct regexp, minlenret)
+#define PVRE_gofs_ix             rx_STRLENp | STRUCT_OFFSET(struct regexp, gofs)
+#define PVRE_nparens_ix          rx_U32p | STRUCT_OFFSET(struct regexp, nparens)
+#define PVRE_intflags_ix         rx_U32p | STRUCT_OFFSET(struct regexp, intflags)
+#define PVRE_lastparen_ix        rx_U32p | STRUCT_OFFSET(struct regexp, lastparen)
+#define PVRE_lastcloseparen_ix   rx_U32p | STRUCT_OFFSET(struct regexp, lastcloseparen)
+#define PVRE_sublen_ix           rx_SSize_tp | STRUCT_OFFSET(struct regexp, sublen)
+#define PVRE_suboffset_ix        rx_SSize_tp | STRUCT_OFFSET(struct regexp, suboffset)
+#define PVRE_subcoffset_ix       rx_SSize_tp | STRUCT_OFFSET(struct regexp, subcoffset)
+#define PVRE_maxlen_ix           rx_SSize_tp | STRUCT_OFFSET(struct regexp, maxlen)
+#define PVRE_pre_prefix_ix       rx_pre_prefix | 0
+void
+C_REGEX(sv)
+	B::REGEXP sv
+    ALIAS:
+	B::REGEXP::mother_re        = PVRE_mother_re_ix
+	B::REGEXP::paren_names      = PVRE_paren_names_ix
+	B::REGEXP::extflags         = PVRE_extflags_ix
+	B::REGEXP::minlen           = PVRE_minlen_ix
+	B::REGEXP::minlenret        = PVRE_minlenret_ix
+	B::REGEXP::gofs             = PVRE_gofs_ix
+	B::REGEXP::nparens          = PVRE_nparens_ix
+	B::REGEXP::intflags         = PVRE_intflags_ix
+	B::REGEXP::lastparen        = PVRE_lastparen_ix
+	B::REGEXP::lastcloseparen   = PVRE_lastcloseparen_ix
+	B::REGEXP::sublen           = PVRE_sublen_ix
+	B::REGEXP::suboffset        = PVRE_suboffset_ix
+	B::REGEXP::subcoffset       = PVRE_subcoffset_ix
+	B::REGEXP::maxlen           = PVRE_maxlen_ix
+	B::REGEXP::pre_prefix       = PVRE_pre_prefix_ix
+    PREINIT:
+	char *ptr;
+	SV *ret;
+    PPCODE:
+	ptr = (ix & 0xFFFF) + (char*)ReANY(sv);
+	switch ((U8)(ix >> 16)) {
+	case (U8)(rx_SVp >> 16):
+	    ret = *ptr ? make_sv_object(aTHX_ *((SV **)ptr)) : &PL_sv_undef;
+	    break;
+	case (U8)(rx_STRLENp >> 16):
+	    ret = sv_2mortal(newSVuv(*((STRLEN *)ptr)));
+	    break;
+	case (U8)(rx_U32p >> 16):
+	    ret = sv_2mortal(newSVuv(*((U32 *)ptr)));
+	    break;
+	case (U8)(rx_SSize_tp >> 16):
+	    ret = sv_2mortal(newSViv(*((SSize_t *)ptr)));
+	    break;
+	case (U8)(rx_pre_prefix >> 16):
+	    ret = sv_2mortal(newSVuv(((regexp *)ptr)->pre_prefix);
+	    break;
+	default:
+	    croak("Illegal alias 0x%08x for B::REGEX", (unsigned)ix);
+	}
+	ST(0) = ret;
+	XSRETURN(1);
+
+void
+MOTHER(sv)
+       B::REGEXP       sv
+    PREINIT:
+      REGEXP *mother;
+    PPCODE:
+      mother = ReANY(sv)->mother_re;
+      if(!mother)
+          PUSHs(&PL_sv_undef);
+      else
+          PUSHs(make_sv_object(aTHX_ ((SV *)mother)));
+
 MODULE = B     PACKAGE = B::SV        PREFIX = Sv
 
 bool
