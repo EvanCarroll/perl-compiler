@@ -2,7 +2,7 @@ package B::GV;
 
 use strict;
 
-use B qw/cstring svref_2object SVt_PVGV SVf_ROK SVf_UTF8/;
+use B qw/cstring svref_2object SVt_PVGV SVf_ROK SVf_UTF8 SVf_AMAGIC/;
 
 use B::C::Config;
 use B::C::Save::Hek qw/save_shared_he get_sHe_HEK/;
@@ -61,6 +61,12 @@ sub do_save {
 
     my $stash_symbol = $gv->get_stash_symbol();
 
+    my $magic_stash = $gv->FLAGS & SVf_AMAGIC ? $stash_symbol : q{NULL};
+
+    # my $stash_symbol_copy = $stash_symbol;
+    # warn "#### NAME ??? ". $gv->get_fullname();
+    # $stash_symbol = q{NULL} if $gv->get_fullname() && $gv->get_fullname() =~ qr{^(main::)?DATA$};
+
     my $namehek = q{NULL};
     if ( my $gvname = $gv->NAME ) {
         my $share_he = save_shared_he($gvname);
@@ -71,7 +77,7 @@ sub do_save {
     my $xpvg_ix = xpvgvsect()->saddl(
 
         # _XPV_HEAD
-        "%s"                => $stash_symbol,             # HV* xmg_stash;      /* class package */
+        "%s"                => $magic_stash,              # HV* xmg_stash;      /* class package */
         "{%s}"              => $gv->save_magic($name),    # union _xmgu xmg_u;
         '%d'                => $gv->CUR,                  # STRLEN  xpv_cur;        /* length of svu_pv as a C string */
         '{.xpvlenu_len=%d}' => $gv->LEN,                  # union xpv_len_u - xpvlenu_len or xpvlenu_pv
