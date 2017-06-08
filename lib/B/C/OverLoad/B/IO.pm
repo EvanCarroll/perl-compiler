@@ -8,26 +8,6 @@ use B::C::Save qw/savecowpv/;
 use B::C::File qw/init init2 svsect xpviosect/;
 use B::C::Helpers::Symtable qw/savesym/;
 
-sub save_data {
-    my ( $io, $globname, $data ) = @_;
-
-    my $ref = svref_2object( \$data )->save;
-
-    # force inclusion of PerlIO::scalar as it was loaded in BEGIN.
-    init2()->add_eval( sprintf 'open(%s, \'<:scalar\', \\\\$%s);', $globname, $globname );
-
-    init()->pre_destruct( sprintf 'eval_pv("close %s;", 1);', $globname );
-    $B::C::use_xsloader = 1;    # layers are not detected as XSUB CV, so force it
-
-    # STATIC_HV: This needs to be done earlier in C.pm -- TODO
-    require PerlIO;
-    require PerlIO::scalar;
-
-    # Do some sorta magic to save the XS also.
-
-    return $ref;
-}
-
 sub do_save {
     my ( $io, $fullname ) = @_;
 
