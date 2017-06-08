@@ -194,8 +194,8 @@ sub savegp_from_gv {
     $gp_sv = $gv->save_gv_sv($fullname) if $savefields & Save_SV;
     $gp_av = $gv->save_gv_av($fullname) if $savefields & Save_AV;
     $gp_hv = $gv->save_gv_hv($fullname) if $savefields & Save_HV;
-    $gp_cv   = $gv->save_gv_cv( $fullname, $gp_ix ) if $savefields & Save_CV;
-    $gp_form = $gv->save_gv_format($fullname)       if $savefields & Save_FORM;    # FIXME incomplete for now
+    $gp_cv = $gv->save_gv_cv( $fullname, $gp_ix ) if $savefields & Save_CV;
+    $gp_form = $gv->save_gv_format($fullname) if $savefields & Save_FORM;    # FIXME incomplete for now
 
     my $io_sv;
     ( $gp_io, $io_sv ) = $gv->save_gv_io($fullname) if $savefields & Save_IO;    # FIXME: get rid of sym
@@ -447,29 +447,23 @@ sub save_gv_io {
     return 'NULL' unless $$gvio;
     return 'NULL' if $fullname =~ m/^(?:main::)?(stdout|stderr|stdin)/i;
 
-    my $is_data;
-    my $sv;
     if ( $fullname =~ m/::DATA$/ ) {
         no strict 'refs';
         my $fh = *{$fullname}{IO};
         use strict 'refs';
-        $is_data = 'is_DATA';
 
         if ( $fh->opened ) {
             my @read_data = <$fh>;
             my $data = join '', @read_data;
 
             # TODO: save_data only used for GV... can probably use it there
-            $sv = $gvio->save_data( $fullname, $data );
-
-            return ( 'NULL', $sv );
+            return $gvio->save_io_and_data( $fullname, $data );
         }
 
-        # WTFGO ????
-
+        # Houston we have a problem there ?
     }
 
-    return ( $gvio->save( $fullname, $is_data ), $sv );
+    return ( $gvio->save($fullname), undef );
 }
 
 sub get_savefields {
