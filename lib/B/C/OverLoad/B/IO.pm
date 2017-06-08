@@ -108,7 +108,12 @@ sub do_save {
     }
 
     # svsect()->comment("any=xpvcv, refcnt, flags, sv_u");
-    my $sv_ix = svsect->sadd( "(XPVIO*)&xpvio_list[%u], %Lu, 0x%x, {%s}", $xpvio_ix, $io->REFCNT + 1, $io->FLAGS, '0' );
+    ##### ???? the last argument is 0 !!!
+    warn sprintf( "####### IO->PV - %s ", $io->PV );
+
+    #my $sv_u = $is_DATA ? cstring( "\340\321n" ) : "0";
+    my $sv_u = q{0};
+    my $sv_ix = svsect->sadd( "(XPVIO*)&xpvio_list[%u], %Lu, 0x%x, {%s}", $xpvio_ix, $io->REFCNT + 1, $io->FLAGS, $sv_u );
 
     return savesym( $io, "&sv_list[$sv_ix]" );
 }
