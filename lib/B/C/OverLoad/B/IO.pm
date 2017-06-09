@@ -31,9 +31,10 @@ sub save_io_and_data {
     $B::C::xsub{'PerlIO::scalar'}     = 'Dynamic-' . $INC{'PerlIO/scalar.pm'};    # force dl_init boot
 
     # Do some sorta magic to save the XS also.
-    my $io_sym = $io->save( $globname, 'is_DATA' );
+    #my $io_sym = $io->save( $globname, 'is_DATA' );
+    #return ( $io_sym, $ref );
 
-    return ( $io_sym, $ref );
+    return ( q{NULL}, $ref );
 }
 
 sub do_save {

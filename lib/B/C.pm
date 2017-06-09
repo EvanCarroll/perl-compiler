@@ -36,8 +36,8 @@ our $settings = {
 };
 
 ### temporary workaround for IO::DATA
-require PerlIO;
-require PerlIO::scalar;
+#require PerlIO;
+#require PerlIO::scalar;
 
 # This loads B/C_heavy.pl from the same location C.pm came from.
 sub load_heavy {
