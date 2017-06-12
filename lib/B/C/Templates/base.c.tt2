@@ -178,8 +178,10 @@ static void declare_static_sections() { /* declare our static section 'blocks' t
 /* TODO: move sv_list first and other most common structs as order matters ! */
 [% FOREACH sect IN section_list -%]
 [% lines = section.$sect.index + 1 -%]
+[% SET sname = section.$sect.name() -%]
+[% SET lname = "${sname}_list" -%]
 [% NEXT IF lines == 0 -%]
-    DeclareStaticMemory( (Malloc_t) &[% section.$sect.name() %]_list[0], (Malloc_t) &[% section.$sect.name() %]_list[[% section.$sect.index %]], sizeof([% section.$sect.name() %]_list[0]) );
+    DeclareStaticMemory( (Malloc_t) &[% lname %][0], (Malloc_t) &[% lname %][[% section.$sect.index %]], sizeof([% lname %][0]) );
 [% END -%]
 
     /* stupid but just show that this sould work ! and return earlier */
