@@ -206,7 +206,6 @@ static void declare_static_sections() { /* declare our static section 'blocks' t
 [% NEXT IF lines == 0 -%]
     declare_static_memory( &[% lname %][0], &[% lname %][[% section.$sect.index %]], sizeof([% lname %][0]) );
 [% END -%]
-//DeclareStaticMemory( (Malloc_t) &[% lname %][0], (Malloc_t) &[% lname %][[% section.$sect.index %]], sizeof([% lname %][0]) );
 
 [% IF section.const.index >= 0 -%]
     declare_static_memory( cowpv0, cowpv[% section.const.index %], 0 /* we do not know - breaks re-alloc */ );
