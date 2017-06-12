@@ -174,23 +174,6 @@ Static GV *dynamic_gv_list[[% gv_index %]];
 Static [% section.$sect.typename() %] [% section.$sect.name() %]_list[[% lines %]];
 [% END -%]
 
-static void declare_static_sections() { /* declare our static section 'blocks' to perl */
-/* TODO: move sv_list first and other most common structs as order matters ! */
-[% FOREACH sect IN section_list -%]
-[% lines = section.$sect.index + 1 -%]
-[% SET sname = section.$sect.name() -%]
-[% SET lname = "${sname}_list" -%]
-[% NEXT IF lines == 0 -%]
-    DeclareStaticMemory( (Malloc_t) &[% lname %][0], (Malloc_t) &[% lname %][[% section.$sect.index %]], sizeof([% lname %][0]) );
-[% END -%]
-
-    /* stupid but just show that this sould work ! and return earlier */
-    Safefree( &sv_list[1] );
-    Safefree( &sv_list[2] );
-    Safefree( &gv_list[3] );
-
-}
-
 /* hack for when Perl accesses PVX of GVs */
 Static const char emptystring[] = "\0";
 
@@ -212,6 +195,31 @@ XS(XS_DynaLoader_dl_find_symbol);
 /* <const.output> */
 [% section.const.output( "%s\n" ) %]
 /* </const.output> */
+
+static void declare_static_sections() { /* declare our static section 'blocks' to perl */
+/* TODO: move sv_list first and other (gv_list) most common structs as order matters ! */
+/* CV, magic, and then anything else */
+[% FOREACH sect IN section_list -%]
+[% lines = section.$sect.index + 1 -%]
+[% SET sname = section.$sect.name() -%]
+[% SET lname = "${sname}_list" -%]
+[% NEXT IF lines == 0 -%]
+    declare_static_memory( &[% lname %][0], &[% lname %][[% section.$sect.index %]], sizeof([% lname %][0]) );
+[% END -%]
+//DeclareStaticMemory( (Malloc_t) &[% lname %][0], (Malloc_t) &[% lname %][[% section.$sect.index %]], sizeof([% lname %][0]) );
+
+[% IF section.const.index >= 0 -%]
+    declare_static_memory( cowpv0, cowpv[% section.const.index %], 0 /* we do not know - breaks re-alloc */ );
+[% END -%]
+
+    /* stupid but just show that this sould work ! and return earlier */
+    /*
+    Safefree( &sv_list[1] );
+    Safefree( &sv_list[2] );
+    Safefree( &gv_list[3] );
+    */
+
+}
 
 [% IF section.decl.comment() %]
     /* [% section.decl.comment() %] */
