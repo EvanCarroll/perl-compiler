@@ -175,12 +175,17 @@ Static [% section.$sect.typename() %] [% section.$sect.name() %]_list[[% lines %
 [% END -%]
 
 static void declare_static_sections() { /* declare our static section 'blocks' to perl */
-
+/* TODO: move sv_list first and other most common structs as order matters ! */
 [% FOREACH sect IN section_list -%]
 [% lines = section.$sect.index + 1 -%]
 [% NEXT IF lines == 0 -%]
     DeclareStaticMemory( (Malloc_t) &[% section.$sect.name() %]_list[0], (Malloc_t) &[% section.$sect.name() %]_list[[% section.$sect.index %]], sizeof([% section.$sect.name() %]_list[0]) );
 [% END -%]
+
+    /* stupid but just show that this sould work ! and return earlier */
+    Safefree( &sv_list[1] );
+    Safefree( &sv_list[2] );
+    Safefree( &gv_list[3] );
 
 }
 
