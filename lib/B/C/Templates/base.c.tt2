@@ -110,6 +110,8 @@ Static SHARED_HE* sharedhe_list[[% section.sharedhe.index + 1 %]] =  {
 [%- END %]
 };
 
+#include "perl_parse.h"
+
 /************************************************************************************************************
 *
 *       output_all()
@@ -719,6 +721,8 @@ static void dl_init(pTHX)
     [% END %]
 }
 
+
+
 /************************************************************************************************************
 *
 *       output_main()
@@ -803,10 +807,10 @@ main(int argc, char **argv, char **env)
 	fakeargv[i + options_count - 1] = argv[i];
     fakeargv[argc + options_count - 1] = 0;
 
-    benchmark_time("pre perl_parse");
-    exitstatus = perl_parse(&BC_unthreaded_interpreter, xs_init, argc + options_count - 1,
+    benchmark_time("pre bc_perl_parse");
+    exitstatus = bc_perl_parse(&BC_unthreaded_interpreter, xs_init, argc + options_count - 1,
 			    fakeargv, env);
-    benchmark_time("post perl_parse");
+    benchmark_time("post bc_perl_parse");
     if (exitstatus)
 	exit( exitstatus );
 
