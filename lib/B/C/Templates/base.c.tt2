@@ -808,8 +808,7 @@ main(int argc, char **argv, char **env)
     fakeargv[argc + options_count - 1] = 0;
 
     benchmark_time("pre bc_perl_parse");
-    exitstatus = bc_perl_parse(&BC_unthreaded_interpreter, xs_init, argc + options_count - 1,
-			    fakeargv, env);
+    exitstatus = bc_perl_parse(&BC_unthreaded_interpreter, xs_init, argc + options_count - 1, fakeargv, env);
     benchmark_time("post bc_perl_parse");
     if (exitstatus)
 	exit( exitstatus );
