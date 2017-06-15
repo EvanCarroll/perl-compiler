@@ -66,9 +66,10 @@ sub compile_script {
     $harness_opts .= ' -staticxs'  if $use_static_xs;
 
     my $cc_harness         = get_full_path(qq{$FindBin::Bin/../../../../script/cc_harness});
+    my $perl_parse_include_dir = get_full_path(qq{$FindBin::Bin/../../../..});
     my $c_file_full_path   = get_full_path($c_file);
     my $bin_file_full_path = get_full_path( $bin_file, 0 );
-    $cmd = "$PERL $cc_harness $harness_opts ${c_file_full_path} -o ${bin_file_full_path} 2>&1";
+    $cmd = "$PERL $cc_harness $harness_opts -I$perl_parse_include_dir ${c_file_full_path} -o ${bin_file_full_path} 2>&1";
     diag $cmd if $ENV{VERBOSE};
     my $compile_output = `$cmd`;
     note $compile_output if $compile_output;
