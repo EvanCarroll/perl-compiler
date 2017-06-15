@@ -10,6 +10,7 @@ use Test::More;
 BEGIN {
     use FindBin;
     unshift @INC, $FindBin::Bin . "/../../../lib";
+    $ENV{CPATH} = $FindBin::Bin . "/../../../..";
 }
 
 die "Please use perl 5.24" unless $^V =~ qr{^v5.24};
