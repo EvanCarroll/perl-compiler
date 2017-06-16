@@ -247,9 +247,6 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
     char c;
     bool doextract = FALSE;
     const char *cddir = NULL;
-#ifdef USE_SITECUSTOMIZE
-    bool minus_f = FALSE;
-#endif
     SV *linestr_sv = NULL;
     bool add_read_e_script = FALSE;
     U32 lex_start_flags = 0;
@@ -346,9 +343,6 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
 	    break;
 
 	case 'f':
-#ifdef USE_SITECUSTOMIZE
-	    minus_f = TRUE;
-#endif
 	    s++;
 	    goto reswitch;
 
@@ -491,51 +485,10 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
     }
 
     /* Set $^X early so that it can be used for relocatable paths in @INC  */
-    /* and for SITELIB_EXP in USE_SITECUSTOMIZE                            */
     assert (!TAINT_get);
     TAINT;
     set_caret_X();
     TAINT_NOT;
-
-#if defined(USE_SITECUSTOMIZE)
-    if (!minus_f) {
-	/* The games with local $! are to avoid setting errno if there is no
-	   sitecustomize script.  "q%c...%c", 0, ..., 0 becomes "q\0...\0",
-	   ie a q() operator with a NUL byte as a the delimiter. This avoids
-	   problems with pathnames containing (say) '  */
-#  ifdef PERL_IS_MINIPERL
-	AV *const inc = GvAV(PL_incgv);
-	SV **const inc0 = inc ? av_fetch(inc, 0, FALSE) : NULL;
-
-	if (inc0) {
-            /* if lib/buildcustomize.pl exists, it should not fail. If it does,
-               it should be reported immediately as a build failure.  */
-	    (void)Perl_av_create_and_unshift_one(aTHX_ &PL_preambleav,
-						 Perl_newSVpvf(aTHX_
-		"BEGIN { my $f = q%c%s%"SVf"/buildcustomize.pl%c; "
-			"do {local $!; -f $f }"
-			" and do $f || die $@ || qq '$f: $!' }",
-                                0, (TAINTING_get ? "./" : ""), SVfARG(*inc0), 0));
-	}
-#  else
-	/* SITELIB_EXP is a function call on Win32.  */
-	const char *const raw_sitelib = SITELIB_EXP;
-	if (raw_sitelib) {
-	    /* process .../.. if PERL_RELOCATABLE_INC is defined */
-	    SV *sitelib_sv = mayberelocate(raw_sitelib, strlen(raw_sitelib),
-					   INCPUSH_CAN_RELOCATE);
-	    const char *const sitelib = SvPVX(sitelib_sv);
-	    (void)Perl_av_create_and_unshift_one(aTHX_ &PL_preambleav,
-						 Perl_newSVpvf(aTHX_
-							       "BEGIN { do {local $!; -f q%c%s/sitecustomize.pl%c} && do q%c%s/sitecustomize.pl%c }",
-							       0, SVfARG(sitelib), 0,
-							       0, SVfARG(sitelib), 0));
-	    assert (SvREFCNT(sitelib_sv) == 1);
-	    SvREFCNT_dec(sitelib_sv);
-	}
-#  endif
-    }
-#endif
 
     if (!scriptname)
 	scriptname = argv[0];
@@ -1885,9 +1838,6 @@ S_Internals_V(pTHX_ CV *cv)
 #  endif
 #  ifdef USE_PERL_ATOF
 			     " USE_PERL_ATOF"
-#  endif	       
-#  ifdef USE_SITECUSTOMIZE
-			     " USE_SITECUSTOMIZE"
 #  endif	       
 	;
     PERL_UNUSED_ARG(cv);
