@@ -416,6 +416,7 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
     PERL_SET_PHASE(PERL_PHASE_START);
 
     /* init_main_stash(); PL_defstash setup */
+    PL_curstash = PL_defstash;
 
     {
 	const char *s;

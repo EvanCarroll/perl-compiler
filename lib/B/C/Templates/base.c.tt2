@@ -763,6 +763,7 @@ main(int argc, char **argv, char **env)
     /* setup $0 on execution */
     CopFILE_set(&PL_compiling, argv[0]);
 
+    /* Sets up all PL_## variables */
 	perl_construct( &BC_unthreaded_interpreter );
 
 	PL_perl_destruct_level = 0;
