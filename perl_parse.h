@@ -45,36 +45,7 @@ bc_perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
     dJMPENV;
 
     PERL_ARGS_ASSERT_PERL_PARSE;
-#ifndef MULTIPLICITY
     PERL_UNUSED_ARG(my_perl);
-#endif
-#if defined(USE_HASH_SEED) || defined(USE_HASH_SEED_EXPLICIT) || defined(USE_HASH_SEED_DEBUG)
-    {
-        const char * const s = PerlEnv_getenv("PERL_HASH_SEED_DEBUG");
-
-        if (s && strEQ(s, "1")) {
-            const unsigned char *seed= PERL_HASH_SEED;
-            const unsigned char *seed_end= PERL_HASH_SEED + PERL_HASH_SEED_BYTES;
-            PerlIO_printf(Perl_debug_log, "HASH_FUNCTION = %s HASH_SEED = 0x", PERL_HASH_FUNC);
-            while (seed < seed_end) {
-                PerlIO_printf(Perl_debug_log, "%02x", *seed++);
-            }
-#ifdef PERL_HASH_RANDOMIZE_KEYS
-            PerlIO_printf(Perl_debug_log, " PERTURB_KEYS = %d (%s)",
-                    PL_HASH_RAND_BITS_ENABLED,
-                    PL_HASH_RAND_BITS_ENABLED == 0 ? "NO" : PL_HASH_RAND_BITS_ENABLED == 1 ? "RANDOM" : "DETERMINISTIC");
-#endif
-            PerlIO_printf(Perl_debug_log, "\n");
-        }
-    }
-#endif /* #if defined(USE_HASH_SEED) || defined(USE_HASH_SEED_EXPLICIT) */
-
-#ifdef __amigaos4__
-    {
-        struct NameTranslationInfo nti;
-        __translate_amiga_to_unix_path_name(&argv[0],&nti); 
-    }
-#endif
 
     PL_origargc = argc;
     PL_origargv = argv;
@@ -110,9 +81,6 @@ bc_perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
 	      while (*s) s++;
 	      for (i = 1; i < PL_origargc; i++) {
 		   if ((PL_origargv[i] == s + 1
-#ifdef OS2
-			|| PL_origargv[i] == s + 2
-#endif 
 			    )
 		       ||
 		       (aligned &&
@@ -140,10 +108,8 @@ bc_perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
 		    INT2PTR(char *, PTR2UV(s + PTRSIZE) & mask)))
 		 )
 	      {
-#ifndef OS2		/* ENVIRON is read by the kernel too. */
 		   s = PL_origenviron[0];
 		   while (*s) s++;
-#endif
 		   my_setenv("NoNe  SuCh", NULL);
 		   /* Force copy of environment. */
 		   for (i = 1; PL_origenviron[i]; i++) {
@@ -497,10 +463,6 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
 	scriptname = BIT_BUCKET;	/* don't look for script or read stdin */
     }
     else if (scriptname == NULL) {
-#ifdef MSDOS
-	if ( PerlLIO_isatty(PerlIO_fileno(PerlIO_stdin())) )
-	    moreswitches("h");
-#endif
 	scriptname = "-";
     }
 
@@ -518,7 +480,6 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
 
 	validate_suid(rsfp);
 
-#ifndef PERL_MICRO
 #  if defined(SIGCHLD) || defined(SIGCLD)
 	{
 #  ifndef SIGCHLD
@@ -532,7 +493,6 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
 	    }
 	}
 #  endif
-#endif
 
 	if (doextract) {
 
@@ -563,10 +523,8 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
 
     if (xsinit)
 	(*xsinit)(aTHX);	/* in case linked C routines want magical variables */
-#ifndef PERL_MICRO
 #if defined(VMS) || defined(WIN32) || defined(DJGPP) || defined(__CYGWIN__) || defined(SYMBIAN)
     init_os_extras();
-#endif
 #endif
 
 #ifdef USE_SOCKS
@@ -906,7 +864,6 @@ STATIC void init_postdump_symbols(pTHX_ int argc, char **argv, char **env)
 	GvMULTI_on(PL_envgv);
 	hv = GvHVn(PL_envgv);
 	hv_magic(hv, NULL, PERL_MAGIC_env);
-#ifndef PERL_MICRO
 #ifdef USE_ENVIRON_ARRAY
 	/* Note that if the supplied env parameter is actually a copy
 	   of the global environ then it may now point to free'd memory
@@ -917,9 +874,6 @@ STATIC void init_postdump_symbols(pTHX_ int argc, char **argv, char **env)
 	    env = environ;
 	env_is_not_environ = env != environ;
 	if (env_is_not_environ
-#  ifdef USE_ITHREADS
-	    && PL_curinterp == aTHX
-#  endif
 	   )
 	{
 	    environ[0] = NULL;
@@ -937,11 +891,6 @@ STATIC void init_postdump_symbols(pTHX_ int argc, char **argv, char **env)
 		continue;
             nlen = s - old_var;
 
-#if defined(MSDOS) && !defined(DJGPP)
-	    *s = '\0';
-	    (void)strupr(old_var);
-	    *s = '=';
-#endif
             if (hv_exists(hv, old_var, nlen)) {
                 const char *name = savepvn(old_var, nlen);
 
@@ -992,7 +941,6 @@ STATIC void init_postdump_symbols(pTHX_ int argc, char **argv, char **env)
           SvREFCNT_dec_NN(dups);
       }
 #endif /* USE_ENVIRON_ARRAY */
-#endif /* !PERL_MICRO */
     }
     TAINT_NOT;
 
