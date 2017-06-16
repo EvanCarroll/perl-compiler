@@ -14,6 +14,7 @@ static void init_predump_symbols(pTHX);
 static SV * mayberelocate(pTHX_ const char *const dir, STRLEN len, U32 flags);
 static SV * S_incpush_if_exists(pTHX_ AV *const av, SV *dir, SV *const stem);
 static void S_Internals_V(pTHX_ CV *cv);
+#define NEVER Perl_croak_nocontext("Shouldn't get here\n\n");
 
 #define incpush_use_sep(a,b,c)  S_incpush_use_sep(aTHX_ a,b,c)
 static void S_incpush_use_sep(pTHX_ const char *p, STRLEN len, U32 flags);
@@ -50,10 +51,7 @@ bc_perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
     PL_origargc = argc;
     PL_origargv = argv;
 
-    if (PL_origalen != 0) {
-	PL_origalen = 1; /* don't use old PL_origalen if perl_parse() is called again */
-    }
-    else {
+    /* START: Determine how long $0 is allowed to be */
 	/* Set PL_origalen be the sum of the contiguous argv[]
 	 * elements plus the size of the env in case that it is
 	 * contiguous with the argv[].  This is used in mg.c:Perl_magic_set()
@@ -132,30 +130,11 @@ bc_perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
 #endif /* !defined(PERL_USE_SAFE_PUTENV) */
 
 	 PL_origalen = s ? s - PL_origargv[0] + 1 : 0;
-    }
+    
+    /* END: Determine how long $0 is allowed to be */
 
-    if (PL_do_undump) {
-
-	/* Come here if running an undumped a.out. */
-
-	PL_origfilename = savepv(argv[0]);
-	PL_do_undump = FALSE;
-	cxstack_ix = -1;		/* start label stack again */
-	init_ids();
-	assert (!TAINT_get);
-	TAINT;
-	set_caret_X();
-	TAINT_NOT;
-	init_postdump_symbols(argc,argv,env);
-	return 0;
-    }
-
-    if (PL_main_root) {
-	op_free(PL_main_root);
-	PL_main_root = NULL;
-    }
+	PL_main_root = NULL; /* We should really be setting PL_main_root statically */
     PL_main_start = NULL;
-    SvREFCNT_dec(PL_main_cv);
     PL_main_cv = NULL;
 
     time(&PL_basetime);
@@ -166,13 +145,6 @@ bc_perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
     switch (ret) {
     case 0:
 	bc_parse_body(env,xsinit);
-	if (PL_unitcheckav) {
-	    call_list(oldscope, PL_unitcheckav);
-	}
-	if (PL_checkav) {
-	    PERL_SET_PHASE(PERL_PHASE_CHECK);
-	    call_list(oldscope, PL_checkav);
-	}
 	ret = 0;
 	break;
     case 1:
