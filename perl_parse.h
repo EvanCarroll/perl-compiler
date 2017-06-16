@@ -142,33 +142,12 @@ bc_perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
     PL_dowarn = G_WARN_OFF;
 
     JMPENV_PUSH(ret);
-    switch (ret) {
-    case 0:
-	bc_parse_body(env,xsinit);
-	ret = 0;
-	break;
-    case 1:
-	STATUS_ALL_FAILURE;
-	/* FALLTHROUGH */
-    case 2:
-	/* my_exit() was called */
-	while (PL_scopestack_ix > oldscope)
-	    LEAVE;
-	FREETMPS;
-	SET_CURSTASH(PL_defstash);
-	if (PL_unitcheckav) {
-	    call_list(oldscope, PL_unitcheckav);
-	}
-	if (PL_checkav) {
-	    PERL_SET_PHASE(PERL_PHASE_CHECK);
-	    call_list(oldscope, PL_checkav);
-	}
-	ret = STATUS_EXIT;
-	break;
-    case 3:
-	PerlIO_printf(Perl_error_log, "panic: top_env\n");
-	ret = 1;
-	break;
+    if(ret) {
+        PerlIO_printf(Perl_error_log, "panic: jmpenv failed!\n");
+    }
+    else {
+        bc_parse_body(env,xsinit);
+        ret = 0;
     }
     JMPENV_POP;
     return ret;
