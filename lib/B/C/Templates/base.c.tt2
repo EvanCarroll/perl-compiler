@@ -752,9 +752,6 @@ int
 main(int argc, char **argv, char **env)
 {
     int exitstatus;
-    int i;
-    char **fakeargv;
-    int options_count;
 
     /* Assure the interpreter struct is zeroed out. */
     Zero(&BC_unthreaded_interpreter, 1, PerlInterpreter);
@@ -796,35 +793,20 @@ main(int argc, char **argv, char **env)
     PL_use_safe_putenv = 0;
 #endif /* PERL_USE_SAFE_PUTENV */
 
-/*  XXX With -e "" we need to fake parse_body() scriptname = BIT_BUCKET */
-#define EXTRA_OPTIONS 4
-
     benchmark_time("prenewx");
-    Newx(fakeargv, argc + EXTRA_OPTIONS + 1, char *);
-    fakeargv[0] = argv[0];
-    fakeargv[1] = "-e";
-    fakeargv[2] = "";
-    options_count = 3;
-
-  [% IF TAINT %]
-/*  honour -T */
-    fakeargv[options_count] = "-T";
-    ++options_count;
-  [% END %]
-
-    fakeargv[options_count] = "--";
-    ++options_count;
-
-    benchmark_time("for argc");
-    for (i = 1; i < argc; i++)
-	fakeargv[i + options_count - 1] = argv[i];
-    fakeargv[argc + options_count - 1] = 0;
 
     declare_static_sections(); /* declare all our sections to perl */
 
     benchmark_time("pre bc_perl_parse");
-    exitstatus = bc_perl_parse(&BC_unthreaded_interpreter, xs_init, argc + options_count - 1,
-			    fakeargv, env);
+
+  [% IF TAINT %]
+    /* -T option was passed to B::C so we need to do the same here. bc_perl_parse doesn't parse perl args now. */
+    TAINTING_set(TRUE);
+    TAINT_WARN_set(FALSE);
+  [% END %]
+
+
+    exitstatus = bc_perl_parse(&BC_unthreaded_interpreter, xs_init, argc, argv, env);
     benchmark_time("post bc_perl_parse");
     if (exitstatus)
        	exit( exitstatus );

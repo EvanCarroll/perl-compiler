@@ -1,12 +1,9 @@
 
 void bc_parse_body(char **env, XSINIT_t xsinit);
 static PerlIO * open_script(pTHX_ const char *scriptname, bool dosearch, bool *suidscript);
-static I32 read_e_script(pTHX_ int idx, SV *buf_sv, int maxlen);
-static void init_ids(pTHX);
 static void init_postdump_symbols(pTHX_ int argc, char **argv, char **env);
 static void forbid_setid(pTHX_ const char flag, const bool suidscript);
 static void incpush(pTHX_ const char *const dir, STRLEN len, U32 flags);
-static void minus_v(pTHX);
 static void init_perllib(pTHX);
 static void validate_suid(pTHX_ PerlIO *rsfp);
 static void find_beginning(pTHX_ SV* linestr_sv, PerlIO *rsfp);
@@ -41,7 +38,6 @@ int
 bc_perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
 {
     dVAR;
-    I32 oldscope;
     int ret;
     dJMPENV;
 
@@ -138,7 +134,6 @@ bc_perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
     PL_main_cv = NULL;
 
     time(&PL_basetime);
-    oldscope = PL_scopestack_ix;
     PL_dowarn = G_WARN_OFF;
 
     JMPENV_PUSH(ret);
@@ -161,171 +156,15 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
     char **argv = PL_origargv;
     const char *scriptname = NULL;
     bool dosearch = FALSE;
-    char c;
     bool doextract = FALSE;
     const char *cddir = NULL;
     SV *linestr_sv = NULL;
-    bool add_read_e_script = FALSE;
     U32 lex_start_flags = 0;
 
     PERL_SET_PHASE(PERL_PHASE_START);
 
     /* init_main_stash(); PL_defstash setup */
     PL_curstash = PL_defstash;
-
-    {
-	const char *s;
-    for (argc--,argv++; argc > 0; argc--,argv++) {
-	if (argv[0][0] != '-' || !argv[0][1])
-	    break;
-	s = argv[0]+1;
-      reswitch:
-	switch ((c = *s)) {
-	case 'C':
-#ifndef PERL_STRICT_CR
-	case '\r':
-#endif
-	case ' ':
-	case '0':
-	case 'F':
-	case 'a':
-	case 'c':
-	case 'd':
-	case 'D':
-	case 'h':
-	case 'i':
-	case 'l':
-	case 'M':
-	case 'm':
-	case 'n':
-	case 'p':
-	case 's':
-	case 'u':
-	case 'U':
-	case 'v':
-	case 'W':
-	case 'X':
-	case 'w':
-	    if ((s = moreswitches(s)))
-		goto reswitch;
-	    break;
-
-	case 't':
-#if defined(SILENT_NO_TAINT_SUPPORT)
-            /* silently ignore */
-#elif defined(NO_TAINT_SUPPORT)
-            Perl_croak_nocontext("This perl was compiled without taint support. "
-                       "Cowardly refusing to run with -t or -T flags");
-#else
-	    CHECK_MALLOC_TOO_LATE_FOR('t');
-	    if( !TAINTING_get ) {
-	         TAINT_WARN_set(TRUE);
-	         TAINTING_set(TRUE);
-	    }
-#endif
-	    s++;
-	    goto reswitch;
-	case 'T':
-#if defined(SILENT_NO_TAINT_SUPPORT)
-            /* silently ignore */
-#elif defined(NO_TAINT_SUPPORT)
-            Perl_croak_nocontext("This perl was compiled without taint support. "
-                       "Cowardly refusing to run with -t or -T flags");
-#else
-	    CHECK_MALLOC_TOO_LATE_FOR('T');
-	    TAINTING_set(TRUE);
-	    TAINT_WARN_set(FALSE);
-#endif
-	    s++;
-	    goto reswitch;
-
-	case 'E':
-	    PL_minus_E = TRUE;
-	    /* FALLTHROUGH */
-	case 'e':
-	    forbid_setid('e', FALSE);
-	    if (!PL_e_script) {
-		PL_e_script = newSVpvs("");
-		add_read_e_script = TRUE;
-	    }
-	    if (*++s)
-		sv_catpv(PL_e_script, s);
-	    else if (argv[1]) {
-		sv_catpv(PL_e_script, argv[1]);
-		argc--,argv++;
-	    }
-	    else
-		Perl_croak(aTHX_ "No code specified for -%c", c);
-	    sv_catpvs(PL_e_script, "\n");
-	    break;
-
-	case 'f':
-	    s++;
-	    goto reswitch;
-
-	case 'I':	/* -I handled both here and in moreswitches() */
-	    forbid_setid('I', FALSE);
-	    if (!*++s && (s=argv[1]) != NULL) {
-		argc--,argv++;
-	    }
-	    if (s && *s) {
-		STRLEN len = strlen(s);
-		incpush(s, len, INCPUSH_ADD_SUB_DIRS|INCPUSH_ADD_OLD_VERS);
-	    }
-	    else
-		Perl_croak(aTHX_ "No directory specified for -I");
-	    break;
-	case 'S':
-	    forbid_setid('S', FALSE);
-	    dosearch = TRUE;
-	    s++;
-	    goto reswitch;
-	case 'V':
-	    {
-		SV *opts_prog;
-
-		if (*++s != ':')  {
-		    opts_prog = newSVpvs("use Config; Config::_V()");
-		}
-		else {
-		    ++s;
-		    opts_prog = Perl_newSVpvf(aTHX_
-					      "use Config; Config::config_vars(qw%c%s%c)",
-					      0, s, 0);
-		    s += strlen(s);
-		}
-		Perl_av_create_and_push(aTHX_ &PL_preambleav, opts_prog);
-		/* don't look for script or read stdin */
-		scriptname = BIT_BUCKET;
-		goto reswitch;
-	    }
-	case 'x':
-	    doextract = TRUE;
-	    s++;
-	    if (*s)
-		cddir = s;
-	    break;
-	case 0:
-	    break;
-	case '-':
-	    if (!*++s || isSPACE(*s)) {
-		argc--,argv++;
-		goto switch_end;
-	    }
-	    /* catch use of gnu style long options.
-	       Both of these exit immediately.  */
-	    if (strEQ(s, "version"))
-		minus_v();
-	    if (strEQ(s, "help"))
-	    s--;
-	    /* FALLTHROUGH */
-	default:
-	    Perl_croak(aTHX_ "Unrecognized switch: -%s  (-h will show valid options)",s);
-	}
-    }
-    }
-
-  switch_end:
 
     {
 	char *s;
@@ -559,20 +398,9 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
 
     PL_subname = newSVpvs("main");
 
-    if (add_read_e_script)
-	filter_add(read_e_script, NULL);
-
     /* now parse the script */
 
     SETERRNO(0,SS_NORMAL);
-    if (yyparse(GRAMPROG) || PL_parser->error_count) {
-	if (PL_minus_c)
-	    Perl_croak(aTHX_ "%s had compilation errors.\n", PL_origfilename);
-	else {
-	    Perl_croak(aTHX_ "Execution of %s aborted due to compilation errors.\n",
-		       PL_origfilename);
-	}
-    }
     CopLINE_set(PL_curcop, 0);
     SET_CURSTASH(PL_defstash);
     if (PL_e_script) {
@@ -740,52 +568,6 @@ static PerlIO * open_script(pTHX_ const char *scriptname, bool dosearch, bool *s
             Strerror(EISDIR));
 
     return rsfp;
-}
-
-static I32
-read_e_script(pTHX_ int idx, SV *buf_sv, int maxlen)
-{
-    const char * const p  = SvPVX_const(PL_e_script);
-    const char *nl = strchr(p, '\n');
-
-    PERL_UNUSED_ARG(idx);
-    PERL_UNUSED_ARG(maxlen);
-
-    nl = (nl) ? nl+1 : SvEND(PL_e_script);
-    if (nl-p == 0) {
-	filter_del(read_e_script);
-	return 0;
-    }
-    sv_catpvn(buf_sv, p, nl-p);
-    sv_chop(PL_e_script, nl);
-    return 1;
-}
-
-STATIC void init_ids(pTHX)
-{
-    /* no need to do anything here any more if we don't
-     * do tainting. */
-#ifndef NO_TAINT_SUPPORT
-    const Uid_t my_uid = PerlProc_getuid();
-    const Uid_t my_euid = PerlProc_geteuid();
-    const Gid_t my_gid = PerlProc_getgid();
-    const Gid_t my_egid = PerlProc_getegid();
-
-    PERL_UNUSED_CONTEXT;
-
-    /* Should not happen: */
-    CHECK_MALLOC_TAINT(my_uid && (my_euid != my_uid || my_egid != my_gid));
-    TAINTING_set( TAINTING_get | (my_uid && (my_euid != my_uid || my_egid != my_gid)) );
-#endif
-    /* BUG */
-    /* PSz 27 Feb 04
-     * Should go by suidscript, not uid!=euid: why disallow
-     * system("ls") in scripts run from setuid things?
-     * Or, is this run before we check arguments and set suidscript?
-     * What about SETUID_SCRIPTS_ARE_SECURE_NOW: could we use fdscript then?
-     * (We never have suidscript, can we be sure to have fdscript?)
-     * Or must then go by UID checks? See comments in forbid_setid also.
-     */
 }
 
 STATIC void init_postdump_symbols(pTHX_ int argc, char **argv, char **env)
@@ -1035,107 +817,6 @@ static void incpush(pTHX_ const char *const dir, STRLEN len, U32 flags)
 	    SvREFCNT_dec(libdir);
 	}
     }
-}
-
-static void minus_v(pTHX)
-{
-	PerlIO * PIO_stdout;
-	{
-	    const char * const level_str = "v" PERL_VERSION_STRING;
-	    const STRLEN level_len = sizeof("v" PERL_VERSION_STRING)-1;
-#ifdef PERL_PATCHNUM
-	    SV* level;
-#  ifdef PERL_GIT_UNCOMMITTED_CHANGES
-	    static const char num [] = PERL_PATCHNUM "*";
-#  else
-	    static const char num [] = PERL_PATCHNUM;
-#  endif
-	    {
-		const STRLEN num_len = sizeof(num)-1;
-		/* A very advanced compiler would fold away the strnEQ
-		   and this whole conditional, but most (all?) won't do it.
-		   SV level could also be replaced by with preprocessor
-		   catenation.
-		*/
-		if (num_len >= level_len && strnEQ(num,level_str,level_len)) {
-		    /* per 46807d8e80, PERL_PATCHNUM is outside of the control
-		       of the interp so it might contain format characters
-		    */
-		    level = newSVpvn(num, num_len);
-		} else {
-		    level = Perl_newSVpvf_nocontext("%s (%s)", level_str, num);
-		}
-	    }
-#else
-	SV* level = newSVpvn(level_str, level_len);
-#endif /* #ifdef PERL_PATCHNUM */
-	PIO_stdout =  PerlIO_stdout();
-	    PerlIO_printf(PIO_stdout,
-		"\nThis is perl "	STRINGIFY(PERL_REVISION)
-		", version "		STRINGIFY(PERL_VERSION)
-		", subversion "		STRINGIFY(PERL_SUBVERSION)
-		" (%"SVf") built for "	ARCHNAME, SVfARG(level)
-		);
-	    SvREFCNT_dec_NN(level);
-	}
-#if defined(LOCAL_PATCH_COUNT)
-	if (LOCAL_PATCH_COUNT > 0)
-	    PerlIO_printf(PIO_stdout,
-			  "\n(with %d registered patch%s, "
-			  "see perl -V for more detail)",
-			  LOCAL_PATCH_COUNT,
-			  (LOCAL_PATCH_COUNT!=1) ? "es" : "");
-#endif
-
-	PerlIO_printf(PIO_stdout,
-		      "\n\nCopyright 1987-2016, Larry Wall\n");
-#ifdef MSDOS
-	PerlIO_printf(PIO_stdout,
-		      "\nMS-DOS port Copyright (c) 1989, 1990, Diomidis Spinellis\n");
-#endif
-#ifdef DJGPP
-	PerlIO_printf(PIO_stdout,
-		      "djgpp v2 port (jpl5003c) by Hirofumi Watanabe, 1996\n"
-		      "djgpp v2 port (perl5004+) by Laszlo Molnar, 1997-1999\n");
-#endif
-#ifdef OS2
-	PerlIO_printf(PIO_stdout,
-		      "\n\nOS/2 port Copyright (c) 1990, 1991, Raymond Chen, Kai Uwe Rommel\n"
-		      "Version 5 port Copyright (c) 1994-2002, Andreas Kaiser, Ilya Zakharevich\n");
-#endif
-#ifdef OEMVS
-	PerlIO_printf(PIO_stdout,
-		      "MVS (OS390) port by Mortice Kern Systems, 1997-1999\n");
-#endif
-#ifdef __VOS__
-	PerlIO_printf(PIO_stdout,
-		      "Stratus OpenVOS port by Paul.Green@stratus.com, 1997-2013\n");
-#endif
-#ifdef POSIX_BC
-	PerlIO_printf(PIO_stdout,
-		      "BS2000 (POSIX) port by Start Amadeus GmbH, 1998-1999\n");
-#endif
-#ifdef UNDER_CE
-	PerlIO_printf(PIO_stdout,
-			"WINCE port by Rainer Keuchel, 2001-2002\n"
-			"Built on " __DATE__ " " __TIME__ "\n\n");
-	wce_hitreturn();
-#endif
-#ifdef __SYMBIAN32__
-	PerlIO_printf(PIO_stdout,
-		      "Symbian port by Nokia, 2004-2005\n");
-#endif
-#ifdef BINARY_BUILD_NOTICE
-	BINARY_BUILD_NOTICE;
-#endif
-	PerlIO_printf(PIO_stdout,
-		      "\n\
-Perl may be copied only under the terms of either the Artistic License or the\n\
-GNU General Public License, which may be found in the Perl 5 source kit.\n\n\
-Complete documentation for Perl, including FAQ lists, should be found on\n\
-this system using \"man perl\" or \"perldoc perl\".  If you have access to the\n\
-Internet, point your browser at http://www.perl.org/, the Perl Home Page.\n\n");
-	my_exit(0);
 }
 
 static void init_perllib(pTHX)
