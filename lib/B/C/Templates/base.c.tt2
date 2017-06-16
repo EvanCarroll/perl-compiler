@@ -151,6 +151,9 @@ typedef struct my_padname_with_str MyPADNAME;
 
 typedef struct { U32 a; U32 b; }      ASSIGN_HEKKEY2PV;
 
+/* extra typedef */
+[% section.typedef.output( "%s\n" ) %]
+
 /*
     Tricky hack for -fcog since 5.10 on !c99 compilers required. We need a char* as
     *first* sv_u element to be able to statically initialize it. A int does not allow it.
@@ -297,6 +300,7 @@ Static [% section.$sect.typename() %] [% section.$sect.name() %]_list[[% lines %
 [% section.$sect.output("    { %s }, /* %s_list[%d] %s %s */\n") %]
 };
 
+
 [% END %]
 
 /* handy helpers for B::C */
@@ -338,6 +342,8 @@ PAD ** INITPADLIST(PADLIST *pad, int number_of_items) {
 [% section.init_COREbootstraplink.output( "    %s\n", 'perl_init_COREbootstraplink' ) %]
 [% section.init_bootstraplink.output( "    %s\n", 'perl_init_bootstraplink' ) %]
 
+#define SIG_SIZE [% Config.sig_size %]
+
 void setup_perl_globals() {
     PL_defstash = [% PL.defstash %];       /*  SVt_PVHV */
     PL_curstname = [% PL.curstname %];     /* "main" SVt_PV */
@@ -348,6 +354,12 @@ void setup_perl_globals() {
     PL_replgv = [% PL.replgv %];           /* *main::^R SVt_PVGV */
     PL_debstash = [% PL.debstash %];       /* *main::DB:: SVt_PVHV */
     PL_globalstash = [% PL.globalstash %]; /* *main::CORE::GLOBAL:: SVt_PVHV */
+
+    /* initialize signals - view Perl_magic_setsig and Perl_whichsig_pvn for usage */
+    Newxz(PL_psig_name, 2 * SIG_SIZE, SV*);
+    Newxz(PL_psig_pend, SIG_SIZE, int);
+    PL_psig_ptr = PL_psig_name + SIG_SIZE;
+
 }
 
 static void init_pl_strtab(pTHX) {

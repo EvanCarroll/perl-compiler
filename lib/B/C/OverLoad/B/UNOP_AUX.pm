@@ -3,7 +3,7 @@ package B::UNOP_AUX;
 use strict;
 
 use B::C::Config;
-use B::C::File qw/unopauxsect init decl free/;
+use B::C::File qw/unopauxsect init decl free meta_unopaux_item/;
 use B::C::Helpers qw/do_labels is_constant/;
 
 sub _clear_stack {
@@ -23,70 +23,37 @@ sub do_save {
 
     unopauxsect()->comment_common("first, aux");
 
-    my $ix = unopauxsect()->index + 1;
-    unopauxsect()->sadd( "%s, s\\_%x, unopaux_item$ix + 1", $op->_save_common, ${ $op->first } );
+    my $ix = unopauxsect()->sadd( "%s, s\\_%x, FIRST_unopaux_item", $op->_save_common, ${ $op->first } );
     unopauxsect()->debug( $op->name, $op->flagspv ) if debug('flags');
 
+    my @to_be_filled = map { 0 } 1 .. $auxlen;                                       #
+
+    my $unopaux_item_sect = meta_unopaux_item( $auxlen + 1 );
+    $unopaux_item_sect->comment(q{length prefix, UNOP_AUX_item * $auxlen });
+    my $uaux_item_ix = $unopaux_item_sect->add( join( ', ', qq[{.uv=$auxlen}], @to_be_filled ) );
+    my $symname = $unopaux_item_sect->get_sym();
+
+    unopauxsect()->update_field( $ix, 15, qq{&$symname.aaab} );
+
     # This cannot be a section, as the number of elements is variable
-    my $i      = 1;
-    my $s      = "Static UNOP_AUX_item unopaux_item${ix}[] = {\n\t{.uv=$auxlen}\t/* length prefix */\n";
+    my $i            = 1;                                                            # maybe rename tp field_ix
+    my $struct_field = q{aaaa};
+
     my $action = 0;
     for my $item (@aux_list) {
+        my $field;
+
+        $struct_field++;
+        my $symat = "${symname}.$struct_field";
+
         unless ( ref $item ) {
 
             # symbolize MDEREF action
-            my $cmt = 'action';
-            if ( verbose() ) {
-                if ( $op->name eq 'multideref' ) {
-                    my $act = $item & 0xf;    # MDEREF_ACTION_MASK
-                    $cmt = 'AV_pop_rv2av_aelem'          if $act == 1;
-                    $cmt = 'AV_gvsv_vivify_rv2av_aelem'  if $act == 2;
-                    $cmt = 'AV_padsv_vivify_rv2av_aelem' if $act == 3;
-                    $cmt = 'AV_vivify_rv2av_aelem'       if $act == 4;
-                    $cmt = 'AV_padav_aelem'              if $act == 5;
-                    $cmt = 'AV_gvav_aelem'               if $act == 6;
-                    $cmt = 'HV_pop_rv2hv_helem'          if $act == 8;
-                    $cmt = 'HV_gvsv_vivify_rv2hv_helem'  if $act == 9;
-                    $cmt = 'HV_padsv_vivify_rv2hv_helem' if $act == 10;
-                    $cmt = 'HV_vivify_rv2hv_helem'       if $act == 11;
-                    $cmt = 'HV_padhv_helem'              if $act == 12;
-                    $cmt = 'HV_gvhv_helem'               if $act == 13;
-                    my $idx = $item & 0x30;    # MDEREF_INDEX_MASK
-                    $cmt .= ''             if $idx == 0x0;
-                    $cmt .= ' INDEX_const' if $idx == 0x10;
-                    $cmt .= ' INDEX_padsv' if $idx == 0x20;
-                    $cmt .= ' INDEX_gvsv'  if $idx == 0x30;
-                }
-                elsif ( $op->name eq 'signature' ) {    # cperl only for now
-                    my $act = $item & 0xf;              # SIGNATURE_ACTION_MASK
-                    $cmt = 'reload'            if $act == 0;
-                    $cmt = 'end'               if $act == 1;
-                    $cmt = 'padintro'          if $act == 2;
-                    $cmt = 'arg'               if $act == 3;
-                    $cmt = 'arg_default_none'  if $act == 4;
-                    $cmt = 'arg_default_undef' if $act == 5;
-                    $cmt = 'arg_default_0'     if $act == 6;
-                    $cmt = 'arg_default_1'     if $act == 7;
-                    $cmt = 'arg_default_iv'    if $act == 8;
-                    $cmt = 'arg_default_const' if $act == 9;
-                    $cmt = 'arg_default_padsv' if $act == 10;
-                    $cmt = 'arg_default_gvsv'  if $act == 11;
-                    $cmt = 'arg_default_op'    if $act == 12;
-                    $cmt = 'array'             if $act == 13;
-                    $cmt = 'hash'              if $act == 14;
-                    my $idx = $item & 0x3F;    # SIGNATURE_MASK
-                    $cmt .= ''           if $idx == 0x0;
-                    $cmt .= ' flag skip' if $idx == 0x10;
-                    $cmt .= ' flag ref'  if $idx == 0x20;
-                }
-                else {
-                    die "Unknown UNOP_AUX op {$op->name}";
-                }
-            }
+            my $cmt = $op->get_action_name($item);
             $action = $item;
-            debug( hv => $op->name . " action $action $cmt" );
-            $s .= sprintf( "\t,{.uv=0x%x} \t/* %s: %u */\n", $item, $cmt, $item );
 
+            #debug( hv => $op->name . " action $action $cmt" );
+            $field = sprintf( "{.uv=0x%x}", $item );    #  \t/* %s: %u */ , $cmt, $item
         }
         else {
             # const and sv already at compile-time, gv deferred to init-time.
@@ -97,36 +64,96 @@ sub do_save {
             # || SvROK(keysv)
             # || SvIsCOW_shared_hash(keysv));
             my $constkey = ( $action & 0x30 ) == 0x10 ? 1 : 0;
-            my $itemsym = $item->save( "unopaux_item${ix}[$i]" . ( $constkey ? " const" : "" ) );
+            my $itemsym = $item->save( "$symat" . ( $constkey ? " const" : "" ) );
             if ( is_constant($itemsym) ) {
                 if ( ref $item eq 'B::IV' ) {
                     my $iv = $item->IVX;
-                    $s .= "\t,{.iv = $iv}\n";
+                    $field = "{.iv=$iv}";
                 }
                 elsif ( ref $item eq 'B::UV' ) {    # also for PAD_OFFSET
                     my $uv = $item->UVX;
-                    $s .= "\t,{.uv = $uv}\n";
+                    $field = "{.uv=$uv}";
                 }
                 else {                              # SV
-                    $s .= "\t,{.sv = $itemsym}\n";
+                    $field = "{.sv=$itemsym}";
                 }
             }
             else {
-                # gv or other late inits
-                $s .= "\t,{.sv=Nullsv} \t/* $itemsym */\n";
-                init()->add("unopaux_item${ix}[$i].sv = (SV*)$itemsym;");
+                if ( $itemsym =~ qr{^PL_} ) {
+                    $field = "{.sv=Nullsv}";        #  \t/* $itemsym */
+                    init()->add("$symat.sv = (SV*)$itemsym;");
+                }
+                else {
+                    ## gv or other late inits
+                    $field = "{.sv = (SV*) $itemsym}";
+                }
             }
         }
+
+        $unopaux_item_sect->update_field( $uaux_item_ix, $i, q[ ] . $field );
         $i++;
     }
 
-    decl()->add("$s\n};");
-
     my $sym = "(OP*)&unopaux_list[$ix]";
+
     free()->add("    ($sym)->op_type = OP_NULL;");
     do_labels( $op, $level + 1, 'first' );
 
     return $sym;
+}
+
+sub get_action_name {
+    my ( $op, $item ) = @_;
+
+    my $cmt = 'action';
+    if ( $op->name eq 'multideref' ) {
+        my $act = $item & 0xf;    # MDEREF_ACTION_MASK
+        $cmt = 'AV_pop_rv2av_aelem'          if $act == 1;
+        $cmt = 'AV_gvsv_vivify_rv2av_aelem'  if $act == 2;
+        $cmt = 'AV_padsv_vivify_rv2av_aelem' if $act == 3;
+        $cmt = 'AV_vivify_rv2av_aelem'       if $act == 4;
+        $cmt = 'AV_padav_aelem'              if $act == 5;
+        $cmt = 'AV_gvav_aelem'               if $act == 6;
+        $cmt = 'HV_pop_rv2hv_helem'          if $act == 8;
+        $cmt = 'HV_gvsv_vivify_rv2hv_helem'  if $act == 9;
+        $cmt = 'HV_padsv_vivify_rv2hv_helem' if $act == 10;
+        $cmt = 'HV_vivify_rv2hv_helem'       if $act == 11;
+        $cmt = 'HV_padhv_helem'              if $act == 12;
+        $cmt = 'HV_gvhv_helem'               if $act == 13;
+        my $idx = $item & 0x30;    # MDEREF_INDEX_MASK
+        $cmt .= ''             if $idx == 0x0;
+        $cmt .= ' INDEX_const' if $idx == 0x10;
+        $cmt .= ' INDEX_padsv' if $idx == 0x20;
+        $cmt .= ' INDEX_gvsv'  if $idx == 0x30;
+    }
+    elsif ( $op->name eq 'signature' ) {    # cperl only for now
+        my $act = $item & 0xf;              # SIGNATURE_ACTION_MASK
+        $cmt = 'reload'            if $act == 0;
+        $cmt = 'end'               if $act == 1;
+        $cmt = 'padintro'          if $act == 2;
+        $cmt = 'arg'               if $act == 3;
+        $cmt = 'arg_default_none'  if $act == 4;
+        $cmt = 'arg_default_undef' if $act == 5;
+        $cmt = 'arg_default_0'     if $act == 6;
+        $cmt = 'arg_default_1'     if $act == 7;
+        $cmt = 'arg_default_iv'    if $act == 8;
+        $cmt = 'arg_default_const' if $act == 9;
+        $cmt = 'arg_default_padsv' if $act == 10;
+        $cmt = 'arg_default_gvsv'  if $act == 11;
+        $cmt = 'arg_default_op'    if $act == 12;
+        $cmt = 'array'             if $act == 13;
+        $cmt = 'hash'              if $act == 14;
+        my $idx = $item & 0x3F;    # SIGNATURE_MASK
+        $cmt .= ''           if $idx == 0x0;
+        $cmt .= ' flag skip' if $idx == 0x10;
+        $cmt .= ' flag ref'  if $idx == 0x20;
+    }
+    else {
+        die "Unknown UNOP_AUX op {$op->name}";
+    }
+
+    return $cmt;
+
 }
 
 1;
