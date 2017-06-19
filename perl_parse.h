@@ -2,7 +2,6 @@
 void bc_parse_body(char **env, XSINIT_t xsinit);
 static void init_postdump_symbols(pTHX_ int argc, char **argv, char **env);
 static void init_predump_symbols(pTHX);
-static void S_Internals_V(pTHX_ CV *cv);
 #define NEVER Perl_croak_nocontext("Shouldn't get here\n\n");
 
 int
@@ -226,7 +225,6 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
     boot_core_PerlIO();
     boot_core_UNIVERSAL();
     boot_core_mro();
-    newXS("Internals::V", S_Internals_V, __FILE__);
 
     if (xsinit)
 	(*xsinit)(aTHX);	/* in case linked C routines want magical variables */
@@ -492,163 +490,4 @@ static void init_predump_symbols(pTHX)
     GvIOp(tmpgv) = MUTABLE_IO(SvREFCNT_inc_simple(io));
 
     PL_statname = newSVpvs("");		/* last filename we did stat on */
-}
-
-static void
-S_Internals_V(pTHX_ CV *cv)
-{
-    dXSARGS;
-#ifdef LOCAL_PATCH_COUNT
-    const int local_patch_count = LOCAL_PATCH_COUNT;
-#else
-    const int local_patch_count = 0;
-#endif
-    const int entries = 3 + local_patch_count;
-    int i;
-    static const char non_bincompat_options[] = 
-#  ifdef DEBUGGING
-			     " DEBUGGING"
-#  endif
-#  ifdef NO_MATHOMS
-			     " NO_MATHOMS"
-#  endif
-#  ifdef NO_HASH_SEED
-			     " NO_HASH_SEED"
-#  endif
-#  ifdef NO_TAINT_SUPPORT
-			     " NO_TAINT_SUPPORT"
-#  endif
-#  ifdef PERL_BOOL_AS_CHAR
-			     " PERL_BOOL_AS_CHAR"
-#  endif
-#  ifdef PERL_COPY_ON_WRITE
-			     " PERL_COPY_ON_WRITE"
-#  endif
-#  ifdef PERL_DISABLE_PMC
-			     " PERL_DISABLE_PMC"
-#  endif
-#  ifdef PERL_DONT_CREATE_GVSV
-			     " PERL_DONT_CREATE_GVSV"
-#  endif
-#  ifdef PERL_EXTERNAL_GLOB
-			     " PERL_EXTERNAL_GLOB"
-#  endif
-#  ifdef PERL_HASH_FUNC_SIPHASH
-			     " PERL_HASH_FUNC_SIPHASH"
-#  endif
-#  ifdef PERL_HASH_FUNC_SDBM
-			     " PERL_HASH_FUNC_SDBM"
-#  endif
-#  ifdef PERL_HASH_FUNC_DJB2
-			     " PERL_HASH_FUNC_DJB2"
-#  endif
-#  ifdef PERL_HASH_FUNC_SUPERFAST
-			     " PERL_HASH_FUNC_SUPERFAST"
-#  endif
-#  ifdef PERL_HASH_FUNC_MURMUR3
-			     " PERL_HASH_FUNC_MURMUR3"
-#  endif
-#  ifdef PERL_HASH_FUNC_ONE_AT_A_TIME
-			     " PERL_HASH_FUNC_ONE_AT_A_TIME"
-#  endif
-#  ifdef PERL_HASH_FUNC_ONE_AT_A_TIME_HARD
-			     " PERL_HASH_FUNC_ONE_AT_A_TIME_HARD"
-#  endif
-#  ifdef PERL_HASH_FUNC_ONE_AT_A_TIME_OLD
-			     " PERL_HASH_FUNC_ONE_AT_A_TIME_OLD"
-#  endif
-#  ifdef PERL_IS_MINIPERL
-			     " PERL_IS_MINIPERL"
-#  endif
-#  ifdef PERL_MALLOC_WRAP
-			     " PERL_MALLOC_WRAP"
-#  endif
-#  ifdef PERL_MEM_LOG
-			     " PERL_MEM_LOG"
-#  endif
-#  ifdef PERL_MEM_LOG_NOIMPL
-			     " PERL_MEM_LOG_NOIMPL"
-#  endif
-#  ifdef PERL_PERTURB_KEYS_DETERMINISTIC
-			     " PERL_PERTURB_KEYS_DETERMINISTIC"
-#  endif
-#  ifdef PERL_PERTURB_KEYS_DISABLED
-			     " PERL_PERTURB_KEYS_DISABLED"
-#  endif
-#  ifdef PERL_PERTURB_KEYS_RANDOM
-			     " PERL_PERTURB_KEYS_RANDOM"
-#  endif
-#  ifdef PERL_PRESERVE_IVUV
-			     " PERL_PRESERVE_IVUV"
-#  endif
-#  ifdef PERL_RELOCATABLE_INCPUSH
-			     " PERL_RELOCATABLE_INCPUSH"
-#  endif
-#  ifdef PERL_USE_DEVEL
-			     " PERL_USE_DEVEL"
-#  endif
-#  ifdef PERL_USE_SAFE_PUTENV
-			     " PERL_USE_SAFE_PUTENV"
-#  endif
-#  ifdef SILENT_NO_TAINT_SUPPORT
-                             " SILENT_NO_TAINT_SUPPORT"
-#  endif
-#  ifdef UNLINK_ALL_VERSIONS
-			     " UNLINK_ALL_VERSIONS"
-#  endif
-#  ifdef USE_ATTRIBUTES_FOR_PERLIO
-			     " USE_ATTRIBUTES_FOR_PERLIO"
-#  endif
-#  ifdef USE_FAST_STDIO
-			     " USE_FAST_STDIO"
-#  endif	       
-#  ifdef USE_HASH_SEED_EXPLICIT
-			     " USE_HASH_SEED_EXPLICIT"
-#  endif
-#  ifdef USE_LOCALE
-			     " USE_LOCALE"
-#  endif
-#  ifdef USE_LOCALE_CTYPE
-			     " USE_LOCALE_CTYPE"
-#  endif
-#  ifdef WIN32_NO_REGISTRY
-			     " USE_NO_REGISTRY"
-#  endif
-#  ifdef USE_PERL_ATOF
-			     " USE_PERL_ATOF"
-#  endif	       
-	;
-    PERL_UNUSED_ARG(cv);
-    PERL_UNUSED_VAR(items);
-
-    EXTEND(SP, entries);
-
-    PUSHs(sv_2mortal(newSVpv(PL_bincompat_options, 0)));
-    PUSHs(Perl_newSVpvn_flags(aTHX_ non_bincompat_options,
-			      sizeof(non_bincompat_options) - 1, SVs_TEMP));
-
-#ifndef PERL_BUILD_DATE
-#  ifdef __DATE__
-#    ifdef __TIME__
-#      define PERL_BUILD_DATE __DATE__ " " __TIME__
-#    else
-#      define PERL_BUILD_DATE __DATE__
-#    endif
-#  endif
-#endif
-
-#ifdef PERL_BUILD_DATE
-    PUSHs(Perl_newSVpvn_flags(aTHX_
-			      STR_WITH_LEN("Compiled at " PERL_BUILD_DATE),
-			      SVs_TEMP));
-#else
-    PUSHs(&PL_sv_undef);
-#endif
-
-    for (i = 1; i <= local_patch_count; i++) {
-	/* This will be an undef, if PL_localpatches[i] is NULL.  */
-	PUSHs(sv_2mortal(newSVpv(PL_localpatches[i], 0)));
-    }
-
-    XSRETURN(entries);
 }
