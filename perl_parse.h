@@ -1,10 +1,6 @@
 
 void bc_parse_body(char **env, XSINIT_t xsinit);
-static PerlIO * open_script(pTHX_ const char *scriptname, bool dosearch, bool *suidscript);
 static void init_postdump_symbols(pTHX_ int argc, char **argv, char **env);
-static void forbid_setid(pTHX_ const char flag, const bool suidscript);
-static void validate_suid(pTHX_ PerlIO *rsfp);
-static void find_beginning(pTHX_ SV* linestr_sv, PerlIO *rsfp);
 static void init_predump_symbols(pTHX);
 static void S_Internals_V(pTHX_ CV *cv);
 #define NEVER Perl_croak_nocontext("Shouldn't get here\n\n");
@@ -141,13 +137,9 @@ bc_perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
 void bc_parse_body(char **env, XSINIT_t xsinit)
 {
     dVAR;
-    PerlIO *rsfp;
     int argc = PL_origargc;
     char **argv = PL_origargv;
     const char *scriptname = NULL;
-    bool dosearch = FALSE;
-    bool doextract = FALSE;
-    const char *cddir = NULL;
     SV *linestr_sv = NULL;
     U32 lex_start_flags = 0;
 
@@ -232,40 +224,14 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
 
     /* init_perllib(); We hard code @INC on our own.*/
 
-    {
-	bool suidscript = FALSE;
-
-	rsfp = open_script(scriptname, dosearch, &suidscript);
-	if (!rsfp) {
-	    rsfp = PerlIO_stdin();
-	    lex_start_flags = LEX_DONT_CLOSE_RSFP;
-	}
-
-	validate_suid(rsfp);
-
 	{
 	    Sighandler_t sigstate = rsignal_state(SIGCHLD);
 	    if (sigstate == (Sighandler_t) SIG_IGN) {
-		Perl_ck_warner(aTHX_ packWARN(WARN_SIGNAL),
+    		Perl_ck_warner(aTHX_ packWARN(WARN_SIGNAL),
 			       "Can't ignore signal CHLD, forcing to default");
-		(void)rsignal(SIGCHLD, (Sighandler_t)SIG_DFL);
+    		(void)rsignal(SIGCHLD, (Sighandler_t)SIG_DFL);
 	    }
 	}
-
-	if (doextract) {
-
-	    /* This will croak if suidscript is true, as -x cannot be used with
-	       setuid scripts.  */
-	    forbid_setid('x', suidscript);
-	    /* Hence you can't get here if suidscript is true */
-
-	    linestr_sv = newSV_type(SVt_PV);
-	    lex_start_flags |= LEX_START_COPIED;
-	    find_beginning(linestr_sv, rsfp);
-	    if (cddir && PerlDir_chdir( (char *)cddir ) < 0)
-		Perl_croak(aTHX_ "Can't chdir to %s",cddir);
-	}
-    }
 
     PL_main_cv = PL_compcv = MUTABLE_CV(newSV_type(SVt_PVCV));
     CvUNIQUE_on(PL_compcv);
@@ -287,7 +253,7 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
     /* more than once (ENV isn't cleared first, for example)	 */
     /* But running with -u leaves %ENV & @ARGV undefined!    XXX */
     if (!PL_do_undump)
-	init_postdump_symbols(argc,argv,env);
+        init_postdump_symbols(argc,argv,env);
 
     /* PL_unicode is turned on by -C, or by $ENV{PERL_UNICODE},
      * or explicitly in some platforms.
@@ -345,7 +311,7 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
     }
 
 
-    lex_start(linestr_sv, rsfp, lex_start_flags);
+    lex_start(linestr_sv, NULL, lex_start_flags);
     SvREFCNT_dec(linestr_sv);
 
     PL_subname = newSVpvs("main");
@@ -375,141 +341,6 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
     ENTER;
     PL_restartjmpenv = NULL;
     PL_restartop = 0;
-}
-
-static PerlIO * open_script(pTHX_ const char *scriptname, bool dosearch, bool *suidscript)
-{
-    int fdscript = -1;
-    PerlIO *rsfp = NULL;
-    Stat_t tmpstatbuf;
-    int fd;
-
-    if (PL_e_script) {
-	PL_origfilename = savepvs("-e");
-    }
-    else {
-        const char *s;
-        UV uv;
-	/* if find_script() returns, it returns a malloc()-ed value */
-	scriptname = PL_origfilename = find_script(scriptname, dosearch, NULL, 1);
-
-	if (strnEQ(scriptname, "/dev/fd/", 8)
-            && isDIGIT(scriptname[8])
-            && grok_atoUV(scriptname + 8, &uv, &s)
-            && uv <= PERL_INT_MAX
-        ) {
-            fdscript = (int)uv;
-	    if (*s) {
-		/* PSz 18 Feb 04
-		 * Tell apart "normal" usage of fdscript, e.g.
-		 * with bash on FreeBSD:
-		 *   perl <( echo '#!perl -DA'; echo 'print "$0\n"')
-		 * from usage in suidperl.
-		 * Does any "normal" usage leave garbage after the number???
-		 * Is it a mistake to use a similar /dev/fd/ construct for
-		 * suidperl?
-		 */
-		*suidscript = TRUE;
-		/* PSz 20 Feb 04  
-		 * Be supersafe and do some sanity-checks.
-		 * Still, can we be sure we got the right thing?
-		 */
-		if (*s != '/') {
-		    Perl_croak(aTHX_ "Wrong syntax (suid) fd script name \"%s\"\n", s);
-		}
-		if (! *(s+1)) {
-		    Perl_croak(aTHX_ "Missing (suid) fd script name\n");
-		}
-		scriptname = savepv(s + 1);
-		Safefree(PL_origfilename);
-		PL_origfilename = (char *)scriptname;
-	    }
-	}
-    }
-
-    CopFILE_free(PL_curcop);
-    CopFILE_set(PL_curcop, PL_origfilename);
-    if (*PL_origfilename == '-' && PL_origfilename[1] == '\0')
-	scriptname = (char *)"";
-    if (fdscript >= 0) {
-	rsfp = PerlIO_fdopen(fdscript,PERL_SCRIPT_MODE);
-    }
-    else if (!*scriptname) {
-	forbid_setid(0, *suidscript);
-	return NULL;
-    }
-    else {
-#ifdef FAKE_BIT_BUCKET
-	/* This hack allows one not to have /dev/null (or BIT_BUCKET as it
-	 * is called) and still have the "-e" work.  (Believe it or not,
-	 * a /dev/null is required for the "-e" to work because source
-	 * filter magic is used to implement it. ) This is *not* a general
-	 * replacement for a /dev/null.  What we do here is create a temp
-	 * file (an empty file), open up that as the script, and then
-	 * immediately close and unlink it.  Close enough for jazz. */ 
-#define FAKE_BIT_BUCKET_PREFIX "/tmp/perlnull-"
-#define FAKE_BIT_BUCKET_SUFFIX "XXXXXXXX"
-#define FAKE_BIT_BUCKET_TEMPLATE FAKE_BIT_BUCKET_PREFIX FAKE_BIT_BUCKET_SUFFIX
-	char tmpname[sizeof(FAKE_BIT_BUCKET_TEMPLATE)] = {
-	    FAKE_BIT_BUCKET_TEMPLATE
-	};
-	const char * const err = "Failed to create a fake bit bucket";
-	if (strEQ(scriptname, BIT_BUCKET)) {
-#ifdef HAS_MKSTEMP /* Hopefully mkstemp() is safe here. */
-            int old_umask = umask(0177);
-	    int tmpfd = mkstemp(tmpname);
-            umask(old_umask);
-	    if (tmpfd > -1) {
-		scriptname = tmpname;
-		close(tmpfd);
-	    } else
-		Perl_croak(aTHX_ err);
-#else
-#  ifdef HAS_MKTEMP
-	    scriptname = mktemp(tmpname);
-	    if (!scriptname)
-		Perl_croak(aTHX_ err);
-#  endif
-#endif
-	}
-#endif
-	rsfp = PerlIO_open(scriptname,PERL_SCRIPT_MODE);
-#ifdef FAKE_BIT_BUCKET
-	if (memEQ(scriptname, FAKE_BIT_BUCKET_PREFIX,
-		  sizeof(FAKE_BIT_BUCKET_PREFIX) - 1)
-	    && strlen(scriptname) == sizeof(tmpname) - 1) {
-	    unlink(scriptname);
-	}
-	scriptname = BIT_BUCKET;
-#endif
-    }
-    if (!rsfp) {
-	/* PSz 16 Sep 03  Keep neat error message */
-	if (PL_e_script)
-	    Perl_croak(aTHX_ "Can't open "BIT_BUCKET": %s\n", Strerror(errno));
-	else
-	    Perl_croak(aTHX_ "Can't open perl script \"%s\": %s\n",
-		    CopFILE(PL_curcop), Strerror(errno));
-    }
-    fd = PerlIO_fileno(rsfp);
-#if defined(HAS_FCNTL) && defined(F_SETFD) && defined(FD_CLOEXEC)
-    if (fd >= 0) {
-        /* ensure close-on-exec */
-        if (fcntl(fd, F_SETFD, FD_CLOEXEC) < 0) {
-            Perl_croak(aTHX_ "Can't open perl script \"%s\": %s\n",
-                       CopFILE(PL_curcop), Strerror(errno));
-        }
-    }
-#endif
-
-    if (fd < 0 ||
-        (PerlLIO_fstat(fd, &tmpstatbuf) >= 0
-         && S_ISDIR(tmpstatbuf.st_mode)))
-        Perl_croak(aTHX_ "Can't open perl script \"%s\": %s\n",
-            CopFILE(PL_curcop),
-            Strerror(EISDIR));
-
-    return rsfp;
 }
 
 STATIC void init_postdump_symbols(pTHX_ int argc, char **argv, char **env)
@@ -622,77 +453,6 @@ STATIC void init_postdump_symbols(pTHX_ int argc, char **argv, char **env)
     /* touch @F array to prevent spurious warnings 20020415 MJD */
     if (PL_minus_a) {
       (void) get_av("main::F", GV_ADD | GV_ADDMULTI);
-    }
-}
-
-static void forbid_setid(pTHX_ const char flag, const bool suidscript)
-{
-    char string[3] = "-x";
-    const char *message = "program input from stdin";
-
-    PERL_UNUSED_CONTEXT;
-    if (flag) {
-	string[1] = flag;
-	message = string;
-    }
-
-#ifdef SETUID_SCRIPTS_ARE_SECURE_NOW
-    if (PerlProc_getuid() != PerlProc_geteuid())
-        Perl_croak(aTHX_ "No %s allowed while running setuid", message);
-    if (PerlProc_getgid() != PerlProc_getegid())
-        Perl_croak(aTHX_ "No %s allowed while running setgid", message);
-#endif /* SETUID_SCRIPTS_ARE_SECURE_NOW */
-    if (suidscript)
-        Perl_croak(aTHX_ "No %s allowed with (suid) fdscript", message);
-}
-
-static void validate_suid(pTHX_ PerlIO *rsfp)
-{
-    const Uid_t  my_uid = PerlProc_getuid();
-    const Uid_t my_euid = PerlProc_geteuid();
-    const Gid_t  my_gid = PerlProc_getgid();
-    const Gid_t my_egid = PerlProc_getegid();
-
-    if (my_euid != my_uid || my_egid != my_gid) {	/* (suidperl doesn't exist, in fact) */
-	dVAR;
-        int fd = PerlIO_fileno(rsfp);
-        Stat_t statbuf;
-        if (fd < 0 || PerlLIO_fstat(fd, &statbuf) < 0) { /* may be either wrapped or real suid */
-            Perl_croak_nocontext( "Illegal suidscript");
-        }
-        if ((my_euid != my_uid && my_euid == statbuf.st_uid && statbuf.st_mode & S_ISUID)
-            ||
-            (my_egid != my_gid && my_egid == statbuf.st_gid && statbuf.st_mode & S_ISGID)
-            )
-	    if (!PL_do_undump)
-		Perl_croak(aTHX_ "YOU HAVEN'T DISABLED SET-ID SCRIPTS IN THE KERNEL YET!\n\
-FIX YOUR KERNEL, PUT A C WRAPPER AROUND THIS SCRIPT, OR USE -u AND UNDUMP!\n");
-	/* not set-id, must be wrapped */
-    }
-}
-
-static void find_beginning(pTHX_ SV* linestr_sv, PerlIO *rsfp)
-{
-    const char *s;
-    const char *s2;
-
-    /* skip forward in input to the real script? */
-
-    do {
-	if ((s = sv_gets(linestr_sv, rsfp, 0)) == NULL)
-	    Perl_croak(aTHX_ "No Perl script found in input\n");
-	s2 = s;
-    } while (!(*s == '#' && s[1] == '!' && ((s = instr(s,"perl")) || (s = instr(s2,"PERL")))));
-    PerlIO_ungetc(rsfp, '\n');		/* to keep line count right */
-    while (*s && !(isSPACE (*s) || *s == '#')) s++;
-    s2 = s;
-    while (*s == ' ' || *s == '\t') s++;
-    if (*s++ == '-') {
-	while (isDIGIT(s2[-1]) || s2[-1] == '-' || s2[-1] == '.'
-	       || s2[-1] == '_') s2--;
-	if (strnEQ(s2-4,"perl",4))
-	    while ((s = moreswitches(s)))
-		;
     }
 }
 
