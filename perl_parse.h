@@ -130,64 +130,6 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
     /* init_main_stash(); PL_defstash setup */
     PL_curstash = PL_defstash;
 
-    {
-	char *s;
-
-    if (
-        !TAINTING_get &&
-	(s = PerlEnv_getenv("PERL5OPT")))
-    {
-        /* s points to static memory in getenv(), which may be overwritten at
-         * any time; use a mortal copy instead */
-	s = SvPVX(sv_2mortal(newSVpv(s, 0)));
-
-	while (isSPACE(*s))
-	    s++;
-	if (*s == '-' && *(s+1) == 'T') {
-	    CHECK_MALLOC_TOO_LATE_FOR('T');
-	    TAINTING_set(TRUE);
-            TAINT_WARN_set(FALSE);
-	}
-	else {
-	    char *popt_copy = NULL;
-	    while (s && *s) {
-	        const char *d;
-		while (isSPACE(*s))
-		    s++;
-		if (*s == '-') {
-		    s++;
-		    if (isSPACE(*s))
-			continue;
-		}
-		d = s;
-		if (!*s)
-		    break;
-		if (!strchr("CDIMUdmtwW", *s))
-		    Perl_croak(aTHX_ "Illegal switch in PERL5OPT: -%c", *s);
-		while (++s && *s) {
-		    if (isSPACE(*s)) {
-			if (!popt_copy) {
-			    popt_copy = SvPVX(sv_2mortal(newSVpv(d,0)));
-			    s = popt_copy + (s - d);
-			    d = popt_copy;
-			}
-		        *s++ = '\0';
-			break;
-		    }
-		}
-		if (*d == 't') {
-		    if( !TAINTING_get) {
-		        TAINT_WARN_set(TRUE);
-		        TAINTING_set(TRUE);
-		    }
-		} else {
-		    moreswitches(d);
-		}
-	    }
-	}
-    }
-    }
-
     /* Set $^X early so that it can be used for relocatable paths in @INC  */
     assert (!TAINT_get);
     TAINT;
