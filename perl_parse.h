@@ -41,25 +41,18 @@ bc_perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
 	  * PTRSIZE bytes.  As long as no system has something bizarre
 	  * like the argv[] interleaved with some other data, we are
 	  * fine.  (Did I just evoke Murphy's Law?)  --jhi */
-	 if (PL_origargv && PL_origargc >= 1 && (s = PL_origargv[0])) {
-	      while (*s) s++;
-	      for (i = 1; i < PL_origargc; i++) {
-		   if ((PL_origargv[i] == s + 1
-			    )
-		       ||
-		       (aligned &&
-			(PL_origargv[i] >  s &&
-			 PL_origargv[i] <=
-			 INT2PTR(char *, PTR2UV(s + PTRSIZE) & mask)))
-			)
-		   {
-			s = PL_origargv[i];
-			while (*s) s++;
-		   }
-		   else
-			break;
-	      }
-	 }
+	if (PL_origargv && PL_origargc >= 1 && (s = PL_origargv[0])) {
+        while (*s) s++;
+
+        for (i = 1; i < PL_origargc; i++) {
+            if ((PL_origargv[i] == s + 1) || (aligned && (PL_origargv[i] >  s && PL_origargv[i] <= INT2PTR(char *, PTR2UV(s + PTRSIZE) & mask))) ) {
+                s = PL_origargv[i];
+                while (*s) s++;
+            }
+            else
+                break;
+	    }
+	}
 
 	 /* Can we grab env area too to be used as the area for $0? */
 	if (s && PL_origenviron && !PL_use_safe_putenv) {
