@@ -80,9 +80,12 @@ bc_perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
     PL_main_start = NULL;
     PL_main_cv = NULL;
 
+    /* $^T or $BASETIME */
     time(&PL_basetime);
+
     PL_dowarn = G_WARN_OFF;
 
+    /* BEGIN eval {} */ 
     JMPENV_PUSH(ret);
     if(ret) {
         PerlIO_printf(Perl_error_log, "panic: jmpenv failed!\n");
@@ -196,7 +199,6 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
         }
     }
 
-    lex_start(linestr_sv, NULL, lex_start_flags);
     SvREFCNT_dec(linestr_sv);
 
     PL_subname = newSVpvs("main");
@@ -206,19 +208,6 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
     SETERRNO(0,SS_NORMAL);
     CopLINE_set(PL_curcop, 0);
     PL_defstash = PL_curstash;
-    if (PL_e_script) {
-	SvREFCNT_dec(PL_e_script);
-	PL_e_script = NULL;
-    }
-
-    if (PL_do_undump)
-        my_unexec();
-
-    if (isWARN_ONCE) {
-        SAVECOPFILE(PL_curcop);
-        SAVECOPLINE(PL_curcop);
-        gv_check(PL_defstash);
-    }
 
     LEAVE;
     FREETMPS;
