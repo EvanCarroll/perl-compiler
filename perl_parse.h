@@ -18,30 +18,30 @@ bc_perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
     PL_origargv = argv;
 
     /* START: Determine how long $0 is allowed to be */
-	/* Set PL_origalen be the sum of the contiguous argv[]
-	 * elements plus the size of the env in case that it is
-	 * contiguous with the argv[].  This is used in mg.c:Perl_magic_set()
-	 * as the maximum modifiable length of $0.  In the worst case
-	 * the area we are able to modify is limited to the size of
-	 * the original argv[0].  (See below for 'contiguous', though.)
-	 * --jhi */
-	const char *s = NULL;
-	int i;
-	const UV mask = ~(UV)(PTRSIZE-1);
+    /* Set PL_origalen be the sum of the contiguous argv[]
+     * elements plus the size of the env in case that it is
+     * contiguous with the argv[].  This is used in mg.c:Perl_magic_set()
+     * as the maximum modifiable length of $0.  In the worst case
+     * the area we are able to modify is limited to the size of
+     * the original argv[0].  (See below for 'contiguous', though.)
+     * --jhi */
+    const char *s = NULL;
+    int i;
+    const UV mask = ~(UV)(PTRSIZE-1);
 
     /* Do the mask check only if the args seem like aligned. */
-	const UV aligned = (mask < ~(UV)0) && ((PTR2UV(argv[0]) & mask) == PTR2UV(argv[0]));
+    const UV aligned = (mask < ~(UV)0) && ((PTR2UV(argv[0]) & mask) == PTR2UV(argv[0]));
 
-	 /* See if all the arguments are contiguous in memory.  Note
-	  * that 'contiguous' is a loose term because some platforms
-	  * align the argv[] and the envp[].  If the arguments look
-	  * like non-aligned, assume that they are 'strictly' or
-	  * 'traditionally' contiguous.  If the arguments look like
-	  * aligned, we just check that they are within aligned
-	  * PTRSIZE bytes.  As long as no system has something bizarre
-	  * like the argv[] interleaved with some other data, we are
-	  * fine.  (Did I just evoke Murphy's Law?)  --jhi */
-	if (PL_origargv && PL_origargc >= 1 && (s = PL_origargv[0])) {
+     /* See if all the arguments are contiguous in memory.  Note
+      * that 'contiguous' is a loose term because some platforms
+      * align the argv[] and the envp[].  If the arguments look
+      * like non-aligned, assume that they are 'strictly' or
+      * 'traditionally' contiguous.  If the arguments look like
+      * aligned, we just check that they are within aligned
+      * PTRSIZE bytes.  As long as no system has something bizarre
+      * like the argv[] interleaved with some other data, we are
+      * fine.  (Did I just evoke Murphy's Law?)  --jhi */
+    if (PL_origargv && PL_origargc >= 1 && (s = PL_origargv[0])) {
         while (*s) s++;
 
         for (i = 1; i < PL_origargc; i++) {
@@ -51,11 +51,11 @@ bc_perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
             }
             else
                 break;
-	    }
-	}
+        }
+    }
 
-	 /* Can we grab env area too to be used as the area for $0? */
-	if (s && PL_origenviron && !PL_use_safe_putenv) {
+     /* Can we grab env area too to be used as the area for $0? */
+    if (s && PL_origenviron && !PL_use_safe_putenv) {
         if ((PL_origenviron[0] == s + 1) || (aligned && (PL_origenviron[0] > s && PL_origenviron[0] <= INT2PTR(char *, PTR2UV(s + PTRSIZE) & mask))) ) {
             s = PL_origenviron[0];
             while (*s) s++;
@@ -70,13 +70,13 @@ bc_perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
                     break;
             }
         }
-	}
+    }
 
-	PL_origalen = s ? s - PL_origargv[0] + 1 : 0;
+    PL_origalen = s ? s - PL_origargv[0] + 1 : 0;
     
     /* END: Determine how long $0 is allowed to be */
 
-	PL_main_root = NULL; /* We should really be setting PL_main_root statically */
+    PL_main_root = NULL; /* We should really be setting PL_main_root statically */
     PL_main_start = NULL;
     PL_main_cv = NULL;
 
@@ -119,10 +119,10 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
     TAINT_NOT;
 
     if (!scriptname)
-	scriptname = argv[0];
+    scriptname = argv[0];
     if (PL_e_script) {
         argc++,argv--;
-        scriptname = BIT_BUCKET;	/* don't look for script or read stdin */
+        scriptname = BIT_BUCKET;    /* don't look for script or read stdin */
     }
     else if (scriptname == NULL) {
         scriptname = "-";
@@ -130,14 +130,14 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
 
     /* init_perllib(); We hard code @INC on our own.*/
 
-	{
-	    Sighandler_t sigstate = rsignal_state(SIGCHLD);
-	    if (sigstate == (Sighandler_t) SIG_IGN) {
-    		Perl_ck_warner(aTHX_ packWARN(WARN_SIGNAL),
-			       "Can't ignore signal CHLD, forcing to default");
-    		(void)rsignal(SIGCHLD, (Sighandler_t)SIG_DFL);
-	    }
-	}
+    {
+        Sighandler_t sigstate = rsignal_state(SIGCHLD);
+        if (sigstate == (Sighandler_t) SIG_IGN) {
+            Perl_ck_warner(aTHX_ packWARN(WARN_SIGNAL),
+                   "Can't ignore signal CHLD, forcing to default");
+            (void)rsignal(SIGCHLD, (Sighandler_t)SIG_DFL);
+        }
+    }
 
     PL_main_cv = PL_compcv = MUTABLE_CV(newSV_type(SVt_PVCV));
     CvUNIQUE_on(PL_compcv);
@@ -151,12 +151,12 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
     boot_core_mro();
 
     if (xsinit)
-        (*xsinit)(aTHX);	/* in case linked C routines want magical variables */
+        (*xsinit)(aTHX);    /* in case linked C routines want magical variables */
 
     init_predump_symbols();
 
     /* init_postdump_symbols not currently designed to be called */
-    /* more than once (ENV isn't cleared first, for example)	 */
+    /* more than once (ENV isn't cleared first, for example)     */
     /* But running with -u leaves %ENV & @ARGV undefined!    XXX */
     if (!PL_do_undump)
         init_postdump_symbols(argc,argv,env);
@@ -166,7 +166,7 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
      * locale.c:Perl_init_i18nl10n() if the environment
      * look like the user wants to use UTF-8. */
     if (PL_unicode) {
-	 /* Requires init_predump_symbols(). */
+     /* Requires init_predump_symbols(). */
         if (!(PL_unicode & PERL_UNICODE_LOCALE_FLAG) || PL_utf8locale) {
             IO* io;
             PerlIO* fp;
@@ -236,26 +236,26 @@ STATIC void init_postdump_symbols(pTHX_ int argc, char **argv, char **env)
     init_argv_symbols(argc,argv);
 
     if ((tmpgv = gv_fetchpvs("0", GV_ADD|GV_NOTQUAL, SVt_PV))) {
-    	sv_setpv(GvSV(tmpgv),PL_origfilename);
+        sv_setpv(GvSV(tmpgv),PL_origfilename);
     }
 
     if ((PL_envgv = gv_fetchpvs("ENV", GV_ADD|GV_NOTQUAL, SVt_PVHV))) {
-    	HV *hv;
-    	bool env_is_not_environ;
-    	SvREFCNT_inc_simple_void_NN(PL_envgv);
-    	GvMULTI_on(PL_envgv);
-    	hv = GvHVn(PL_envgv);
-    	hv_magic(hv, NULL, PERL_MAGIC_env);
+        HV *hv;
+        bool env_is_not_environ;
+        SvREFCNT_inc_simple_void_NN(PL_envgv);
+        GvMULTI_on(PL_envgv);
+        hv = GvHVn(PL_envgv);
+        hv_magic(hv, NULL, PERL_MAGIC_env);
 
-    	/* Note that if the supplied env parameter is actually a copy
-    	   of the global environ then it may now point to free'd memory
-    	   if the environment has been modified since. To avoid this
-    	   problem we treat env==NULL as meaning 'use the default'
-    	*/
-    	if (!env)
-    	    env = environ;
-    	env_is_not_environ = env != environ;
-    	if (env_is_not_environ) {
+        /* Note that if the supplied env parameter is actually a copy
+           of the global environ then it may now point to free'd memory
+           if the environment has been modified since. To avoid this
+           problem we treat env==NULL as meaning 'use the default'
+        */
+        if (!env)
+            env = environ;
+        env_is_not_environ = env != environ;
+        if (env_is_not_environ) {
             environ[0] = NULL;
         }
         if (env) {
@@ -353,12 +353,12 @@ static void init_predump_symbols(pTHX)
        So a compromise is to set up the correct @IO::File::ISA,
        so that code that does C<use IO::Handle>; will still work.
     */
-		   
+           
     Perl_populate_isa(aTHX_ STR_WITH_LEN("IO::File::ISA"),
-		      STR_WITH_LEN("IO::Handle::"),
-		      STR_WITH_LEN("IO::Seekable::"),
-		      STR_WITH_LEN("Exporter::"),
-		      NULL);
+              STR_WITH_LEN("IO::Handle::"),
+              STR_WITH_LEN("IO::Seekable::"),
+              STR_WITH_LEN("Exporter::"),
+              NULL);
 
     PL_stdingv = gv_fetchpvs("STDIN", GV_ADD|GV_NOTQUAL, SVt_PVIO);
     GvMULTI_on(PL_stdingv);
@@ -388,5 +388,5 @@ static void init_predump_symbols(pTHX)
     GvMULTI_on(tmpgv);
     GvIOp(tmpgv) = MUTABLE_IO(SvREFCNT_inc_simple(io));
 
-    PL_statname = newSVpvs("");		/* last filename we did stat on */
+    PL_statname = newSVpvs("");        /* last filename we did stat on */
 }
