@@ -1,8 +1,7 @@
 
 void bc_parse_body(char **env, XSINIT_t xsinit);
-static void init_postdump_symbols(pTHX_ int argc, char **argv, char **env);
-static void init_predump_symbols(pTHX);
-#define NEVER Perl_croak_nocontext("Shouldn't get here\n\n");
+static void bc_init_postdump_symbols(pTHX_ int argc, char **argv, char **env);
+static void bc_init_predump_symbols(pTHX);
 
 int
 bc_perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
@@ -153,13 +152,13 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
     if (xsinit)
         (*xsinit)(aTHX);    /* in case linked C routines want magical variables */
 
-    init_predump_symbols();
+    bc_init_predump_symbols();
 
-    /* init_postdump_symbols not currently designed to be called */
+    /* bc_init_postdump_symbols not currently designed to be called */
     /* more than once (ENV isn't cleared first, for example)     */
     /* But running with -u leaves %ENV & @ARGV undefined!    XXX */
     if (!PL_do_undump)
-        init_postdump_symbols(argc,argv,env);
+        bc_init_postdump_symbols(argc,argv,env);
 
     /* PL_unicode is turned on by -C, or by $ENV{PERL_UNICODE},
      * or explicitly in some platforms.
@@ -217,7 +216,7 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
     PL_restartop = 0;
 }
 
-STATIC void init_postdump_symbols(pTHX_ int argc, char **argv, char **env)
+STATIC void bc_init_postdump_symbols(pTHX_ int argc, char **argv, char **env)
 {
     GV* tmpgv;
 
@@ -332,7 +331,7 @@ STATIC void init_postdump_symbols(pTHX_ int argc, char **argv, char **env)
     }
 }
 
-static void init_predump_symbols(pTHX)
+static void bc_init_predump_symbols(pTHX)
 {
     GV *tmpgv;
     IO *io;
