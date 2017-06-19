@@ -203,19 +203,6 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
         }
     }
 
-    {
-        const char *s;
-        if ((s = PerlEnv_getenv("PERL_SIGNALS"))) {
-            if (strEQ(s, "unsafe"))
-                 PL_signals |=  PERL_SIGNALS_UNSAFE_FLAG;
-            else if (strEQ(s, "safe"))
-                 PL_signals &= ~PERL_SIGNALS_UNSAFE_FLAG;
-            else
-                 Perl_croak(aTHX_ "PERL_SIGNALS illegal: \"%s\"", s);
-        }
-    }
-
-
     lex_start(linestr_sv, NULL, lex_start_flags);
     SvREFCNT_dec(linestr_sv);
 
