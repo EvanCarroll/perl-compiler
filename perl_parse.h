@@ -83,7 +83,6 @@ bc_perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
 	      }
 	 }
 
-#ifndef PERL_USE_SAFE_PUTENV
 	 /* Can we grab env area too to be used as the area for $0? */
 	 if (s && PL_origenviron && !PL_use_safe_putenv) {
 	      if ((PL_origenviron[0] == s + 1)
@@ -115,7 +114,6 @@ bc_perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
 		   }
 	      }
 	 }
-#endif /* !defined(PERL_USE_SAFE_PUTENV) */
 
 	 PL_origalen = s ? s - PL_origargv[0] + 1 : 0;
     
@@ -162,9 +160,7 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
 	char *s;
 
     if (
-#ifndef SECURE_INTERNAL_GETENV
         !TAINTING_get &&
-#endif
 	(s = PerlEnv_getenv("PERL5OPT")))
     {
         /* s points to static memory in getenv(), which may be overwritten at
@@ -174,16 +170,9 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
 	while (isSPACE(*s))
 	    s++;
 	if (*s == '-' && *(s+1) == 'T') {
-#if defined(SILENT_NO_TAINT_SUPPORT)
-            /* silently ignore */
-#elif defined(NO_TAINT_SUPPORT)
-            Perl_croak_nocontext("This perl was compiled without taint support. "
-                       "Cowardly refusing to run with -t or -T flags");
-#else
 	    CHECK_MALLOC_TOO_LATE_FOR('T');
 	    TAINTING_set(TRUE);
             TAINT_WARN_set(FALSE);
-#endif
 	}
 	else {
 	    char *popt_copy = NULL;
@@ -213,17 +202,10 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
 		    }
 		}
 		if (*d == 't') {
-#if defined(SILENT_NO_TAINT_SUPPORT)
-            /* silently ignore */
-#elif defined(NO_TAINT_SUPPORT)
-                    Perl_croak_nocontext("This perl was compiled without taint support. "
-                               "Cowardly refusing to run with -t or -T flags");
-#else
 		    if( !TAINTING_get) {
 		        TAINT_WARN_set(TRUE);
 		        TAINTING_set(TRUE);
 		    }
-#endif
 		} else {
 		    moreswitches(d);
 		}
@@ -261,11 +243,7 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
 
 	validate_suid(rsfp);
 
-#  if defined(SIGCHLD) || defined(SIGCLD)
 	{
-#  ifndef SIGCHLD
-#    define SIGCHLD SIGCLD
-#  endif
 	    Sighandler_t sigstate = rsignal_state(SIGCHLD);
 	    if (sigstate == (Sighandler_t) SIG_IGN) {
 		Perl_ck_warner(aTHX_ packWARN(WARN_SIGNAL),
@@ -273,7 +251,6 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
 		(void)rsignal(SIGCHLD, (Sighandler_t)SIG_DFL);
 	    }
 	}
-#  endif
 
 	if (doextract) {
 
@@ -304,17 +281,6 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
 
     if (xsinit)
 	(*xsinit)(aTHX);	/* in case linked C routines want magical variables */
-#if defined(VMS) || defined(WIN32) || defined(DJGPP) || defined(__CYGWIN__) || defined(SYMBIAN)
-    init_os_extras();
-#endif
-
-#ifdef USE_SOCKS
-#   ifdef HAS_SOCKS5_INIT
-    socks5_init(argv[0]);
-#   else
-    SOCKSinit(argv[0]);
-#   endif
-#endif
 
     init_predump_symbols();
     /* init_postdump_symbols not currently designed to be called */
@@ -327,10 +293,6 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
      * or explicitly in some platforms.
      * locale.c:Perl_init_i18nl10n() if the environment
      * look like the user wants to use UTF-8. */
-#if defined(__SYMBIAN32__)
-    PL_unicode = PERL_UNICODE_STD_FLAG; /* See PERL_SYMBIAN_CONSOLE_UTF8. */
-#endif
-#  ifndef PERL_IS_MINIPERL
     if (PL_unicode) {
 	 /* Requires init_predump_symbols(). */
 	 if (!(PL_unicode & PERL_UNICODE_LOCALE_FLAG) || PL_utf8locale) {
@@ -369,7 +331,6 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
 	      }
 	 }
     }
-#endif
 
     {
 	const char *s;
@@ -410,16 +371,6 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
 
     LEAVE;
     FREETMPS;
-
-#ifdef MYMALLOC
-    {
-	const char *s;
-        UV uv;
-        s = PerlEnv_getenv("PERL_DEBUG_MSTATS");
-        if (s && grok_atoUV(s, &uv, NULL) && uv >= 2)
-            dump_mstats("after compilation:");
-    }
-#endif
 
     ENTER;
     PL_restartjmpenv = NULL;
