@@ -5,23 +5,6 @@ static void init_predump_symbols(pTHX);
 static void S_Internals_V(pTHX_ CV *cv);
 #define NEVER Perl_croak_nocontext("Shouldn't get here\n\n");
 
-#define SET_CURSTASH(newstash)                       \
-	if (PL_curstash != newstash) {                \
-	    SvREFCNT_dec(PL_curstash);                 \
-	    PL_curstash = (HV *)SvREFCNT_inc(newstash); \
-	}
-
-
-
-#define INCPUSH_UNSHIFT			0x01
-#define INCPUSH_ADD_OLD_VERS		0x02
-#define INCPUSH_ADD_VERSIONED_SUB_DIRS	0x04
-#define INCPUSH_ADD_ARCHONLY_SUB_DIRS	0x08
-#define INCPUSH_NOT_BASEDIR		0x10
-#define INCPUSH_CAN_RELOCATE		0x20
-#define INCPUSH_ADD_SUB_DIRS	(INCPUSH_ADD_VERSIONED_SUB_DIRS|INCPUSH_ADD_ARCHONLY_SUB_DIRS)
-
-
 int
 bc_perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
 {
@@ -320,7 +303,7 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
 
     SETERRNO(0,SS_NORMAL);
     CopLINE_set(PL_curcop, 0);
-    SET_CURSTASH(PL_defstash);
+    PL_defstash = PL_curstash;
     if (PL_e_script) {
 	SvREFCNT_dec(PL_e_script);
 	PL_e_script = NULL;
@@ -345,9 +328,6 @@ void bc_parse_body(char **env, XSINIT_t xsinit)
 
 STATIC void init_postdump_symbols(pTHX_ int argc, char **argv, char **env)
 {
-#ifdef USE_ITHREADS
-    dVAR;
-#endif
     GV* tmpgv;
 
     PL_toptarget = newSV_type(SVt_PVIV);
@@ -370,7 +350,7 @@ STATIC void init_postdump_symbols(pTHX_ int argc, char **argv, char **env)
 	GvMULTI_on(PL_envgv);
 	hv = GvHVn(PL_envgv);
 	hv_magic(hv, NULL, PERL_MAGIC_env);
-#ifdef USE_ENVIRON_ARRAY
+
 	/* Note that if the supplied env parameter is actually a copy
 	   of the global environ then it may now point to free'd memory
 	   if the environment has been modified since. To avoid this
@@ -446,7 +426,6 @@ STATIC void init_postdump_symbols(pTHX_ int argc, char **argv, char **env)
           }
           SvREFCNT_dec_NN(dups);
       }
-#endif /* USE_ENVIRON_ARRAY */
     }
     TAINT_NOT;
 

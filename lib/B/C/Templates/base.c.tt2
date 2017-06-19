@@ -805,6 +805,7 @@ main(int argc, char **argv, char **env)
     TAINT_WARN_set(FALSE);
   [% END %]
 
+    PL_curstash = PL_defstash;
 
     exitstatus = bc_perl_parse(&BC_unthreaded_interpreter, xs_init, argc, argv, env);
     benchmark_time("post bc_perl_parse");
