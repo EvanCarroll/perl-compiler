@@ -12,7 +12,6 @@ use Test::More;
 BEGIN {
     use FindBin;
     unshift @INC, $FindBin::Bin . "/../../../lib";
-    $ENV{CPATH} = $FindBin::Bin . "/../../../..";
 }
 my $working_dir = $FindBin::Bin;
 
