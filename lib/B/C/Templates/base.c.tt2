@@ -232,7 +232,7 @@ static void declare_static_sections() { /* declare our static section 'blocks' t
 [% section.decl.output( "%s\n" ) %]
 /* </decl.output> */
 
-static void HvSETUP(HV* hv, U32 size, bool has_ook) {
+static void HvSETUP(HV* hv, U32 size, bool has_ook, SV* backref) {
     char *array;
     MEM_SIZE alloc_size = PERL_HV_ARRAY_ALLOC_BYTES(size);
 
@@ -242,6 +242,11 @@ static void HvSETUP(HV* hv, U32 size, bool has_ook) {
 
     /* setting the hash array to the HV (in sv_list) in sv_any */
     HvARRAY(hv) = (HE **) array;
+
+    /* set the backrefrence for HV which is stored in AUX (in magic for regular SVs) */
+    /* do not check if backref is defined or not */
+    if ( has_ook )
+        HvAUX(hv)->xhv_backreferences = (AV*) backref;
 
     return;
 }
