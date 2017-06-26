@@ -43,7 +43,6 @@ my $CORE_SYMS = {
 our $under = '';
 our @under = ();
 
-
 sub do_save {
     my ( $gv, $name ) = @_;
 
@@ -430,10 +429,7 @@ sub cv_needs_import_after_bootstrap {
     return 0 unless $cvsym && $cvsym =~ m{BOOTSTRAP_XS_\Q[[\E(.+?)\Q]]\E_XS_BOOTSTRAP};
     my $bootstrapped_xs_sub = $1;
 
-    my $package  = $gv->CV->GV->STASH->NAME;    # is it the same than package earlier ??
-    my $oname    = $gv->CV->GV->NAME;
-    my $origname = $package . "::" . $oname;
-
+    my $origname = $gv->CV->FULLNAME;
     return '' if $origname =~ m/::__ANON__$/;    # How do we bootstrap __ANON__ XSUBs?
 
     my $ret = $fullname eq $origname ? '' : $origname;
