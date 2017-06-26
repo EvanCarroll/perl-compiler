@@ -43,24 +43,14 @@ my $CORE_SYMS = {
 our $under = '';
 our @under = ();
 
+
 sub do_save {
     my ( $gv, $name ) = @_;
 
     # return earlier for special cases
     return $CORE_SYMS->{ $gv->get_fullname } if $gv->is_coresym();
 
-    # workardound for Errno constant values
-    if ( $gv->get_fullname =~ qr{^Errno::(.+)$} ) {
-        my $errno_const = $1;
-        if ( my $sub = 'Errno'->can($errno_const) ) {
-            my $const = eval qq{\&Errno::${errno_const}};
-            if ( $const =~ qr{^[0-9]+$} ) {
-                $const = int($const);
-                my $v = eval qq[sub { $const }];
-                return B::svref_2object( \$v )->save( $gv->get_fullname );
-            }
-        }
-    }
+    # This is probably dead code.
 
     # STATIC_HV need to handle $0
 
