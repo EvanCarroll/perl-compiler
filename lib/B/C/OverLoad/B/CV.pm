@@ -119,7 +119,7 @@ sub do_save {
 
         return unless exists $_const_sv_function{$ref};
 
-        #die "CV CONST XSUB is not implemented for $ref" unless exists $_const_sv_function{$ref};
+        die "CV CONST XSUB is not implemented for $ref" unless exists $_const_sv_function{$ref};
         return $_const_sv_function{$ref};
     }
 }
