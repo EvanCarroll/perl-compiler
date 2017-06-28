@@ -432,7 +432,7 @@ sub get_isa ($) {
 
 # try_isa($pkg,$name) returns the found $pkg for the method $pkg::$name
 # If a method can be called (via UNIVERSAL::can) search the ISA's. No AUTOLOAD needed.
-# XXX issue 64, empty @ISA if a package has no subs. in Bytecode ok
+# https://code.google.com/archive/p/perl-compiler/issues/64, empty @ISA if a package has no subs. in Bytecode ok
 sub try_isa {
     my ( $cvstashname, $cvname ) = @_;
     return 0 unless defined $cvstashname;
