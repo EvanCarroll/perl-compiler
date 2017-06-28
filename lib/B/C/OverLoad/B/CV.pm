@@ -90,10 +90,10 @@ sub do_save {
         '%d'          => $cv->DEPTH                                # xcv_depth
     );
 
-    # if ( $xcv_outside eq '&PL_main_cv' ) {
-    #     init()->sadd( "xpvcv_list[%u].xcv_outside = (CV*) &PL_main_cv;", $xpvcv_ix );
-    #     xpvcvsect->update_field( $xpvcv_ix, 10, 'NULL /* PL_main_cv */' );
-    # }
+    if ( $xcv_outside eq '&PL_main_cv' ) {                         # this is dead code for now
+        init()->sadd( "xpvcv_list[%u].xcv_outside = (CV*) &PL_main_cv;", $xpvcv_ix );
+        xpvcvsect->update_field( $xpvcv_ix, 10, 'NULL /* PL_main_cv */' );
+    }
 
     # STATIC_HV: We don't think the sv_u is ever set in the SVCV so this check might be wrong
     # we are not saving the svu for a CV, all evidence indicates that the value is null (always?)
@@ -135,13 +135,27 @@ sub typecast_stash_save {
 
 sub get_cv_outside {
     my ($cv) = @_;
+
+    #warn "#### OUTSIDE ".$cv->OUTSIDE."\n";
+
     my $xcv_outside = ${ $cv->OUTSIDE };
-    if ( $xcv_outside == ${ main_cv() } ) {
+
+    # warn sprintf( "#--- outside %s - xcv_outside %s - main %s --- %s", $cv->OUTSIDE, $xcv_outside, main_cv(),
+    # $xcv_outside == ${ main_cv() } ? ' MATCH !!!!!!!' : ''
+    #    );
+
+    if ( $xcv_outside eq ${ main_cv() } ) {
+
+        #warn "#### PL_main_cv $xcv_outside\n";
 
         # Provide a temp. debugging hack for CvOUTSIDE. The address of the symbol &PL_main_cv
         # is known to the linker, the address of the value PL_main_cv not. This is set later
         # (below) at run-time.
         #$xcv_outside = '&PL_main_cv';
+
+        # when we were setting PL_main_cv at init time,
+        #   it appears that uncompiled version of perl was using 0....
+        #   we need to double check XS code for $cv->OUTSIDE to see if it does not fallback to PL_main_cv
         $xcv_outside = 0;
     }
     elsif ( ref( $cv->OUTSIDE ) eq 'B::CV' ) {
