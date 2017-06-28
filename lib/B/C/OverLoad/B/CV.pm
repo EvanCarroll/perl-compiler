@@ -72,6 +72,7 @@ sub do_save {
         $startfield = $cv->save_optree();
     }
 
+    #$xcv_outside = 'NULL' if $xcv_outside eq '&PL_main_cv';
     my $xpvcv_ix = xpvcvsect->saddl(
         '%s'          => $cv->save_magic_stash,                    # xmg_stash
         '{%s}'        => $cv->save_magic($origname),               # xmg_u
@@ -89,10 +90,10 @@ sub do_save {
         '%d'          => $cv->DEPTH                                # xcv_depth
     );
 
-    if ( $xcv_outside eq '&PL_main_cv' ) {
-        init()->sadd( "xpvcv_list[%u].xcv_outside = (CV*) &PL_main_cv;", $xpvcv_ix );
-        xpvcvsect->update_field( $xpvcv_ix, 10, 'NULL /* PL_main_cv */' );
-    }
+    # if ( $xcv_outside eq '&PL_main_cv' ) {
+    #     init()->sadd( "xpvcv_list[%u].xcv_outside = (CV*) &PL_main_cv;", $xpvcv_ix );
+    #     xpvcvsect->update_field( $xpvcv_ix, 10, 'NULL /* PL_main_cv */' );
+    # }
 
     # STATIC_HV: We don't think the sv_u is ever set in the SVCV so this check might be wrong
     # we are not saving the svu for a CV, all evidence indicates that the value is null (always?)
@@ -140,7 +141,8 @@ sub get_cv_outside {
         # Provide a temp. debugging hack for CvOUTSIDE. The address of the symbol &PL_main_cv
         # is known to the linker, the address of the value PL_main_cv not. This is set later
         # (below) at run-time.
-        $xcv_outside = '&PL_main_cv';
+        #$xcv_outside = '&PL_main_cv';
+        $xcv_outside = 0;
     }
     elsif ( ref( $cv->OUTSIDE ) eq 'B::CV' ) {
         $xcv_outside = 0;    # just a placeholder for a run-time GV
