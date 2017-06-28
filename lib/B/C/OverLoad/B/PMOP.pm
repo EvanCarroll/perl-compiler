@@ -88,8 +88,10 @@ sub do_save {
         # But XSLoader and utf8::SWASHNEW itself needs to be early.
         my $initpm = init1();
 
-        $initpm = init2() if $qre =~ m/\\\\[pN]\{/;
-        $initpm = init2() if $qre =~ m/\\U/;
+        if ( $qre =~ m/\\[pN]\{/ or $qre =~ m/\\U/ ) {
+            $initpm = init2();
+            print STDERR "XXXX $qre\n";
+        }
 
         my $eval_seen = $op->reflags & RXf_EVAL_SEEN;
         $initpm->no_split();
