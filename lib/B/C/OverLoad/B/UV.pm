@@ -24,10 +24,10 @@ sub do_save {
     # or also from the SvANY of it. View IV.pm for more information
 
     svsect()->saddl(
-        "BODYLESS_UV_PTR(%s)" => $sym,               # sv_any
-        u32fmt()              => $sv->REFCNT + 1,    # sv_refcnt
-        '0x%x'                => $sv->FLAGS,         # sv_flags
-        '{.svu_uv=%s}'        => "$uvx$suff",        # sv_u.svu_uv
+        "BODYLESS_UV_PTR(%s)" => $sym,           # sv_any
+        u32fmt()              => $sv->REFCNT,    # sv_refcnt
+        '0x%x'                => $sv->FLAGS,     # sv_flags
+        '{.svu_uv=%s}'        => "$uvx$suff",    # sv_u.svu_uv
     );
 
     svsect()->debug( $fullname, $sv );

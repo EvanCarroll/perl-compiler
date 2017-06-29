@@ -33,7 +33,7 @@ sub do_save {
         $xpv_sym = sprintf( "&xpvnv_list[%d]", $xpv_ix );
     }
 
-    my $ix = svsect()->sadd( "%s, %Lu, 0x%x, {.svu_pv=(char*) %s}", $xpv_sym, $sv->REFCNT + 1, $flags, $savesym );
+    my $ix = svsect()->sadd( "%s, %Lu, 0x%x, {.svu_pv=(char*) %s}", $xpv_sym, $sv->REFCNT, $flags, $savesym );
     svsect()->debug( $fullname, $sv );
     return "&sv_list[" . $ix . "]";
 }

@@ -29,7 +29,7 @@ sub do_save {
     # save the pv
     my $ix = svsect()->sadd(
         "%s, %u, 0x%x, {.svu_pv=(char*) %s}",
-        $xpv_sym, $sv->REFCNT + 1, $flags, $savesym
+        $xpv_sym, $sv->REFCNT, $flags, $savesym
     );
     svsect()->debug( $fullname, $sv );
     return "&sv_list[" . $ix . "]";
