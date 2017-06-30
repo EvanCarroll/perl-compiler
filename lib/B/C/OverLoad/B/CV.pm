@@ -130,24 +130,8 @@ sub typecast_stash_save {
 sub get_cv_outside {
     my ($cv) = @_;
 
-    my $xcv_outside = ${ $cv->OUTSIDE };
-
-    #$xcv_outside = $cv->OUTSIDE->save;
-
-    #if ( ref( $cv->OUTSIDE ) eq 'B::CV' && ) {
-    # if ( $xcv_outside eq ${ main_cv() } ) {
-    #     $xcv_outside = $cv->OUTSIDE->save;
-    # }
-    # els
-    if ( ref( $cv->OUTSIDE ) eq 'B::CV' ) {
-        $xcv_outside = 0;    # just a placeholder for a run-time GV
-    }
-    elsif ($xcv_outside) {
-        die ref( $cv->OUTSIDE ) . " $xcv_outside <------- \n";
-        $xcv_outside = $cv->OUTSIDE->save;
-    }
-
-    return $xcv_outside;
+    my $ref = ref( $cv->OUTSIDE );
+    return $ref && $ref eq 'B::CV' ? 0 : $cv->OUTSIDE->save;
 }
 
 sub cv_save_padlist {
