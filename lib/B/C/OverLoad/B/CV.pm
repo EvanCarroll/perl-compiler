@@ -143,8 +143,7 @@ sub get_cv_outside {
         $xcv_outside = 0;    # just a placeholder for a run-time GV
     }
     elsif ($xcv_outside) {
-
-        #warn ref($cv->OUTSIDE) . " $xcv_outside <------- \n";
+        die ref( $cv->OUTSIDE ) . " $xcv_outside <------- \n";
         $xcv_outside = $cv->OUTSIDE->save;
     }
 
