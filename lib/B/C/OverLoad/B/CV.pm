@@ -131,7 +131,12 @@ sub get_cv_outside {
     my ($cv) = @_;
 
     my $ref = ref( $cv->OUTSIDE );
-    return $ref && $ref eq 'B::CV' ? 0 : $cv->OUTSIDE->save;
+
+    return 0 unless $ref;
+    return 0 if $ref eq 'B::CV' && ${ $cv->OUTSIDE } ne ${ main_cv() };
+
+    #return 0 if $ref eq 'B::SPECIAL'; ## ??
+    return $cv->OUTSIDE->save;
 }
 
 sub cv_save_padlist {
