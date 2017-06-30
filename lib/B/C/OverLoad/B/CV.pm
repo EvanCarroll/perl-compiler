@@ -15,8 +15,6 @@ use B::C::Helpers::Symtable qw/objsym savesym/;
 my $initsub_index = 0;
 my $anonsub_index = 0;
 
-sub SVt_PVFM { 14 }    # probably move it to a better place
-
 sub do_save {
     my ( $cv, $origname ) = @_;
     debug( cv => "CV ==  %s", $origname );
@@ -134,16 +132,19 @@ sub get_cv_outside {
 
     my $xcv_outside = ${ $cv->OUTSIDE };
 
-    if ( $xcv_outside eq ${ main_cv() } ) {
+    #$xcv_outside = $cv->OUTSIDE->save;
 
-        #$xcv_outside = $cv->OUTSIDE->save;
-        $xcv_outside = 0 . q{ /* main cv */};
-        $xcv_outside = $cv->OUTSIDE->save if $cv->FLAGS & SVt_PVFM;
-    }
-    elsif ( ref( $cv->OUTSIDE ) eq 'B::CV' ) {
+    #if ( ref( $cv->OUTSIDE ) eq 'B::CV' && ) {
+    # if ( $xcv_outside eq ${ main_cv() } ) {
+    #     $xcv_outside = $cv->OUTSIDE->save;
+    # }
+    # els
+    if ( ref( $cv->OUTSIDE ) eq 'B::CV' ) {
         $xcv_outside = 0;    # just a placeholder for a run-time GV
     }
     elsif ($xcv_outside) {
+
+        #warn ref($cv->OUTSIDE) . " $xcv_outside <------- \n";
         $xcv_outside = $cv->OUTSIDE->save;
     }
 

@@ -34,7 +34,7 @@ mro/package_aliases_utf8.t  SKIP      Runs REAALY slow and many of the failures 
 op/attrhand.t               PLAN      BC issue #271 - Attribute::Handlers
 op/blocks.t                 COMPAT    check order of execution of special blocks ( BEGIN included )
 op/caller.t                 TESTS     Test results:
-op/closure.t                TESTS     BC issue #278 - destruction issue
+op/closure.t                SIG       Exit signal is 11 SEGV
 op/coreamp.t                COMPAT    unsupported experimental::lexical_topic + BC issue #219 - overload issue
 op/coresubs.t               COMPAT    uses B::walkoptree
 op/eval.t                   SKIP      TODO: infinite loop while running the binary + BC issue #219 - overload issue
