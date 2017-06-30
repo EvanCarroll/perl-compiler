@@ -15,6 +15,8 @@ use B::C::Helpers::Symtable qw/objsym savesym/;
 my $initsub_index = 0;
 my $anonsub_index = 0;
 
+sub SVt_PVFM { 14 }    # probably move it to a better place
+
 sub do_save {
     my ( $cv, $origname ) = @_;
     debug( cv => "CV ==  %s", $origname );
@@ -89,11 +91,6 @@ sub do_save {
         '%d'          => $cv->DEPTH                                # xcv_depth
     );
 
-    if ( $xcv_outside eq '&PL_main_cv' ) {                         # this is dead code for now
-        init()->sadd( "xpvcv_list[%u].xcv_outside = (CV*) &PL_main_cv;", $xpvcv_ix );
-        xpvcvsect->update_field( $xpvcv_ix, 10, 'NULL /* PL_main_cv */' );
-    }
-
     # STATIC_HV: We don't think the sv_u is ever set in the SVCV so this check might be wrong
     # we are not saving the svu for a CV, all evidence indicates that the value is null (always?)
     # CVf_NAMED flag lets you know to use the HEK for the name
@@ -139,16 +136,15 @@ sub get_cv_outside {
 
     if ( $xcv_outside eq ${ main_cv() } ) {
 
-        # when we were setting PL_main_cv at init time,
-        #   it appears that uncompiled version of perl was using 0....
-        #   we need to double check XS code for $cv->OUTSIDE to see if it does not fallback to PL_main_cv
-        $xcv_outside = 0;
+        #$xcv_outside = $cv->OUTSIDE->save;
+        $xcv_outside = 0 . q{ /* main cv */};
+        $xcv_outside = $cv->OUTSIDE->save if $cv->FLAGS & SVt_PVFM;
     }
     elsif ( ref( $cv->OUTSIDE ) eq 'B::CV' ) {
         $xcv_outside = 0;    # just a placeholder for a run-time GV
     }
     elsif ($xcv_outside) {
-        $cv->OUTSIDE->save;
+        $xcv_outside = $cv->OUTSIDE->save;
     }
 
     return $xcv_outside;
@@ -298,11 +294,15 @@ sub is_phase_name {
 sub FULLNAME {
     my ($cv) = @_;
 
+    #return q{PL_main_cv} if $cv eq ${ main_cv() };
     # Do not coerce a RV into a GV during compile by calling $cv->GV on something with a NAME_HEK (RV)
     my $name = $cv->NAME_HEK;
     return $name if ($name);
 
-    return $cv->GV->STASH->NAME . '::' . $cv->GV->NAME;
+    my $gv = $cv->GV;
+    return q{SPECIAL} if ref $gv eq 'B::SPECIAL';
+
+    return $cv->GV->FULLNAME;
 }
 
 1;
