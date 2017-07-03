@@ -126,24 +126,25 @@ sub save_hints {
     my ( $op, $sym ) = @_;
 
     my $hints = $op->hints_hash;
-    return unless $$hints;
+    return unless ref $hints;
 
     my $i = 0;
     if ( exists $cophhtable{$$hints} ) {
         my $cophh = $cophhtable{$$hints};
-        init()->sadd( "CopHINTHASH_set(&%s, %s);", $sym, $cophh );
-        return;
+        return init()->sadd( "CopHINTHASH_set(&%s, %s);", $sym, $cophh );
     }
 
-    my $hint_hv = $hints->HASH if ref $hints eq 'B::RHE';
+    die unless ref $hints eq 'B::RHE';    # does it really happen ?
+
+    my $hint_hv = $hints->HASH;
     my $cophh = sprintf( "cophh%d", scalar keys %cophhtable );
     $cophhtable{$$hints} = $cophh;
     decl()->sadd( "Static COPHH *%s;", $cophh );
     foreach my $k ( sort keys %$hint_hv ) {
         my ( $ck, $kl, $utf8 ) = strlen_flags($k);
         my $v = $hint_hv->{$k};
-        next if $k eq ':';    #skip label, see below
-        my $val = B::svref_2object( \$v )->save("\$^H{$k}");
+        next if $k eq ':';                # skip label, saved just after
+        my $val = B::svref_2object( \$v )->save("\$^H{$k}");    ## .... problem ????
         if ($utf8) {
             init()->sadd(
                 "%s = cophh_store_pvn(%s, %s, %d, 0, %s, COPHH_KEY_UTF8);",
@@ -159,9 +160,7 @@ sub save_hints {
         $i++;
     }
 
-    init()->sadd( "CopHINTHASH_set(&%s, %s);", $sym, $cophh );
-
-    return;
+    return init()->sadd( "CopHINTHASH_set(&%s, %s);", $sym, $cophh );
 }
 
 1;
