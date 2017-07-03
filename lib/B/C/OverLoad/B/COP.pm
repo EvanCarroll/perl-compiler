@@ -54,7 +54,7 @@ sub do_save {
 
     copsect()->debug( $op->name, $op );
 
-    $op->save_hints($ix);
+    $op->save_hints($sym);
 
     if ($add_label) {
 
@@ -123,7 +123,7 @@ sub do_save {
 }
 
 sub save_hints {
-    my ( $op, $ix ) = @_;
+    my ( $op, $sym ) = @_;
 
     my $hints = $op->hints_hash;
     return unless $$hints;
@@ -131,35 +131,37 @@ sub save_hints {
     my $i = 0;
     if ( exists $cophhtable{$$hints} ) {
         my $cophh = $cophhtable{$$hints};
-        init()->sadd( "CopHINTHASH_set(&cop_list[%d], %s);", $ix, $cophh );
-    }
-    else {
-        my $hint_hv = $hints->HASH if ref $hints eq 'B::RHE';
-        my $cophh = sprintf( "cophh%d", scalar keys %cophhtable );
-        $cophhtable{$$hints} = $cophh;
-        decl()->sadd( "Static COPHH *%s;", $cophh );
-        foreach my $k ( sort keys %$hint_hv ) {
-            my ( $ck, $kl, $utf8 ) = strlen_flags($k);
-            my $v = $hint_hv->{$k};
-            next if $k eq ':';    #skip label, see below
-            my $val = B::svref_2object( \$v )->save("\$^H{$k}");
-            if ($utf8) {
-                init()->sadd(
-                    "%s = cophh_store_pvn(%s, %s, %d, 0, %s, COPHH_KEY_UTF8);",
-                    $cophh, $i ? $cophh : 'NULL', $ck, $kl, $val
-                );
-            }
-            else {
-                init()->sadd(
-                    "%s = cophh_store_pvs(%s, %s, %s, 0);",
-                    $cophh, $i ? $cophh : 'NULL', $ck, $val
-                );
-            }
-            $i++;
-        }
-        init()->sadd( "CopHINTHASH_set(&cop_list[%d], %s);", $ix, $cophh );
+        init()->sadd( "CopHINTHASH_set(&%s, %s);", $sym, $cophh );
+        return;
     }
 
+    my $hint_hv = $hints->HASH if ref $hints eq 'B::RHE';
+    my $cophh = sprintf( "cophh%d", scalar keys %cophhtable );
+    $cophhtable{$$hints} = $cophh;
+    decl()->sadd( "Static COPHH *%s;", $cophh );
+    foreach my $k ( sort keys %$hint_hv ) {
+        my ( $ck, $kl, $utf8 ) = strlen_flags($k);
+        my $v = $hint_hv->{$k};
+        next if $k eq ':';    #skip label, see below
+        my $val = B::svref_2object( \$v )->save("\$^H{$k}");
+        if ($utf8) {
+            init()->sadd(
+                "%s = cophh_store_pvn(%s, %s, %d, 0, %s, COPHH_KEY_UTF8);",
+                $cophh, $i ? $cophh : 'NULL', $ck, $kl, $val
+            );
+        }
+        else {
+            init()->sadd(
+                "%s = cophh_store_pvs(%s, %s, %s, 0);",
+                $cophh, $i ? $cophh : 'NULL', $ck, $val
+            );
+        }
+        $i++;
+    }
+
+    init()->sadd( "CopHINTHASH_set(&%s, %s);", $sym, $cophh );
+
+    return;
 }
 
 1;
