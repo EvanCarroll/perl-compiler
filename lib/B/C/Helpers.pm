@@ -52,7 +52,13 @@ sub cstring_cow {
     #   cowpv7[] = "$c\000\303\277";
 
     my $cstr = cstring($str);
+
     $cstr =~ s{"$}{$cow"};
+
+    # this is very weird... probably a cstring issue there
+    if ( length($cstr) < ( length($cow) + 2 ) ) {    # $cstr && $cstr eq '0' ||
+        return qq["$cow"];
+    }
 
     return $cstr;
 }
@@ -62,7 +68,11 @@ sub cow_strlen_flags {
     my $str = shift;
 
     my ( $is_utf8, $cur ) = read_utf8_string($str);
+
     my $cstr = cstring_cow( $str, q{\000\377} );
+
+    #my $xx = join ':', map { ord } split(//, $str );
+    #warn "STR $cstr ; $cur [$xx]\n" if $cur < 5;# && $cstr eq '0';
 
     return ( $cstr, $cur, $cur + 2, $is_utf8 ? 'SVf_UTF8' : '0' );    # NOTE: The actual Cstring length will be 2 bytes longer than $cur
 }
@@ -81,7 +91,7 @@ sub read_utf8_string {
     }
     else {
         #$cur = length( pack "a*", $name );
-        $cur = length($name);
+        $cur = length($name);    ### ... should use the c lenght
     }
 
     return ( $is_utf8, $cur );
