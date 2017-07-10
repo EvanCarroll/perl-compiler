@@ -4,7 +4,7 @@ use strict;
 
 use B::C::Config;
 use B qw/SVf_READONLY HEf_SVKEY SVf_READONLY SVf_AMAGIC SVf_IsCOW cstring cchar SVp_POK svref_2object class/;
-use B::C::Save qw/savepv/;
+use B::C::Save qw/savepv savecowpv/;
 use B::C::Decimal qw/get_integer_value get_double_value/;
 use B::C::File qw/init init_static_assignments svsect xpvmgsect magicsect init_vtables/;
 use B::C::Helpers qw/read_utf8_string get_index/;
@@ -165,7 +165,11 @@ sub save_magic {
                 $ptrsv = ref $ptr =~ m/OP/ ? $ptr->save() : $ptr->save($fullname);
             }
             else {
-                $ptrsv = cstring($ptr);    # Nico thinks everything will happen here.
+                my ( $cow_sym, $cow_cur, $cow_len ) = savecowpv($ptr);
+
+                # use cowpv to protect these strings against destruction
+                $len   = $cow_len;
+                $ptrsv = $cow_sym;
             }
         }
 
