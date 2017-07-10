@@ -41,6 +41,13 @@ sub save_sv {
         "%s"   => "NULL",                        # xav_alloc  /* pointer to beginning of C array of SVs */ This has to be dynamically setup at init().
     );
 
+    # if ( $fill == 987 ) {
+    #     warn "# xxF $fill for $fullname\n" ;
+    #     #eval q{use Carp; warn Carp::longmess};
+    #     warn ( ( "####" x 10 ) . "\n" );
+    #     warn sprintf( "&xpvav_list[%d]\n", $xpv_ix );
+    # }
+
     svsect()->sadd( "&xpvav_list[%d], %Lu, 0x%x, {%s}", $xpv_ix, $av->REFCNT, $av->FLAGS, 0 );
 
     svsect()->debug( $fullname, $av );

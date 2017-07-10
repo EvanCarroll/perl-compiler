@@ -20,7 +20,8 @@ sub Save_FILE() { 64 }
 
 sub _savefields_to_str {
     my $i = shift;
-    return '' unless debug('gv') && $i;
+
+    #return '' unless debug('gv') && $i;
     my $s = qq{$i: };
     $s .= 'HV '   if $i & Save_HV();
     $s .= 'AV '   if $i & Save_AV();
@@ -56,6 +57,10 @@ sub do_save {
     my $savefields = get_savefields( $gv, $gv->get_fullname() );
 
     debug( gv => '===== GV::do_save for %s [ savefields=%s ] ', $gv->get_fullname(), _savefields_to_str($savefields) );
+
+    if ( $name eq 'main::4' ) {
+        warn sprintf( '===== GV::do_save for %s [ savefields=%s ] ' . qq[\n], $gv->get_fullname(), _savefields_to_str($savefields) );
+    }
 
     my $gpsym = $gv->savegp_from_gv($savefields);
 
@@ -510,6 +515,9 @@ sub get_savefields {
     }
     elsif ( $fullname eq 'main::@' ) {
         $savefields = Save_SV;
+    }
+    elsif ( $gvname =~ /^main::[0-9]$/ ) {
+        $savefields = Save_SV | Save_AV;
     }
     elsif ( $gvname =~ /^main::[^A-Za-z]$/ ) {
         $savefields = Save_SV;
