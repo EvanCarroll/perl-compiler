@@ -96,7 +96,7 @@ sub do_save {
 
     # svsect()->comment("any=xpvcv, refcnt, flags, sv_u");
 
-    svsect->supdate( $ix, "(XPVCV*)&xpvcv_list[%u], %Lu, 0x%x, {%s}", $xpvcv_ix, $cv->REFCNT + 1, $flags, $pv );
+    svsect->supdate( $ix, "(XPVCV*)&xpvcv_list[%u], %Lu, 0x%x, {%s}", $xpvcv_ix, $cv->REFCNT, $flags, $pv );
 
     return $sym;
 }
