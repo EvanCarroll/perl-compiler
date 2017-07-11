@@ -18,7 +18,15 @@ sub do_save {
     my ( $ix, $sym ) = svsect()->reserve($sv);
     svsect()->debug( $fullname, $sv );
 
-    my $rv = $sv->RV->save($fullname);
+    my $rv;
+    if ( ref $sv->RV eq 'B::REGEXP' ) {
+
+        #warn "### RV with RE -- $fullname -- $sym\n";
+        $rv = $sv->RV->save( $fullname, $sym );
+    }
+    else {
+        $rv = $sv->RV->save($fullname);
+    }
 
     # 5.22 has a wrong RV->FLAGS (https://github.com/perl11/cperl/issues/63)
     my $flags = $sv->FLAGS;
@@ -26,8 +34,8 @@ sub do_save {
 
     svsect()->supdatel(
         $ix,
-        '(void*)%s - sizeof(void*)' => $sym,          # the SvANY is set just below at init time
-        '%Lu'                       => $sv->REFCNT,
+        '(void*)%s - sizeof(void*)' => $sym,              # the SvANY is set just below at init time
+        '%Lu'                       => $sv->REFCNT + 1,
         '0x%x'                      => $flags,
         '{%s}', ( is_constant($rv) ? ".svu_rv=$rv" : "0 /* $rv */" )
     );

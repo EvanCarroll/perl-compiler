@@ -8,7 +8,7 @@ use B::C::File qw/init1 init2 svsect xpvsect/;
 
 # post 5.11: When called from B::RV::save not from PMOP::save precomp
 sub do_save {
-    my ( $sv, $fullname ) = @_;
+    my ( $sv, $fullname, $parent_rv_sym ) = @_;
 
     my ( $ix, $sym ) = svsect()->reserve($sv);
     svsect()->debug( $sv->name, $sv );
@@ -53,13 +53,22 @@ sub do_save {
     $initpm->sadd( 'REGEXP* regex_sv = CALLREGCOMP(newSVpvn(%s, %d), 0x%x);', $cstr, $cur, $sv->EXTFLAGS );
     $initpm->add("PL_hints &= ~HINT_RE_EVAL;") if ( $sv->EXTFLAGS & RXf_EVAL_SEEN );
 
-    $initpm->sadd( 'SvANY(%s) = SvANY(regex_sv);', $sym );
+    warn "# ... saving one REGEXP - $parent_rv_sym\n";
 
-    my $without_amp = $sym;
-    $without_amp =~ s/^&//;
-    $initpm->sadd( "%s.sv_u.svu_rx = (struct regexp*)SvANY(regex_sv);", $without_amp );
-    $initpm->sadd( "ReANY(%s)->xmg_stash =  %s;",                       $sym, $magic_stash );
-    $initpm->sadd( "ReANY(%s)->xmg_u.xmg_magic =  %s;",                 $sym, $magic );
+    if ($parent_rv_sym) {
+
+        #$initpm->sadd( 'SvREFCNT_inc(regex_sv);');
+        $initpm->sadd( q{SvRV_set((SV*)%s, (SV*)%s);}, $parent_rv_sym, 'regex_sv' );
+    }
+    else {
+        $initpm->sadd( 'SvANY(%s) = SvANY(regex_sv);', $sym );
+
+        my $without_amp = $sym;
+        $without_amp =~ s/^&//;
+        $initpm->sadd( "%s.sv_u.svu_rx = (struct regexp*)SvANY(regex_sv);", $without_amp );
+        $initpm->sadd( "ReANY(%s)->xmg_stash =  %s;",                       $sym, $magic_stash );
+        $initpm->sadd( "ReANY(%s)->xmg_u.xmg_magic =  %s;",                 $sym, $magic );
+    }
 
     $initpm->indent(-1);
     $initpm->add('}');
