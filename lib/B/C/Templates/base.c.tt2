@@ -775,6 +775,7 @@ static void bc_init_signals() {
 
 [% FOREACH signum IN PL_psig_ptr.keys -%]
     PL_psig_ptr[[% signum -%]] = [% PL_psig_ptr.$signum -%];
+    (void)rsignal([% signum -%], PL_csighandlerp);
 [% END -%]
 
 }
