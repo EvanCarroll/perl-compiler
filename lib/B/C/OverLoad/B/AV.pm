@@ -15,10 +15,11 @@ my ( $use_av_undef_speedup, $use_svpop_speedup ) = ( 1, 1 );
 my $MYMALLOC = $B::C::Flags::Config{usemymalloc} eq 'define';
 
 sub fill {
-    my $av = shift;
+    my ( $av, $fullname ) = @_;
 
     my $fill = eval { $av->FILL };    # cornercase: tied array without FETCHSIZE
-    $fill = -1 if $@;                 # catch error in tie magic
+    return -1 if $@;                                             # catch error in tie magic
+    return -1 if $fullname && $fullname =~ m/^(main::)?[-+]$/;
 
     return $fill;
 }
@@ -27,7 +28,7 @@ sub cast_sv {
     return "(SV*)";
 }
 
-sub cast_section {                    ### Stupid move it to section !!! a section know its type
+sub cast_section {                                               ### Stupid move it to section !!! a section know its type
     return "AV*";
 }
 
@@ -39,15 +40,15 @@ sub update_sv {
     my ( $av, $ix, $fullname, $args ) = @_;
 
     my $fill = $args->{fill};
-    my $max  = $args->{fill};         # for AVs optimization ?
+    my $max  = $args->{fill};                                    # for AVs optimization ?
 
     xpvavsect()->comment('xmg_stash, xmg_u, xav_fill, xav_max, xav_alloc');
     my $xpv_ix = xpvavsect()->saddl(
-        "%s"   => $av->save_magic_stash,         # xmg_stash
-        "{%s}" => $av->save_magic($fullname),    # xmg_u
-        "%s"   => $fill,                         # xav_fill
-        "%s"   => $max,                          # xav_max
-        "%s"   => "NULL",                        # xav_alloc  /* pointer to beginning of C array of SVs */ This has to be dynamically setup at init().
+        "%s"   => $av->save_magic_stash,                         # xmg_stash
+        "{%s}" => $av->save_magic($fullname),                    # xmg_u
+        "%s"   => $fill,                                         # xav_fill
+        "%s"   => $max,                                          # xav_max
+        "%s"   => "NULL",                                        # xav_alloc  /* pointer to beginning of C array of SVs */ This has to be dynamically setup at init().
     );
 
     svsect()->supdate( $ix, "&xpvav_list[%d], %Lu, 0x%x, {%s}", $xpv_ix, $av->REFCNT, $av->FLAGS, 0 );
@@ -73,7 +74,7 @@ sub do_save {
     $av->FLAGS & 2048 and die sprintf( "Unexpected SVf_ROK found in %s\n", ref $av );
     $fullname ||= '';
 
-    my $fill = $av->fill();
+    my $fill = $av->fill($fullname);
 
     my $section = $av->section_sv();
 
@@ -86,7 +87,7 @@ sub do_save {
 
     # XXX AVf_REAL is wrong test: need to save comppadlist but not stack
     # We used to block save on @- and @+ by checking for magic of type D. save_magic doesn't advertize this now so we don't have the "same" blocker.
-    if ( $fill > -1 and $fullname !~ m/^(main::)?[-+]$/ ) {
+    if ( $fill > -1 ) {
         my @array = $av->ARRAY;    # crashes with D magic (Getopt::Long)
         if ( debug('av') ) {
             my $i = 0;
