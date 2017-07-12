@@ -8,9 +8,28 @@ use B::C::File qw/init1 init2 svsect xpvsect/;
 
 # post 5.11: When called from B::RV::save not from PMOP::save precomp
 sub do_save {
-    my ( $sv, $fullname ) = @_;
+    my ( $sv, $fullname, $parent_rv_sym ) = @_;
 
     $sv->FLAGS & 2048 and die sprintf( "Unexpected SVf_ROK found in %s\n", ref $sv );
+
+    if ($parent_rv_sym) {
+        my $initpm = init2();
+        $initpm->open_block();
+
+        my $cstr = cstring( $sv->PV );    ### need more love from below
+        my $cur  = $sv->CUR;
+
+        # Re-compile into an SV.
+        $initpm->add("PL_hints |= HINT_RE_EVAL;") if ( $sv->EXTFLAGS & RXf_EVAL_SEEN );
+        $initpm->sadd( 'REGEXP* regex_sv = CALLREGCOMP(newSVpvn(%s, %d), 0x%x);', $cstr, $cur, $sv->EXTFLAGS );
+        $initpm->add("PL_hints &= ~HINT_RE_EVAL;") if ( $sv->EXTFLAGS & RXf_EVAL_SEEN );
+
+        $initpm->sadd( q{SvRV_set((SV*)%s, SvRV( (SV*)%s ) );}, $parent_rv_sym, 'regex_sv' );
+
+        $initpm->close_block();
+
+        return '0 /* compile RE but unsaved */';
+    }
 
     my ( $ix, $sym ) = svsect()->reserve($sv);
     svsect()->debug( $sv->name, $sv );

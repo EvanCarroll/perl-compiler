@@ -47,7 +47,7 @@ sub save_rv {
     my ( $sv, $sym, $fullname ) = @_;
     $fullname ||= "(Unknown RV)";
 
-    my $rv = $sv->RV->save($fullname);
+    my $rv = $sv->RV->save( $fullname, $sym );
 
     return "$rv" if is_constant($rv);
 
