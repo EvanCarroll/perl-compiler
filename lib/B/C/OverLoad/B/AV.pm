@@ -236,11 +236,11 @@ sub add_to_init {
 
 sub add_malloc_line_for_array_init {
     my ( $av, $deferred_init, $sym, $fill ) = @_;
-    return if !defined $fill;
+    return if !defined $fill || $fill < 0;           # avoid a malloc(0) when fill = -1
 
-    $fill = $fill < 3 ? 3 : $fill + 1;
+    $deferred_init->sadd( "SV **svp = INITAv(%s, %d);", $sym, $fill + 1 );
 
-    $deferred_init->sadd( "SV **svp = INITAv(%s, %d);", $sym, $fill );
+    return;
 }
 
 1;

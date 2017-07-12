@@ -30,14 +30,17 @@ sub add_malloc_line_for_array_init {
     my ( $av, $deferred_init, $sym ) = @_;    # Ignores $fill passed in.
 
     my $fill = $av->MAX + 1;
+    return unless $fill;
     $deferred_init->sadd( "PAD **svp = INITPADLIST(%s, %d);", $sym, $fill );
+
+    return;
 }
 
 sub cast_sv {
     return "(PAD*)";
 }
 
-sub cast_section {                            ### Stupid move it to section !!! a section know its type
+sub cast_section {    ### Stupid move it to section !!! a section know its type
     return "PADLIST*";
 }
 
