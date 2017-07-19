@@ -123,6 +123,10 @@ sub save_magic {
         my $ptr  = $mg->BCPTR;
         my $len  = $mg->LENGTH;
 
+        if ( $type eq 'r' ) {
+            die "This is a REGEXP " . $mg->REGEX;    # ->save
+        }
+
         exists $perl_magic_vtable_map->{$type} or die sprintf( "Unknown magic type '0x%s' / '%s' [check your mapping table dude]", unpack( 'H*', $type ), $type );
         my $vtable = $perl_magic_vtable_map->{$type};
 
@@ -146,9 +150,13 @@ sub save_magic {
         # Save the object if there is one.
         my $obj = '0';
         if ( $type !~ /^[rn]$/ ) {
-            my $o = $mg->OBJ;
+            my $o = $mg->OBJ;    # maybe
             $obj = $o->save($fullname) if ( ref $o ne 'SCALAR' );
         }
+
+        # elsif ( $type eq 'r' ) {
+        #     $obj = $mg->REGEX->save; # science fiction
+        # }
 
         my $ptrsv = '0';
         my $init_ptrsv;
