@@ -193,9 +193,10 @@ sub cleanup_stashes {
     }
 
     # cleanup sepcial stashes
-    foreach my $unsaved (qw{B:: O::}) {
+    foreach my $unsaved (qw{O::}) {
         delete $stashes->{$unsaved};
     }
+    delete $stashes->{'B::'}{'C::'};
 
     foreach my $st ( sort keys %$stashes ) {
         next unless ref $stashes->{$st} eq 'HASH';    # only stashes are hash ref
@@ -214,8 +215,7 @@ sub cleanup_stashes {
     # preserve the file location but remove our bloat and the special -e to avoid a reparse
     foreach my $f (
         map { q{_<} . $_ }
-        qw{
-        /usr/local/cpanel/3rdparty/perl/524/lib64/perl5/5.24.1/x86_64-linux-64int/B.pm
+        qw{        
         /usr/local/cpanel/3rdparty/perl/524/lib64/perl5/5.24.1/x86_64-linux-64int/O.pm
         /usr/local/cpanel/3rdparty/perl/524/lib64/perl5/cpanel_lib/x86_64-linux-64int/B/C.pm
         -e
