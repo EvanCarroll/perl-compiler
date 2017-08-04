@@ -438,7 +438,7 @@ Static [% section.$sect.typename() %] [% section.$sect.name() %]_list[[% lines %
 SV ** INITAv(AV * av, int number_of_items) {
     SV **svp;
 
-    Newx(svp, number_of_items, SV*);
+    do_Newxz(svp, number_of_items, SV*);
     AvALLOC(av) = svp;
     AvARRAY(av) = svp;
     return svp;
