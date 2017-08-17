@@ -34,11 +34,6 @@ sub set_init_vtables {
         }
         else {                  # more than one magic is using the same vtbl, let's use the multi helper
 
-            # use Test::More;
-            # print STDERR "IX: ", explain( [ @{ $saved_mgvtable{$vtable} } ] );
-            # print STDERR "RANGE: ", explain( ranges( @{ $saved_mgvtable{$vtable} } ) );
-            # print STDERR "\n";
-
             my @RangeValues;
 
             my $ix_ranges = get_ranges( @{ $saved_mgvtable{$vtable} } );
@@ -72,8 +67,6 @@ sub set_init_vtables {
             if ( scalar @RangeValues ) {
                 init_vtables()->sadd(
                     'MULTI_SET_MAGIC_LIST_VTBL_RANGE( (const IntegerRange[]){%s}, %d, %s );',
-
-                    #join( ',', map { '{ INTEGER, ' . $_ . ' }' } @{ $saved_mgvtable{$vtable} } ),
                     join( ',', @RangeValues ),
                     scalar @RangeValues,
                     $MGVTBL
