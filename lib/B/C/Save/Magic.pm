@@ -25,6 +25,7 @@ sub save_mgvtable {
 sub set_init_vtables {
 
     foreach my $vtable ( sort keys %saved_mgvtable ) {
+        init_vtables()->sadd( '/* PL_vtbl_%s */', $vtable );
         my $MGVTBL = sprintf( '(MGVTBL*) &PL_vtbl_%s', $vtable );
         my $count = scalar @{ $saved_mgvtable{$vtable} };
         if ( $count == 1 ) {    # preserve one single line syntax
@@ -42,23 +43,43 @@ sub set_init_vtables {
 
             my $ix_ranges = get_ranges( @{ $saved_mgvtable{$vtable} } );
 
+            my @SingleValues;
+
             foreach my $ix_range (@$ix_ranges) {
                 if ( ref $ix_range ) {
-                    push @RangeValues, "{ RANGE, {.range={$ix_range->[0], $ix_range->[1]}} }";
+                    push @RangeValues, "{ $ix_range->[0], $ix_range->[1] }";
                 }
                 else {
-                    push @RangeValues, "{ INTEGER, {.integer=$ix_range } }";
+                    push @SingleValues, $ix_range;
                 }
             }
 
-            init_vtables()->sadd(
-                'MULTI_SET_MAGIC_LIST_VTBL( (const RangeValue[]){%s}, %d, %s );',
+            my $size_singles = scalar @SingleValues;
+            if ( $size_singles == 1 ) {
+                init_vtables()->sadd( 'magic_list[%d].mg_virtual = %s;', $SingleValues[0], $MGVTBL );
+            }
+            elsif ( $size_singles > 1 ) {
 
-                #join( ',', map { '{ INTEGER, ' . $_ . ' }' } @{ $saved_mgvtable{$vtable} } ),
-                join( ',', @RangeValues ),
-                scalar @RangeValues,
-                $MGVTBL
-            );
+                init_vtables()->sadd(
+                    'MULTI_SET_MAGIC_LIST_VTBL( (const int[]){%s}, %d, %s );',
+                    join( ',', @SingleValues ),
+                    scalar @SingleValues,
+                    $MGVTBL
+                );
+
+            }
+
+            if ( scalar @RangeValues ) {
+                init_vtables()->sadd(
+                    'MULTI_SET_MAGIC_LIST_VTBL_RANGE( (const IntegerRange[]){%s}, %d, %s );',
+
+                    #join( ',', map { '{ INTEGER, ' . $_ . ' }' } @{ $saved_mgvtable{$vtable} } ),
+                    join( ',', @RangeValues ),
+                    scalar @RangeValues,
+                    $MGVTBL
+                );
+
+            }
         }
 
         init_vtables()->add('');    # empty line for readability
