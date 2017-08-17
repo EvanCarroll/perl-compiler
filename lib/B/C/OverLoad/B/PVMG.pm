@@ -6,7 +6,8 @@ use B::C::Debug qw/debug verbose WARN/;
 use B qw/SVf_READONLY SVf_READONLY cchar SVp_POK svref_2object/;
 use B::C::Save qw/savecowpv/;
 use B::C::Decimal qw/get_integer_value get_double_value/;
-use B::C::File qw/init init_static_assignments svsect xpvmgsect magicsect init_vtables/;
+use B::C::File qw/init init_static_assignments svsect xpvmgsect magicsect/;
+use B::C::Save::Magic qw{save_mgvtable};
 
 # usually 0x400000, but can be as low as 0x10000
 # http://docs.embarcadero.com/products/rad_studio/delphiAndcpp2009/HelpUpdate2/EN/html/devcommon/compdirsimagebaseaddress_xml.html
@@ -194,7 +195,12 @@ sub save_magic {
             init_static_assignments()->sadd( q{%s.mg_ptr = (char*) %s;}, $last_magic, $init_ptrsv );
         }
 
-        init_vtables()->sadd( '%s.mg_virtual = (MGVTBL*) &PL_vtbl_%s;', $last_magic, $vtable ) if $vtable;
+        if ($vtable) {
+
+            # going to create lines like - magic_list[$ix].mg_virtual = (MGVTBL*) &PL_vtbl_backref;
+            save_mgvtable( $vtable, $last_magic_ix );
+        }
+
         $last_magic = "&" . $last_magic;
     }
 

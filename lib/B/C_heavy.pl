@@ -59,6 +59,7 @@ BEGIN {
 
 use B::C::XS       ();
 use B::C::OverLoad ();
+use B::C::Save::Magic qw{set_init_vtables};
 
 # FIXME: this part can now be dynamic
 # exclude all not B::C:: prefixed subs
@@ -106,6 +107,8 @@ sub start_heavy {
 
     # first iteration over the main tree
     save_optree();
+
+    set_init_vtables();    # populate init_vtables section
 
     # fixups: wtf we could have miss during our initial walk...
     save_main_rest();

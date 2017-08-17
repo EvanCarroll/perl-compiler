@@ -384,6 +384,16 @@ static void HvAddEntry(HV* hv, SV* value, SHARED_HE* hek, I32 max) {
     return;
 }
 
+static void MULTI_SET_MAGIC_LIST_VTBL( const int mgids[], int max, MGVTBL *mgvtbl ) {
+    int i;
+
+    for ( i = 0; i < max; ++i) {
+        magic_list[ mgids[i] ].mg_virtual = mgvtbl;
+    }
+
+    return;
+}
+
 [% IF devel_peek_needed %]
 static void
 S_do_dump(pTHX_ SV *const sv, I32 lim)
