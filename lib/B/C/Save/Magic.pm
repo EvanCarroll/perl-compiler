@@ -33,10 +33,30 @@ sub set_init_vtables {
         }
         else {                  # more than one magic is using the same vtbl, let's use the multi helper
 
+            # use Test::More;
+            # print STDERR "IX: ", explain( [ @{ $saved_mgvtable{$vtable} } ] );
+            # print STDERR "RANGE: ", explain( ranges( @{ $saved_mgvtable{$vtable} } ) );
+            # print STDERR "\n";
+
+            my @RangeValues;
+
+            my $ix_ranges = get_ranges( @{ $saved_mgvtable{$vtable} } );
+
+            foreach my $ix_range (@$ix_ranges) {
+                if ( ref $ix_range ) {
+                    push @RangeValues, "{ RANGE, {.range={$ix_range->[0], $ix_range->[1]}} }";
+                }
+                else {
+                    push @RangeValues, "{ INTEGER, {.integer=$ix_range } }";
+                }
+            }
+
             init_vtables()->sadd(
-                'MULTI_SET_MAGIC_LIST_VTBL( (const int[]){%s}, %d, %s );',
-                join( ',', @{ $saved_mgvtable{$vtable} } ),
-                $count,
+                'MULTI_SET_MAGIC_LIST_VTBL( (const RangeValue[]){%s}, %d, %s );',
+
+                #join( ',', map { '{ INTEGER, ' . $_ . ' }' } @{ $saved_mgvtable{$vtable} } ),
+                join( ',', @RangeValues ),
+                scalar @RangeValues,
                 $MGVTBL
             );
         }
@@ -45,6 +65,40 @@ sub set_init_vtables {
     }
 
     return;
+}
+
+sub get_ranges {                    # move to a more generic helper
+    my @list = @_;
+
+    my @ranges;
+    my ( $from, $to );
+
+    my $do_range = sub {
+        push @ranges, $from == $to ? $from : [ $from, $to ];
+    };
+
+    foreach my $i (@list) {
+
+        # initialize the first range
+        if ( !defined $from ) {
+            $from = $to = $i;
+            next;
+        }
+
+        # check if we can grow
+        if ( $i == $to + 1 ) {
+            $to = $i;
+        }
+        else {    # close the current range
+            $do_range->();
+            $from = $to = $i;    # reinitialize a new range
+        }
+    }
+
+    # close the last range
+    $do_range->() if defined $from;
+
+    return [@ranges];
 }
 
 1;

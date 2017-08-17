@@ -384,11 +384,36 @@ static void HvAddEntry(HV* hv, SV* value, SHARED_HE* hek, I32 max) {
     return;
 }
 
-static void MULTI_SET_MAGIC_LIST_VTBL( const int mgids[], int max, MGVTBL *mgvtbl ) {
+/* simple range declaration: one integer or a range */
+typedef enum { INTEGER, RANGE, SINGLES } RangeType;
+typedef struct
+{
+  int from;
+  int to;
+} IntegerRange;
+
+typedef struct
+{
+  RangeType type;
+  union {
+    int integer;
+    IntegerRange range;
+  } x;
+} RangeValue;
+
+static void MULTI_SET_MAGIC_LIST_VTBL( const RangeValue mgids[], const int max, MGVTBL *mgvtbl ) {
     int i;
 
     for ( i = 0; i < max; ++i) {
-        magic_list[ mgids[i] ].mg_virtual = mgvtbl;
+        if ( mgids[i].type == INTEGER ) {
+            magic_list[ mgids[i].x.integer ].mg_virtual = mgvtbl;
+        } else if ( mgids[i].type == RANGE ) {
+            int iterator;
+            for ( iterator = mgids[i].x.range.from ; iterator <= mgids[i].x.range.to; ++iterator ) {
+                magic_list[ iterator ].mg_virtual = mgvtbl;
+            }
+        }
+
     }
 
     return;
