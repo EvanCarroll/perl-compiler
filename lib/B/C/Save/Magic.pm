@@ -42,7 +42,7 @@ sub set_init_vtables {
 
             foreach my $ix_range (@$ix_ranges) {
                 if ( ref $ix_range ) {
-                    push @RangeValues, "{ $ix_range->[0], $ix_range->[1] }";
+                    push @RangeValues, "{$ix_range->[0],$ix_range->[1]}";
                 }
                 else {
                     push @SingleValues, $ix_range;
