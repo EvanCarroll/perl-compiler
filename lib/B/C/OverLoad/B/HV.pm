@@ -6,6 +6,7 @@ use B qw/svref_2object SVf_READONLY SVf_PROTECT SVf_OOK SVf_AMAGIC/;
 use B::C::Debug qw/debug WARN/;
 use B::C::File qw/init xpvhvsect svsect decl init init2 init_stash init_static_assignments/;
 use B::C::Save::Hek qw/save_shared_he get_sHe_HEK/;
+use B::C::Helpers qw/get_index/;
 
 sub can_save_stash {
     my $stash_name = shift;
@@ -168,8 +169,6 @@ sub do_save {
     $init->open_block( $stash_name ? "STASH declaration for ${stash_name}::" : '' );
 
     {    # add hash content even if the hash is empty [ maybe only for %INC ??? ]
-        $init->add( B::C::Memory::HvSETUP( $init, $sym, $max + 1, $has_ook, $backrefs_sym ) );
-
         my @hash_elements;
         {
             my $i = 0;
@@ -180,16 +179,69 @@ sub do_save {
         # uncomment for saving hashes in a consistent order while debugging
         #@hash_elements = @hash_content_to_save;
 
+        my $hv_setup = B::C::Memory::HvSETUP( $init, $sym, $max + 1, $has_ook, $backrefs_sym );
+
+        my ( @HvEntry_from_GV, @HvEntry_from_SV, @extra );
+
         foreach my $elt (@hash_elements) {
             my ( $key, $value ) = @$elt;
 
             # Insert each key into the hash.
             my ($shared_he) = save_shared_he($key);
-            $init->sadd(
-                "%s; /* %s */",
-                B::C::Memory::HvAddEntry( $init, $sym, $value, $shared_he, $max ), $key
-            );
+
+            # still using now in void context to malloc memory correctly, and handle special cases
+            my $hv_addsingle = B::C::Memory::HvAddEntry( $init, $sym, $value, $shared_he, $max );
+
+            my ( $he_ix, $value_ix );
+            my $comment = "$key - $shared_he => $value";
+            eval {
+                $he_ix    = get_index($shared_he);
+                $value_ix = get_index($value);
+                1;
+            } or do {
+
+                # when the value is a special SV like PL_sv_yes, PL_sv_no, ... cannot deal with multiple add
+                push @extra, sprintf( "%s; /* %s */", $hv_addsingle, $comment );
+                next;
+            };
+
+            my $entry = [ $he_ix, $value_ix, $comment ];
+            if ( $value =~ qr{sv_list} ) {
+                push @HvEntry_from_SV, $entry;
+            }
+            elsif ( $value =~ qr{gv_list} ) {
+                push @HvEntry_from_GV, $entry;
+            }
+            else {
+                die q{Unknown value type: currently HvAddEntries only work with GVs and SVs};
+            }
         }
+
+        my $declare_list = sub {
+            my ( $name, $kvs ) = @_;
+            return unless ref $kvs && scalar @$kvs;
+
+            $init->sadd( 'const HvKeyValue %s[%d] = {', $name, scalar @$kvs );
+            foreach my $kv (@$kvs) {
+                $init->sadd( "\t{ %d, %d }, /* %s */", $kv->[0], $kv->[1], $kv->[2] );
+            }
+            $init->add( '};', '' );    # add an extra empty line
+        };
+
+        $declare_list->( 'kv_sv', \@HvEntry_from_SV );
+        $declare_list->( 'kv_gv', \@HvEntry_from_GV );
+
+        $init->add($hv_setup);
+
+        if ( scalar @HvEntry_from_SV ) {
+            $init->sadd( 'HvAddEntriesSV( %s, kv_sv, %d, %d ); ', $sym, scalar @HvEntry_from_SV, $max );
+        }
+        if ( scalar @HvEntry_from_GV ) {
+            $init->sadd( 'HvAddEntriesGV( %s, kv_gv, %d, %d ); ', $sym, scalar @HvEntry_from_GV, $max );
+        }
+
+        $init->add(@extra) if scalar @extra;
+
     }
 
     $init->add("SvREADONLY_on($sym);") if $hv->FLAGS & SVf_READONLY;

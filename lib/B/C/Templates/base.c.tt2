@@ -384,6 +384,29 @@ static void HvAddEntry(HV* hv, SV* value, SHARED_HE* hek, I32 max) {
     return;
 }
 
+
+typedef struct { int k_ix; int v_ix; } HvKeyValue;
+
+static void HvAddEntriesGV(HV* hv, const HvKeyValue kvs[], int size, I32 max) {
+    int i;
+
+    for ( i = 0; i < size; ++i) {
+        HvAddEntry(hv, (SV*) &gv_list[kvs[i].v_ix], sharedhe_list[kvs[i].k_ix], max);
+    }
+
+    return;
+}
+
+static void HvAddEntriesSV(HV* hv, const HvKeyValue kvs[], int size, I32 max) {
+    int i;
+
+    for ( i = 0; i < size; ++i) {
+        HvAddEntry(hv, &sv_list[kvs[i].v_ix], sharedhe_list[kvs[i].k_ix], max);
+    }
+
+    return;
+}
+
 [% IF devel_peek_needed %]
 static void
 S_do_dump(pTHX_ SV *const sv, I32 lim)
