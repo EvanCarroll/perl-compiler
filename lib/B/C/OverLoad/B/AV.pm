@@ -99,7 +99,7 @@ sub do_save {
 
         # you want to keep this out of the no_split/split
         # map("\t*svp++ = (SV*)$_;", @names),
-        my $acc = '';
+        my @acc;
 
         # remove element from the array when it's a backref
 
@@ -158,7 +158,7 @@ sub do_save {
                 while ( defined( $values[ $i + $count + 1 ] ) and $values[ $i + $count + 1 ] eq "&sv_list[" . ( $1 + $count + 1 ) . "]" ) {
                     $count++;
                 }
-                $acc .= "\tfor (gcount=" . $1 . "; gcount<" . ( $1 + $count + 1 ) . "; gcount++) {" . " *svp++ = $svpcast&sv_list[gcount]; };\n\t";
+                push @acc, "\tfor (gcount=" . $1 . "; gcount<" . ( $1 + $count + 1 ) . "; gcount++) {" . " *svp++ = $svpcast&sv_list[gcount]; };\n\t";
                 $i += $count;
             }
             elsif ($use_av_undef_speedup
@@ -172,15 +172,46 @@ sub do_save {
                 while ( defined $values[ $i + $count + 1 ] and $values[ $i + $count + 1 ] =~ /^ptr_undef|&PL_sv_undef$/ ) {
                     $count++;
                 }
-                $acc .= "\tfor (gcount=0; gcount<" . ( $count + 1 ) . "; gcount++) {" . " *svp++ = $svpcast&PL_sv_undef; };\n\t";
+                push @acc, "\tfor (gcount=0; gcount<" . ( $count + 1 ) . "; gcount++) {" . " *svp++ = $svpcast&PL_sv_undef; };\n\t";
+                $i += $count;
+            }
+            elsif (defined $values[$i]
+                && defined $values[ $i + 1 ]
+                && defined $values[ $i + 2 ]
+                && $values[$i] =~ /^\&padname_list\[(\d+)\]/
+                && $values[ $i + 1 ] eq "&padname_list[" . ( $1 + 1 ) . "]"
+                && $values[ $i + 2 ] eq "&padname_list[" . ( $1 + 2 ) . "]" ) {
+
+                # optimization when we have a growing by 1 pattern
+                $count = 0;
+                while ( defined( $values[ $i + $count + 1 ] ) and $values[ $i + $count + 1 ] eq "&padname_list[" . ( $1 + $count + 1 ) . "]" ) {
+                    $count++;
+                }
+                push @acc, "\tfor (gcount=" . $1 . "; gcount<" . ( $1 + $count + 1 ) . "; gcount++) {" . " *svp++ = $svpcast&padname_list[gcount]; };\n\t";
+                $i += $count;
+            }
+            elsif (defined $values[$i]
+                && defined $values[ $i + 1 ]
+                && defined $values[ $i + 2 ]
+                && $values[$i] =~ /^\&padname_list\[(\d+)\]/
+                && $values[ $i + 1 ] eq $values[$i]
+                && $values[ $i + 2 ] eq $values[$i] ) {
+
+                # optimization when we have a repeat pattern...
+                $count = 0;
+                while ( defined $values[ $i + $count + 1 ] and $values[ $i + $count + 1 ] eq $values[$i] ) {
+                    $count++;
+                }
+                push @acc, "\tfor (gcount=0; gcount<" . ( $count + 1 ) . "; gcount++) {" . " *svp++ = $svpcast" . $values[$i] . "; };\n\t";
                 $i += $count;
             }
             else {    # XXX 5.8.9d Test::NoWarnings has empty values
-                $acc .= "\t*svp++ = $svpcast" . ( $values[$i] ? $values[$i] : '&PL_sv_undef' ) . ";\n\t";
+                push @acc, "\t*svp++ = $svpcast" . ( $values[$i] ? $values[$i] : '&PL_sv_undef' ) . ";\n\t";
             }
         }
 
-        $av->add_to_init( $sym, $acc, $fill, $fullname );
+        my $all_lines = join '', @acc;
+        $av->add_to_init( $sym, $all_lines, $fill, $fullname );
 
         # should really scan for \n, but that would slow
         # it down
