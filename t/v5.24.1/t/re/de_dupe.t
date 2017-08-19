@@ -8,6 +8,25 @@ BEGIN {
 
 plan tests => 4;
 
+# Need to test dupes for
+De-dupe every regex flag with a test for /pp /r etc
+S//g
+Also \G in regex
+
+$’
+
+$`
+
+
+#define RXf_PMf_MULTILINE      (1U << (RXf_PMf_STD_PMMOD_SHIFT+0))    /* /m */
+#define RXf_PMf_SINGLELINE     (1U << (RXf_PMf_STD_PMMOD_SHIFT+1))    /* /s */
+#define RXf_PMf_FOLD           (1U << (RXf_PMf_STD_PMMOD_SHIFT+2))    /* /i */
+#define RXf_PMf_EXTENDED       (1U << (RXf_PMf_STD_PMMOD_SHIFT+3))    /* /x */
+#define RXf_PMf_EXTENDED_MORE  (1U << (RXf_PMf_STD_PMMOD_SHIFT+4))    /* /xx */
+#define RXf_PMf_NOCAPTURE      (1U << (RXf_PMf_STD_PMMOD_SHIFT+5))    /* /n */
+#define RXf_PMf_KEEPCOPY       (1U << (RXf_PMf_STD_PMMOD_SHIFT+6))    /* /p */
+
+
 my $rx = qr//;
 
 is(ref $rx, "Regexp", "qr// blessed into 'Regexp' by default");
