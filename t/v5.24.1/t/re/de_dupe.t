@@ -98,16 +98,66 @@ plan tests => 12;
 
 {
 	# test RXf_PMf_EXTENDED /x
+	my $program = <<EOM;
+dog /* cow */
+frog /* pig */
+EOM
 
-	ok(1);
+	$program =~ s {
+		/\*	# Match the opening delimiter.
+		.*?	# Match a minimal number of characters.
+		\*/	# Match the closing delimiter.
+        } []gsx;
+
+	$program = <<EOM;
+cow /* frog */
+frog /* pig */
+EOM
+    $program =~ s {
+		/\*	# Match the opening delimiter.
+		.*?	# Match a minimal number of characters.
+		\*/	# Match the closing delimiter.
+        } []gsx;
+
+	$program = <<EOM;
+cow /* frog */
+cow /* pig */
+EOM
+
+    $program =~ s {
+		/\*	# Match the opening delimiter.
+		.*?	# Match a minimal number of characters.
+		\*/	# Match the closing delimiter.
+        } []gsx;
+
+	$program = <<EOM;
+cow /* frog */
+cow /* pig */
+EOM
+
+    $program =~ s {
+		/\*	# Match the opening delimiter.
+		.*?	# Match a minimal number of characters.
+		\*/	# Match the closing delimiter.
+        } []gsx;
+
+use Data::Dumper;
+print STDERR Dumper($program);
+
 }
 
 
 
 {
 	# test RXf_PMf_EXTENDED_MORE /xx
-	ok(1);
-	
+\
+	my $string = "#######";
+
+	ok($string =~ /[ ! @ " # $ % ^ & * () = ? <> ' ]/xx, "String matches with RXf_PMf_EXTENDED_MORE");
+	ok($string =~ /[ ! @ " # $ % ^ & * () = ? <> ' ]/xx, "String matches with RXf_PMf_EXTENDED_MORE");
+	ok($string =~ /[ ! @ " # $ % ^ & * () = ? <> ' ]/xx, "String matches with RXf_PMf_EXTENDED_MORE");
+	ok($string =~ /[ ! @ " # $ % ^ & * () = ? <> ' ]/xx, "String matches with RXf_PMf_EXTENDED_MORE");
+
 }
 {
 	# test RXf_PMf_NOCAPTURE /n
