@@ -1,33 +1,34 @@
 #!./perl -w
 
 BEGIN {
-    chdir 't' if -d 't';
-    require './test.pl';
-    set_up_inc('../lib');
+ #   chdir 't' if -d 't';
+ #   require './test.pl';
+ #   set_up_inc('../lib');
 }
 
+use Test::More;
 plan tests => 12;
 
 {
 	note q{Testing $` $'};
 	my $dog = 'happygreendogcow';
-	$dog =~ m{dog}g;
+	ok($dog =~ m{dog}g,"Match once with /g");
 	my $pos = pos($dog);
 
 	is($`,'happygreen', "Match before ok");
 	is($','cow', "Match after ok");
 	is($pos,13,"The position is 13");
 
-	$dog =~ m{dog}g;
+	ok($dog !~ m{dog}g,"No match once we matched once with /g");
 	$pos = pos($dog);
 
 	is($`,'happygreen', "Match before ok (2x)");
 	is($','cow', "Match after ok (2x)");
-	is($pos,13,"The position is 13 (2x)");
+	is($pos,undef,"The position undef since we already matched");
 
 
 	$dog = 'happybluedogfrog';
-	$dog =~ m{dog}g;
+	ok($dog =~ m{dog}g,"Match once with /g");
 	$pos = pos($dog);
 
 	is($`,'happyblue', "Match before ok (changed)");
@@ -36,7 +37,7 @@ plan tests => 12;
 
 
 	$dog = 'happybluedogfrog';
-	$dog =~ m{dog}g;
+	ok($dog =~ m{dog}g,"Match once with /g");
 	$pos = pos($dog);
 
 	is($`,'happyblue', "Match before ok (changed 2x)");
@@ -65,7 +66,7 @@ plan tests => 12;
 	my $string = "bob\ncow\nfrog\ndog\n";
 
 	ok($string =~ m{\ncow}s, "String matches RXf_PMf_SINGLELINE");
-	ok($string =~ m{\nbob}s, "String matches RXf_PMf_SINGLELINE");
+	ok($string !~ m{\nbob}s, "String matches RXf_PMf_SINGLELINE");
 	ok($string =~ m{\ncow}s, "String matches RXf_PMf_SINGLELINE");
 	ok($string =~ m{^bob}s, "String matches RXf_PMf_SINGLELINE");
 	ok($string =~ m{^bob}s, "String matches RXf_PMf_SINGLELINE");
@@ -98,27 +99,107 @@ plan tests => 12;
 {
 	# test RXf_PMf_EXTENDED /x
 
-	
+	ok(1);
 }
 
 
 
 {
 	# test RXf_PMf_EXTENDED_MORE /xx
-
+	ok(1);
 	
 }
-
 {
 	# test RXf_PMf_NOCAPTURE /n
+	my $string = "bobfrogcowdog";
 
+	ok($string =~ m{cow}n, "String matches with RXf_PMf_NOCAPTURE");
+	ok($string =~ m{bob}n, "String matches with RXf_PMf_NOCAPTURE");
+	ok($string =~ m{cow}n, "String matches with RXf_PMf_NOCAPTURE");
+	ok($string =~ m{bob}n, "String matches with RXf_PMf_NOCAPTURE");
+	ok($string =~ m{bob}n, "String matches with RXf_PMf_NOCAPTURE");
+	ok($string =~ m{dog}n, "String matches with RXf_PMf_NOCAPTURE");
+	ok($string =~ m{dog}n, "String matches with RXf_PMf_NOCAPTURE");
+	ok($string =~ m{dog}n, "String matches with RXf_PMf_NOCAPTURE");
+	ok($string =~ m{frog}n, "String matches with RXf_PMf_NOCAPTURE");
+	ok($string =~ m{frog}n, "String matches with RXf_PMf_NOCAPTURE");
+	ok($string =~ m{frogcow}n, "String matches with RXf_PMf_NOCAPTURE");
+	ok($string =~ m{frog}n, "String matches with RXf_PMf_NOCAPTURE");
+	ok($string =~ m{frog}n, "String matches with RXf_PMf_NOCAPTURE");
 	
 }
 
 
 {
 	# test RXf_PMf_KEEPCOPY /p
+	my $string = "bobfrogcowdog";
 
+	ok($string =~ m{cow}p, "String matches with RXf_PMf_KEEPCOPY");
+	is(${^PREMATCH},'bobfrog', "PREMATCH SET");
+	is(${^MATCH},'cow',"MATCH SET");
+	is(${^POSTMATCH},'dog',"MATCH SET");
+
+
+	ok($string =~ m{bob}p, "String matches with RXf_PMf_KEEPCOPY");
+
+	is(${^PREMATCH},'', "PREMATCH SET");
+	is(${^MATCH},'bob',"MATCH SET");
+	is(${^POSTMATCH},'frogcowdog',"MATCH SET");
+
+	ok($string =~ m{cow}p, "String matches with RXf_PMf_KEEPCOPY");
+	is(${^PREMATCH},'bobfrog', "PREMATCH SET");
+	is(${^MATCH},'cow',"MATCH SET");
+	is(${^POSTMATCH},'dog',"MATCH SET");
+
+	ok($string =~ m{bob}p, "String matches with RXf_PMf_KEEPCOPY");
+		is(${^PREMATCH},'', "PREMATCH SET");
+	is(${^MATCH},'bob',"MATCH SET");
+	is(${^POSTMATCH},'frogcowdog',"MATCH SET");
+	ok($string =~ m{bob}p, "String matches with RXf_PMf_KEEPCOPY");
+		is(${^PREMATCH},'', "PREMATCH SET");
+	is(${^MATCH},'bob',"MATCH SET");
+	is(${^POSTMATCH},'frogcowdog',"MATCH SET");
+
+	ok($string =~ m{dog}p, "String matches with RXf_PMf_KEEPCOPY");
+	is(${^PREMATCH},'bobfrogcow', "PREMATCH SET");
+	is(${^MATCH},'dog',"MATCH SET");
+	is(${^POSTMATCH},'',"MATCH SET");
+
+	ok($string =~ m{dog}p, "String matches with RXf_PMf_KEEPCOPY");
+		is(${^PREMATCH},'bobfrogcow', "PREMATCH SET");
+	is(${^MATCH},'dog',"MATCH SET");
+	is(${^POSTMATCH},'',"MATCH SET");
+	ok($string =~ m{dog}p, "String matches with RXf_PMf_KEEPCOPY");
+		is(${^PREMATCH},'bobfrogcow', "PREMATCH SET");
+	is(${^MATCH},'dog',"MATCH SET");
+	is(${^POSTMATCH},'',"MATCH SET");
+	ok($string =~ m{frog}p, "String matches with RXf_PMf_KEEPCOPY");
+
+	is(${^PREMATCH},'bob', "PREMATCH SET");
+	is(${^MATCH},'frog',"MATCH SET");
+	is(${^POSTMATCH},'cowdog',"MATCH SET");
+
+	ok($string =~ m{frog}p, "String matches with RXf_PMf_KEEPCOPY");
+
+	is(${^PREMATCH},'bob', "PREMATCH SET");
+	is(${^MATCH},'frog',"MATCH SET");
+	is(${^POSTMATCH},'cowdog',"MATCH SET");
+
+	ok($string =~ m{frogcow}p, "String matches with RXf_PMf_KEEPCOPY");
+
+	is(${^PREMATCH},'bob', "PREMATCH SET");
+	is(${^MATCH},'frogcow',"MATCH SET");
+	is(${^POSTMATCH},'dog',"MATCH SET");
+	ok($string =~ m{frog}p, "String matches with RXf_PMf_KEEPCOPY");
+
+	is(${^PREMATCH},'bob', "PREMATCH SET");
+	is(${^MATCH},'frog',"MATCH SET");
+	is(${^POSTMATCH},'cowdog',"MATCH SET");
+	ok($string =~ m{frog}p, "String matches with RXf_PMf_KEEPCOPY");
+
+	is(${^PREMATCH},'bob', "PREMATCH SET");
+	is(${^MATCH},'frog',"MATCH SET");
+	is(${^POSTMATCH},'cowdog',"MATCH SET");
 	
 }
 
