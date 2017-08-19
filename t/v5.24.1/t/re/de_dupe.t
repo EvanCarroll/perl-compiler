@@ -255,7 +255,16 @@ is($program,"cow \ncow \n", "The regex strips the comments from the program RXf_
 	
 }
 
-# Need to test dupes for
+{
+	my $string = "bob\nsally\nbob\nsally\nbob\nsally\n";
 
-#s//g
+	ok ($string =~ m{\Gbob}, "string matches bob x1");
+	ok ($string =~ m{\Gbob}, "string matches bob x2");
+	ok ($string !~ m{\Gbob}, "string does not match bob x3");
+
+
+}
+
+# Need to test dupes for
+# Test some captures
 #Also \G in regex
