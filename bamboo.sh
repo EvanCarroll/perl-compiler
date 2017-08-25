@@ -1,7 +1,8 @@
 #!/bin/sh
 
 echo "Removing perl526 & installing perl524"
-[ -e /usr/local/cpanel/3rdparty/perl/526/bin/perl ] && rpm -e --nodeps cpanel-perl-526 ||:
+rpm -e --nodeps cpanel-perl-526 >/dev/null 2>&1 ||:
+rpm -e --nodeps cpanel-perl-526-build >/dev/null 2>&1 ||:
 #rpm -Uv --force rpms/cpanel-perl-524-5.24.1-17.cp1162.x86_64.rpm
 # cheating for now...
 rpm -Uv --force rpms/cpanel-perl-524-5.24.1-5.cp1168.x86_64.rpm
