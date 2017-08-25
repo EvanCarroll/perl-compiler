@@ -85,3 +85,4 @@ fullog.txt
 /results.xml
 /t/v5.24.1/t/.gdbinit
 /parse*
+t/testsuite/t/.gdbinit
