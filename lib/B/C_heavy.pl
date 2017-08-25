@@ -977,10 +977,6 @@ sub dump_rest {
             and !exists $dumped_package{$p}
             and !$static_core_pkg{$p}
             and $p !~ /^(threads|main|__ANON__|PerlIO)$/ ) {
-            if ( $p eq 'warnings::register' ) {
-                delete_unsaved_hashINC('warnings::register');
-                next;
-            }
             $again++;
             debug( [qw/verbose pkg/], "$p marked but not saved, save now" );
 
