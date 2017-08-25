@@ -11,7 +11,7 @@
 
 package B::C;
 
-our $VERSION = '5.024013';
+our $VERSION = '5.024013_01'; # HF: hotfix release - 66 branch is not tracking bc524 anymore...
 our $caller  = caller;       # So we know how we were invoked.
 
 our @ISA = qw(Exporter);
