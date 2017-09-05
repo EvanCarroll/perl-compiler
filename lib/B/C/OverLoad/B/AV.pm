@@ -65,6 +65,22 @@ sub skip_backref_sv {
     return;
 }
 
+my @SHORT_ARRAY;
+
+{
+    my $undef = undef;
+    my $null;
+
+    sub get_NULL {
+
+        #return B::sv_undef();
+        return $null if defined $null;
+        $null = B::svref_2object( \$undef );
+        die unless ref $null eq 'B::NULL';    # sanity check
+        return $null;
+    }
+}
+
 sub do_save {
     my ( $av, $fullname, $cv, $is_backref ) = @_;
 
@@ -104,8 +120,8 @@ sub do_save {
         # remove element from the array when it's a backref
 
         my ( $count, @values ) = (0);
-        {
-            # TODO: This local may no longer be needed now we've removed the 5.16 conditional here.
+        {    # backref optimization [ FIXME move to a sub ]
+                # TODO: This local may no longer be needed now we've removed the 5.16 conditional here.
             if ($is_backref) {
                 my @new_array;
                 foreach my $elt (@array) {
@@ -134,7 +150,47 @@ sub do_save {
 
                 # Idea: bypass the AV save if there's only one element in the array
             }
+        }
 
+        {    # PADLIST optimization [ FIXME move to a sub ]
+            if ( ref($av) eq 'B::PADLIST' ) {
+
+                # save a short :pad for some functions used by B::C
+                my $short = $fullname;
+                $short =~ s{\s+:pad\s*$}{};
+                if (
+                    $short eq q{Exporter::import}
+
+                    #|| $short eq q{XSLoader::load}
+                    #|| $short eq q{XSLoader::loadfile}
+                    #|| $short eq q{XSLoader::bootstrap_inherit}
+                    || $short =~ qr{^XSLoader::}
+                    || $short =~ qr{^Carp::}
+                  ) {
+                    push @SHORT_ARRAY, '' . $array[1];    # we need to alter this array
+                }
+            }
+
+            if ( grep { $_ eq $av } @SHORT_ARRAY ) {
+                my $remove_PV = sub {
+                    my $str = shift;
+                    return unless defined $str;
+                    return 1 if $str =~ qr{^B::};
+                    if ( $fullname =~ qr{^XSLoader::} ) {
+                        return 1 if $str eq 'boot_B::C';
+                        return 1 if $str =~ qr{x86_64-linux-64int/auto/B/C/C.so$};
+                        return 1 if $str eq 'B/C';
+                    }
+
+                    return;
+                };
+
+                # nullified some PVs pointing to B::C stuff
+                @array = map { my $e = $_; ref $e eq 'B::PV' && $remove_PV->( $e->PV ) ? get_NULL() : $e } @array;
+            }
+        }
+
+        {    # build values & fill
             @values = map { $_->save( $fullname . "[" . $count++ . "]" ) || () } @array;
             $fill = scalar(@values) if $is_backref;
         }
