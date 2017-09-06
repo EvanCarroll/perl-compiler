@@ -6,16 +6,9 @@ use B::C::Debug qw/debug/;
 use B::C::File qw/unopauxsect init free meta_unopaux_item/;
 use B::C::Helpers qw/is_constant/;
 
-sub _clear_stack {
-
-    #'B::C::Save'->can('stack_flat')->();
-    return join '', ( 1 .. 42 );    # large enough to do stuff & clear
-}
-
 sub do_save {
     my ($op) = @_;
 
-    _clear_stack();                 # avoid a weird B (or B::C) issue when calling aux_list_thr
     my @aux_list = $op->name eq 'multideref' ? $op->aux_list_thr : $op->aux_list;    # GH#283, GH#341
     my $auxlen = scalar @aux_list;
 
