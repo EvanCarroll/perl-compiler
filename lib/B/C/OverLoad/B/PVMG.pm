@@ -20,9 +20,9 @@ sub do_save {
     svsect()->debug( $fullname, $sv );
 
     my ( $sv_u, $cur, $len, $pv, $flags );
-    if ( $fullname =~ m{^main::[1-9]+$} ) {  # Only modify $1,$2, ... etc.  $0 is magic
+    if ( $fullname =~ m{^main::[1-9][0-9]*$} ) {    # Only modify $1,$2, ... etc.  $0 is magic
         $flags = $sv->FLAGS;
-        $flags ^= SVf_IsCOW;
+        $flags |= SVf_IsCOW;                        # flag it as COW as we are using the generic empty string
         $pv = "";
         ( $sv_u, $cur, $len ) = savecowpv($pv);
         $sv_u = ".svu_pv=(char*) $sv_u";
@@ -31,8 +31,8 @@ sub do_save {
         ( $sv_u, $cur, $len, $pv, $flags ) = $sv->save_svu( $sym, $sym, $fullname );
     }
 
-    my $ivx = get_integer_value( $sv->IVX );    # XXX How to detect HEK* namehek?
-    my $nvx = get_double_value( $sv->NVX );     # it cannot be xnv_u.xgv_stash ptr (BTW set by GvSTASH later)
+    my $ivx = get_integer_value( $sv->IVX );        # XXX How to detect HEK* namehek?
+    my $nvx = get_double_value( $sv->NVX );         # it cannot be xnv_u.xgv_stash ptr (BTW set by GvSTASH later)
 
     # See #305 Encode::XS: XS objects are often stored as SvIV(SvRV(obj)). The real
     # address needs to be patched after the XS object is initialized.
