@@ -3,7 +3,7 @@ package B::PVMG;
 use strict;
 
 use B::C::Debug qw/debug verbose WARN/;
-use B qw/SVf_READONLY SVf_READONLY cchar SVp_POK svref_2object/;
+use B qw/SVf_IsCOW SVf_READONLY SVf_READONLY cchar SVp_POK svref_2object/;
 use B::C::Save qw/savecowpv/;
 use B::C::Decimal qw/get_integer_value get_double_value/;
 use B::C::File qw/init init_static_assignments svsect xpvmgsect magicsect init_vtables/;
@@ -19,7 +19,17 @@ sub do_save {
     my ( $ix, $sym ) = svsect()->reserve($sv);
     svsect()->debug( $fullname, $sv );
 
-    my ( $sv_u, $cur, $len, $pv, $flags ) = $sv->save_svu( $sym, $sym, $fullname );
+    my ( $sv_u, $cur, $len, $pv, $flags );
+    if ( $fullname =~ m{^main::[1-9]+$} ) {  # Only modify $1,$2, ... etc.  $0 is magic
+        $flags = $sv->FLAGS;
+        $flags ^= SVf_IsCOW;
+        $pv = "";
+        ( $sv_u, $cur, $len ) = savecowpv($pv);
+        $sv_u = ".svu_pv=(char*) $sv_u";
+    }
+    else {
+        ( $sv_u, $cur, $len, $pv, $flags ) = $sv->save_svu( $sym, $sym, $fullname );
+    }
 
     my $ivx = get_integer_value( $sv->IVX );    # XXX How to detect HEK* namehek?
     my $nvx = get_double_value( $sv->NVX );     # it cannot be xnv_u.xgv_stash ptr (BTW set by GvSTASH later)
