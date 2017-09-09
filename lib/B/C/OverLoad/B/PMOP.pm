@@ -2,7 +2,7 @@ package B::PMOP;
 
 use strict;
 
-use B qw/RXf_EVAL_SEEN PMf_EVAL SVf_UTF8/;
+use B qw/RXf_EVAL_SEEN PMf_EVAL SVf_UTF8 svref_2object/;
 use B::C::Debug qw/debug/;
 use B::C::File qw/pmopsect init init1 init2/;
 use B::C::Helpers qw/strlen_flags/;
@@ -112,8 +112,8 @@ sub do_save {
         if (
             $pre_saved_sym &&    # If we have already seen this regex
             !$eval_seen    &&    # and it does not have an eval
-            $qre !~ tr{()}{}     # and it does not have a capture
-          ) {                    # we can just use the reference.
+            !_regex_has_capture($qre)    # and it does not have a capture
+          ) {                            # we can just use the reference.
 
             my $comment = $qre;
             $comment =~ s{\Q/*\E}{??}g;
@@ -122,9 +122,8 @@ sub do_save {
             $initpm->sadd( "PM_SETRE(%s, ReREFCNT_inc(PM_GETRE(%s))); /* %s */", $sym, $pre_saved_sym, $comment );
         }
         else {
-            my ( $cstr, undef, undef ) = savecowpv($re);
-
-            $initpm->sadd( "PM_SETRE(%s, CALLREGCOMP(newSVpvn_flags(%s, %s, SVs_TEMP|%s), 0x%x));", $sym, $cstr, $relen, $utf8 ? 'SVf_UTF8' : '0', $pmflags );
+            my $svref = svref_2object( \$re )->save;  # Will auto CoW
+            $initpm->sadd( "PM_SETRE(%s, CALLREGCOMP(%s, 0x%x));", $sym, $svref, $pmflags );
             $initpm->sadd( "RX_EXTFLAGS(PM_GETRE(%s)) = 0x%x;", $sym, $op->reflags );
             $saved_re{$key} = $sym;
         }
@@ -145,6 +144,24 @@ sub do_save {
     }
 
     return "(OP*)" . $sym;
+}
+
+sub _regex_has_capture {
+    my ($qre) = @_;
+
+    # No ()s .. has no capture
+    return 0 if $qre !~ tr{()}{};
+
+    # The number of left "("s is equal to the number of "(?:"
+    # .. has no capture
+    my $left_par_count        = $qre =~ tr{(}{};
+    my $left_par_no_cap_count = 0;
+    while ( $qre =~ /\(\?:/g ) { $left_par_no_cap_count++ }
+
+    return 0 if $left_par_count == $left_par_no_cap_count;
+
+    # Everything else does capture because we have a "("
+    return 1;
 }
 
 1;
