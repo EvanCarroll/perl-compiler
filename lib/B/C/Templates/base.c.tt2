@@ -120,6 +120,20 @@ void *bc_alloc( MEM_SIZE size ) {
 EXTERN_C void boot_[% xsub %] (pTHX_ CV* cv);
 [% END %]
 
+
+/************************************************************************************************************
+*
+*       start COWPVs
+*
+*************************************************************************************************************/
+
+[% section.cowpv.output( "%s\n" ) %]
+/* end COWPVs */
+
+/* <const.output> */
+[% section.const.output( "%s\n" ) %]
+/* </const.output> */
+
 /************************************************************************************************************
 *
 *       Static shared HE
@@ -135,7 +149,7 @@ EXTERN_C void boot_[% xsub %] (pTHX_ CV* cv);
 
 /* macro to ceate the struct (can be protected in C to define it once) */
 #define DEFINE_STATIC_SHARED_HE_STRUCT(len) \
-    struct _sHeS_##len { HE *hent_next; HEK *hent_hek; union { SV *hent_val;  Size_t hent_refcount; } he_valu;  U32 hek_hash;  I32 hek_len;  char hek_key[ len + 1]; char flags; };
+    struct _sHeS_##len { HE *hent_next; HEK *hent_hek; union { SV *hent_val;  Size_t hent_refcount; } he_valu;  U32 hek_hash;  I32 hek_len; char *hek_key; char flags; };
 
 /* macro to create our sHe */
 #define ALLOC_sHe(index, klen, key_string, flags_byte) \
@@ -259,19 +273,6 @@ Static const char xsfile[] = "universal.c";
 XS(XS_DynaLoader_dl_load_file);
 XS(XS_DynaLoader_dl_find_symbol);
 [% END %]
-
-/************************************************************************************************************
-*
-*       start COWPVs
-*
-*************************************************************************************************************/
-
-[% section.cowpv.output( "%s\n" ) %]
-/* end COWPVs */
-
-/* <const.output> */
-[% section.const.output( "%s\n" ) %]
-/* </const.output> */
 
 static void declare_static_sections() { /* declare our static section 'blocks' to perl */
 /* TODO: move sv_list first and other (gv_list) most common structs as order matters ! */

@@ -4,6 +4,7 @@ use strict;
 
 use B::C::File qw(sharedhe sharedhestructs);
 use B::C::Helpers qw/strlen_flags/;
+use B::C::Save qw{savecowpv};
 
 use Exporter ();
 our @ISA = qw(Exporter);
@@ -18,17 +19,20 @@ sub save_shared_he {
     return ( 'NULL', 0 ) unless defined $key;
     return @{ $saved_shared_hash{$key} } if $saved_shared_hash{$key};
 
-    my $utf8 = 0;
-    my ( $cur, $cstring ) = try_latin1($key);
+    my ( $cowpv, $cur, $len, $utf8, $cstring ) = savecowpv($key);
+    $cstring =~ s{\Q\000\377\E"$}{"};    # confort for comment
 
-    if ( !$cur ) {
-        ( $cstring, $cur, $utf8 ) = strlen_flags($key);
-    }
+    # my $utf8 = 0;
+    # my ( $cur, $cstring ) = try_latin1($key);
+
+    # if ( !$cur ) {
+    #     ( $cstring, $cur, $utf8 ) = strlen_flags($key);
+    # }
 
     _define_once($cur);
 
     my $index = sharedhe()->index() + 1;
-    sharedhe()->sadd( "ALLOC_sHe(%d, %d, %s, %d); /* sHe%d */", $index, $cur, $cstring, $utf8 ? 1 : 0, $index );
+    sharedhe()->sadd( "ALLOC_sHe(%d, %d, (char*) %s, %d); /* sHe%d - %s [cowpv] */", $index, $cur, $cowpv, $utf8 ? 1 : 0, $index, $cstring );
 
     # cannot use sHe$ix directly as sharedhe_list is used in by init_pl_strtab and init_assign
     $saved_shared_hash{$key} = [ sprintf( q{sharedhe_list[%d]}, $index ), $cur ];
