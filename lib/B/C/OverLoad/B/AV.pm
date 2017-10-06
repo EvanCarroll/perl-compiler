@@ -9,7 +9,7 @@ use B::C::File qw/init xpvavsect svsect init_static_assignments init_bootstrapli
 use B::C::Helpers qw/key_was_in_starting_stash/;
 
 # maybe need to move to setup/config
-my ( $use_av_undef_speedup, $use_svpop_speedup ) = ( 1, 1 );
+my ( $use_av_undef_speedup, $use_svpop_speedup, $use_padname_list_speedup, $use_gv_list_speedup, $use_nullsv_speedup ) = ( 1, 1, 1, 1, 1 );
 my $MYMALLOC = $B::C::Flags::Config{usemymalloc} eq 'define';
 
 sub fill {
@@ -87,7 +87,7 @@ sub do_save {
     if ( $fill > -1 and $fullname !~ m/^(main::)?[-+]$/ ) {
         my @array = $av->ARRAY;    # crashes with D magic (Getopt::Long)
 
-        #	my @names = map($_->save, @array);
+        #   my @names = map($_->save, @array);
         # XXX Better ways to write loop?
         # Perhaps svp[0] = ...; svp[1] = ...; svp[2] = ...;
         # Perhaps I32 i = 0; svp[i++] = ...; svp[i++] = ...; svp[i++] = ...;
@@ -160,6 +160,51 @@ sub do_save {
                 $acc .= "\tfor (gcount=" . $1 . "; gcount<" . ( $1 + $count + 1 ) . "; gcount++) {" . " *svp++ = $svpcast&sv_list[gcount]; };\n\t";
                 $i += $count;
             }
+            elsif (   $use_gv_list_speedup
+                && defined $values[$i]
+                && defined $values[ $i + 1 ]
+                && defined $values[ $i + 2 ]
+                && $values[$i] =~ /^\&gv_list\[(\d+)\]/
+                && $values[ $i + 1 ] eq "&gv_list[" . ( $1 + 1 ) . "]"
+                && $values[ $i + 2 ] eq "&gv_list[" . ( $1 + 2 ) . "]" ) {
+                $count = 0;
+                while ( defined( $values[ $i + $count + 1 ] ) and $values[ $i + $count + 1 ] eq "&gv_list[" . ( $1 + $count + 1 ) . "]" ) {
+                    $count++;
+                }
+                $acc .= "\tfor (gcount=" . $1 . "; gcount<" . ( $1 + $count + 1 ) . "; gcount++) {" . " *svp++ = $svpcast&gv_list[gcount]; };\n\t";
+                $i += $count;
+            }
+            elsif (   $use_padname_list_speedup
+                # for the incrementing padname_list over and over
+                && defined $values[$i]
+                && defined $values[ $i + 1 ]
+                && defined $values[ $i + 2 ]
+                && $values[$i] =~ /^\&padname_list\[(\d+)\]/
+                && $values[ $i + 1 ] eq "&padname_list[" . ( $1 + 1 ) . "]"
+                && $values[ $i + 2 ] eq "&padname_list[" . ( $1 + 2 ) . "]" ) {
+                $count = 0;
+                while ( defined( $values[ $i + $count + 1 ] ) and $values[ $i + $count + 1 ] eq "&padname_list[" . ( $1 + $count + 1 ) . "]" ) {
+                    $count++;
+                }
+                $acc .= "\tfor (gcount=" . $1 . "; gcount<" . ( $1 + $count + 1 ) . "; gcount++) {" . " *svp++ = $svpcast&padname_list[gcount]; };\n\t";
+                $i += $count;
+            }
+            elsif (   $use_padname_list_speedup
+                # for the same padname_list over and over
+                && defined $values[$i]
+                && defined $values[ $i + 1 ]
+                && defined $values[ $i + 2 ]
+                && $values[$i] =~ /^\&padname_list\[(\d+)\]/
+                && $values[$i + 1] eq "&padname_list[" . ( $1 ) . "]"
+                && $values[$i + 2] eq "&padname_list[" . ( $1 ) . "]" ) {
+                my $single_padname_list_idx = $1;
+                $count = 0;
+                while ( defined( $values[ $i + $count + 1 ] ) and $values[ $i + $count + 1 ] eq "&padname_list[$single_padname_list_idx]" ) {
+                    $count++;
+                }
+                $acc .= "\tfor (gcount=" . $1 . "; gcount<" . ( $1 + $count + 1 ) . "; gcount++) {" . " *svp++ = $svpcast&padname_list[$single_padname_list_idx]; };\n\t";
+                $i += $count;
+            }
             elsif ($use_av_undef_speedup
                 && defined $values[$i]
                 && defined $values[ $i + 1 ]
@@ -172,6 +217,20 @@ sub do_save {
                     $count++;
                 }
                 $acc .= "\tfor (gcount=0; gcount<" . ( $count + 1 ) . "; gcount++) {" . " *svp++ = $svpcast&PL_sv_undef; };\n\t";
+                $i += $count;
+            }
+            elsif ($use_nullsv_speedup
+                && defined $values[$i]
+                && defined $values[ $i + 1 ]
+                && defined $values[ $i + 2 ]
+                && $values[$i] eq 'Nullsv'
+                && $values[ $i + 1 ] eq 'Nullsv'
+                && $values[ $i + 2 ] eq 'Nullsv' ) {
+                $count = 0;
+                while ( defined $values[ $i + $count + 1 ] and $values[ $i + $count + 1 ] eq 'Nullsv' ) {
+                    $count++;
+                }
+                $acc .= "\tfor (gcount=0; gcount<" . ( $count + 1 ) . "; gcount++) {" . " *svp++ = ${svpcast}Nullsv; };\n\t";
                 $i += $count;
             }
             else {    # XXX 5.8.9d Test::NoWarnings has empty values
