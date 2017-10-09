@@ -98,6 +98,8 @@ sub start_heavy {
 
     B::C::Debug::setup_debug( $settings->{'debug_options'}, $settings->{'enable_verbose'} );
 
+    delete_custom_sub();
+
     # Save some stuff we need to save early.
     save_pre_defstash();
 
@@ -109,6 +111,48 @@ sub start_heavy {
 
     # fixups: wtf we could have miss during our initial walk...
     save_main_rest();
+
+    return;
+}
+
+=pod
+
+B::C users can provide their own rules to skip some functions to be saved.
+This is done by using a B::C::Custom::skip_subs_from_package functions.
+
+        package B::C::Custom;
+
+        sub skip_subs_from_package {
+            return {
+                'Quota' => [ qw(getqcarg getdev) ],
+                'CDB_File::Maker' => [ qw(DESTROY finish insert) ],
+                'Proc::FastSpawn' => [ qw(fd_inherit spawn spawnp) ],
+            }
+        }
+
+=cut
+
+sub delete_custom_sub {
+    return unless my $to_skip = 'B::C::Custom'->can('skip_subs_from_package');
+
+    my $rules = $to_skip->();
+    die "skip_subs_from_package should return a HASH ref" unless ref $rules eq 'HASH';
+
+    foreach my $pkg ( sort keys %$rules ) {
+
+        # check if the package namespace existed when we start compiling the program
+        next unless $B::C::settings->{'starting_flat_stashes'}->{$pkg};
+
+        # we can now clear all listed functions
+        die "rule should point to an ARRAY ref" unless ref $rules->{$pkg} eq 'ARRAY';
+
+        foreach my $func ( @{ $rules->{$pkg} } ) {
+            no strict 'refs';
+            undef *{"${pkg}::$func"};
+            delete ${$pkg}{$func};
+        }
+
+    }
 
     return;
 }
