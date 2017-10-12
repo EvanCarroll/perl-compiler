@@ -214,20 +214,8 @@ sub cleanup_stashes {
 
     # STATIC_HV - need more love to make it dynamic
     # preserve the file location but remove our bloat and the special -e to avoid a reparse
-    {
-        my @files_to_delete = qw{
-          /usr/local/cpanel/3rdparty/perl/524/lib64/perl5/5.24.1/x86_64-linux-64int/O.pm
-          /usr/local/cpanel/3rdparty/perl/524/lib64/perl5/cpanel_lib/x86_64-linux-64int/B/C.pm
-          -e
-        };
-        if ( skip_B() ) {
-            push @files_to_delete, '/usr/local/cpanel/3rdparty/perl/524/lib64/perl5/5.24.1/x86_64-linux-64int/B.pm';
-        }
-
-        foreach my $f ( map { q{_<} . $_ } @files_to_delete ) {
-            delete $stashes->{$f};
-        }
-    }
+    delete @stashes{ grep { index($_,q{_<}) == 0 } keys %stashes };
+    delete @{"main::"}{ grep { index($_,q{_<}) == 0 } keys %main:: };
 
     # PerlIO
     # root_stash name keys_to_clear
