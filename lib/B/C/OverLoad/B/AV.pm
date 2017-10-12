@@ -138,46 +138,12 @@ sub do_save {
             $fill = scalar(@values) if $is_backref;
         }
 
-        # Init optimization by Nick Koston
-        # The idea is to create loops so there is less C code. In the real world this seems
-        # to reduce the memory usage ~ 3% and speed up startup time by about 8%.
-
-        $count = 0;
         my $svpcast = $av->cast_sv();    # could be using PADLIST, PADNAMELIST, or AV method for this.
-
-        for ( my $i = 0; $i <= $#array; $i++ ) {
-            if (   $use_svpop_speedup
-                && defined $values[$i]
-                && defined $values[ $i + 1 ]
-                && defined $values[ $i + 2 ]
-                && $values[$i] =~ /^\&sv_list\[(\d+)\]/
-                && $values[ $i + 1 ] eq "&sv_list[" . ( $1 + 1 ) . "]"
-                && $values[ $i + 2 ] eq "&sv_list[" . ( $1 + 2 ) . "]" ) {
-                $count = 0;
-                while ( defined( $values[ $i + $count + 1 ] ) and $values[ $i + $count + 1 ] eq "&sv_list[" . ( $1 + $count + 1 ) . "]" ) {
-                    $count++;
-                }
-                $acc .= "\tfor (gcount=" . $1 . "; gcount<" . ( $1 + $count + 1 ) . "; gcount++) {" . " *svp++ = $svpcast&sv_list[gcount]; };\n\t";
-                $i += $count;
-            }
-            elsif ($use_av_undef_speedup
-                && defined $values[$i]
-                && defined $values[ $i + 1 ]
-                && defined $values[ $i + 2 ]
-                && $values[$i] =~ /^ptr_undef|&PL_sv_undef$/
-                && $values[ $i + 1 ] =~ /^ptr_undef|&PL_sv_undef$/
-                && $values[ $i + 2 ] =~ /^ptr_undef|&PL_sv_undef$/ ) {
-                $count = 0;
-                while ( defined $values[ $i + $count + 1 ] and $values[ $i + $count + 1 ] =~ /^ptr_undef|&PL_sv_undef$/ ) {
-                    $count++;
-                }
-                $acc .= "\tfor (gcount=0; gcount<" . ( $count + 1 ) . "; gcount++) {" . " *svp++ = $svpcast&PL_sv_undef; };\n\t";
-                $i += $count;
-            }
-            else {    # XXX 5.8.9d Test::NoWarnings has empty values
-                $acc .= "\t*svp++ = $svpcast" . ( $values[$i] ? $values[$i] : '&PL_sv_undef' ) . ";\n\t";
-            }
-        }
+        $count = scalar @values;
+        my $cast = $svpcast;
+        $cast =~ tr{()*}{}d;
+        my $list = "($cast * []) {" . join( ',', map { "$svpcast" . ( $_ ? $_ : '&PL_sv_undef' ) } @values ) . "}";
+        $acc = "memcpy(svp,$list,sizeof($cast *) * $count);\t\n";
 
         $av->add_to_init( $sym, $acc, $fill, $fullname );
 
