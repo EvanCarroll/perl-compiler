@@ -97,6 +97,7 @@ sub save_compile_state {
 
     $settings->{'starting_INC'} = save_inc();
 
+    pre_cleanup_stashes();
     $settings->{'starting_stash'} = starting_stash( $::{"main::"}, 1 );
     cleanup_stashes();
 
@@ -107,11 +108,11 @@ sub save_compile_state {
 
     $settings->{'starting_flat_stashes'} = flatten_stashes( $settings->{'starting_stash'} );
 
-    #eval q{ require Data::Dumper; $Data::Dumper::Sortkeys = $Data::Dumper::Sortkeys = 1; };
-    #eval q { print STDERR Data::Dumper::Dumper($settings->{'dl_so_files'}, $settings->{'dl_modules'}) };
-    #eval q { print STDERR Data::Dumper::Dumper($settings->{'starting_INC'}, $settings->{'starting_stash'}) };
-    #eval q { print STDERR Data::Dumper::Dumper(\%seen) };
-    #eval q[print STDERR Data::Dumper::Dumper( $settings->{'starting_flat_stashes'} )];
+    # eval q{ require Data::Dumper; $Data::Dumper::Sortkeys = $Data::Dumper::Sortkeys = 1; };
+    # eval q { print STDERR Data::Dumper::Dumper($settings->{'dl_so_files'}, $settings->{'dl_modules'}) };
+    # eval q { print STDERR Data::Dumper::Dumper($settings->{'starting_INC'}, $settings->{'starting_stash'}) };
+    # eval q { print STDERR Data::Dumper::Dumper(\%seen) };
+    # eval q[print STDERR Data::Dumper::Dumper( $settings->{'starting_flat_stashes'} )];
     #exit;
 
     return;
@@ -155,6 +156,12 @@ sub starting_stash {
     }
 
     return \%hash;
+}
+
+sub pre_cleanup_stashes {
+    delete @{"main::"}{ grep { index( $_, q{_<} ) == 0 } keys %main:: };
+
+    return;
 }
 
 sub cleanup_stashes {
@@ -210,23 +217,6 @@ sub cleanup_stashes {
 
     if ( exists $stashes->{'Carp::'} && scalar keys %{ $stashes->{'Carp::'} } == 1 && exists $stashes->{'Carp::'}->{'croak'} ) {
         delete $stashes->{'Carp::'};
-    }
-
-    # STATIC_HV - need more love to make it dynamic
-    # preserve the file location but remove our bloat and the special -e to avoid a reparse
-    {
-        my @files_to_delete = qw{
-          /usr/local/cpanel/3rdparty/perl/524/lib64/perl5/5.24.1/x86_64-linux-64int/O.pm
-          /usr/local/cpanel/3rdparty/perl/524/lib64/perl5/cpanel_lib/x86_64-linux-64int/B/C.pm
-          -e
-        };
-        if ( skip_B() ) {
-            push @files_to_delete, '/usr/local/cpanel/3rdparty/perl/524/lib64/perl5/5.24.1/x86_64-linux-64int/B.pm';
-        }
-
-        foreach my $f ( map { q{_<} . $_ } @files_to_delete ) {
-            delete $stashes->{$f};
-        }
     }
 
     # PerlIO
