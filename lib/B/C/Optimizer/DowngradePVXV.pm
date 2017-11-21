@@ -47,7 +47,8 @@ sub is_simple_pviv {
     $flags &= ~SVf_POK;
     $flags &= ~SVp_IOK;
     $flags &= ~SVp_POK;
-    $flags &= ~SVf_READONLY;
+
+    # do not remove the SVf_READONLY for now... as this is an issue with POSIX
 
     # remove the type
     $flags &= ~SVt_MASK();
