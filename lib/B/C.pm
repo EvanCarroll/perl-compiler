@@ -11,9 +11,9 @@
 
 package B::C;
 
-our $VERSION = '5.024023';
+our $VERSION = '5.024024';
 
-our $caller  = caller;       # So we know how we were invoked.
+our $caller = caller;    # So we know how we were invoked.
 
 # can be improved
 our $nullop_count     = 0;
