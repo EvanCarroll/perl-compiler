@@ -296,7 +296,7 @@ sub cleanup_stashes {
 sub cleanup_macros_vendor_undefined {
     my ($stashes) = @_;
 
-    foreach my $class (qw(POSIX IO Fcntl Socket Exporter Errno)) {
+    foreach my $class (qw(POSIX IO Socket Exporter Errno)) {    # Fcntl
         my $stash = $class . '::';
 
         next unless ref $stashes->{$stash};
@@ -314,6 +314,7 @@ sub cleanup_macros_vendor_undefined {
 
             if ( $@ =~ m{vendor has not defined}i ) {
 
+                #print STDERR "# --- remove ${class}::${symbol}\n";
                 # we do not delete the sub from the stash but just blacklist it
                 delete $stashes->{$symbol};
             }
