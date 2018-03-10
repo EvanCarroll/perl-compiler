@@ -11,7 +11,7 @@
 
 package B::C;
 
-our $VERSION = '5.026012';
+our $VERSION = '5.026012_01';
 
 our $caller = caller;    # So we know how we were invoked.
 
@@ -306,9 +306,9 @@ sub cleanup_macros_vendor_undefined {
             next if $symbol !~ m{^[0-9A-Z_]+$};
             next if $symbol =~ m{(?:^ISA$|^EXPORT|^DESTROY|^TIE|^VERSION|^AUTOLOAD|^BEGIN|^INIT|^__|^DELETE|^CLEAR|^STORE|^NEXTKEY|^FIRSTKEY|^FETCH|^EXISTS)};
 
-            if ( $class eq 'Fcntl' ) {
-                next unless $symbol =~ qr{^[SOF]_};
-            }
+            #if ( $class eq 'Fcntl' ) {
+            #    next unless $symbol =~ qr{^[O]_};
+            #}
 
             # dynamically check if the vendor has defined this sub or not
             # we could also use one hardcoded list
@@ -322,6 +322,9 @@ sub cleanup_macros_vendor_undefined {
                 #print STDERR "# --- remove ${class}::${symbol}\n";
                 # we do not delete the sub from the stash but just blacklist it
                 delete $stashes->{$stash}->{$symbol};
+
+                # delete from stash too
+                eval qq{undef *${class}::${symbol}};
             }
         }
     }
