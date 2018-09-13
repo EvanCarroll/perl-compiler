@@ -59,6 +59,7 @@ node('docker && jenkins-user') {
                         set +x
                         ## run as root, so we do not skip tests that check \$>
                         sudo bash -lc "PATH=/usr/local/cpanel/3rdparty/perl/${perlVersion}/bin:\$PATH prove -v -wm -j24 --formatter TAP::Formatter::JUnit ${TESTS}" >junit.xml || /bin/true
+                        git diff t/testsuite/C-COMPILED/known_errors.txt > known_errors_delta.txt
                     """
 
                     timeout(time: 30, unit: 'MINUTES') { sh commands }
@@ -66,6 +67,7 @@ node('docker && jenkins-user') {
 
                 stage('Process results') {
                     archiveArtifacts artifacts: 'junit.xml'
+                    archiveArtifacts artifacts: 'known_errors_delta.txt'
 
                     // pek: hudson.tasks.junit.TestResultSummary (failCount skipCount passCount totalCount)
                     testResults = junit testResults: 'junit.xml', keepLongStdio: false
