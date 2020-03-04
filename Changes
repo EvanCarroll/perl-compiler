@@ -1,3 +1,7 @@
+5.030003 2020-03-04
+
+     Fix a SEGV when clearing UNOP_AUX
+
 5.030002 2020-01-03
 
     Do not store AUTOLOAD PV

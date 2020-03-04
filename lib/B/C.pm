@@ -11,7 +11,7 @@
 
 package B::C;
 
-our $VERSION = '5.030002';
+our $VERSION = '5.030003';
 
 our $caller = caller;    # So we know how we were invoked.
 
