@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-#use Config;
+use Config;
 
 use CBOR::Free ();
 
@@ -19,7 +19,7 @@ push @input, {
     hebrew  => q[זה כיף סתם לשמוע איך תנצח קרפד עץ טוב בגן.],
 };
 
-#push @input, \%Config; # SEGV for now
+push @input, \%Config; # fixed in 0.23
 
 # encode some data
 my @encoded;
