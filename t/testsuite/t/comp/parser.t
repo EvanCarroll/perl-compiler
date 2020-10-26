@@ -4,7 +4,7 @@
 # (including weird syntax errors)
 
 BEGIN {
-    unshift @INC, qw(. ../lib);
+    @INC = qw(. ../lib);
     chdir 't' if -d 't';
 }
 

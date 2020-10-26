@@ -5,16 +5,15 @@ BEGIN {
     chdir 't' if -d 't';
     require './test.pl';
     set_up_inc( '../lib' );
+    plan (tests => 192); # some tests are run in BEGIN block
 }
-
-plan (tests => 195); # some tests are run in BEGIN block
 
 # Test that defined() returns true for magic variables created on the fly,
 # even before they have been created.
 # This must come first, even before turning on warnings or setting up
 # $SIG{__WARN__}, to avoid invalidating the tests.  warnings.pm currently
 # does not mention any special variables, but that could easily change.
-{
+BEGIN {
     # not available in miniperl
     my %non_mini = map { $_ => 1 } qw(+ - [);
     for (qw(
@@ -64,8 +63,6 @@ $PERL =
                   './perl');
 
 
-$PERL = $^X;
-
 sub env_is {
     my ($key, $val, $desc) = @_;
 
@@ -107,7 +104,7 @@ END {
 eval '$ENV{"FOO"} = "hi there";';	# check that ENV is inited inside eval
 # cmd.exe will echo 'variable=value' but 4nt will echo just the value
 # -- Nikola Knezevic
-if ($Is_MSWin32)  { like `set FOO`, qr/^(?:FOO=)?hi there$/; }
+if ($Is_MSWin32)  { like `set FOO`, qr/^(?:FOO=)?hi there$/m; }
 elsif ($Is_VMS)   { is `write sys\$output f\$trnlnm("FOO")`, "hi there\n"; }
 else              { is `echo \$FOO`, "hi there\n"; }
 
@@ -454,7 +451,6 @@ SKIP: {
 
 # Make sure Errno hasn't been prematurely autoloaded
 
-   skip('Errno is loaded with a B::C program cause something used %!', 2);
    ok !keys %Errno::;
 
 # Test auto-loading of Errno when %! is used
@@ -487,8 +483,7 @@ SKIP:  {
 }
 
 # Check that we don't auto-load packages
-foreach (['powie::!', 'Errno'],
-	 ['powie::+', 'Tie::Hash::NamedCapture']) {
+foreach (['powie::!', 'Errno']) {
     my ($symbol, $package) = @$_;
     SKIP: {
 	(my $extension = $package) =~ s|::|/|g;
@@ -617,10 +612,9 @@ SKIP: {
 }
 
 SKIP: {
-    skip_if_miniperl("No XS in miniperl", 2);
+    skip_if_miniperl("No XS in miniperl", 1);
 
-    for ( [qw( %- Tie::Hash::NamedCapture )],
-          [qw( %! Errno )] ) {
+    for ( [qw( %! Errno )] ) {
 	my ($var, $mod) = @$_;
 	my $modfile = $mod =~ s|::|/|gr . ".pm";
 	fresh_perl_is
