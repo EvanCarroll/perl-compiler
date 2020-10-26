@@ -35,6 +35,7 @@ bigmem/read.t                      COMPAT    bigmem/read.c is generated ()
 bigmem/regexp.t                    COMPAT    bigmem/regexp.c is generated ()
 bigmem/subst.t                     COMPAT    bigmem/subst.c is generated ()
 bigmem/vec.t                       COMPAT    bigmem/vec.c is generated ()
+japh/abigail.t                     SKIP      skip
 comp/final_line_num.t              COMPAT    This test is about BEGIN / file parse behavior so not relevant to B::C
 comp/hints.t                       COMPAT    tests are using BEGIN block, do not ready for B::C
 comp/parser.t                      COMPAT    We're not going to support ' as a package separator until we need to: https://github.com/rurban/perl-compiler/issues/217
