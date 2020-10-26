@@ -29,6 +29,7 @@ RPMS="cpanel-perl-532-App-cpanminus-1.7044-1.cp1194.noarch.rpm \
     cpanel-perl-532-AppConfig-1.71-1.cp1194.noarch.rpm \
     cpanel-perl-532-B-Flags-0.17-1.cp1194.x86_64.rpm \
     cpanel-perl-532-Capture-Tiny-0.48-1.cp1194.noarch.rpm \
+    cpanel-perl-532-CBOR-Free-0.31-1.cp1194.x86_64.rpm \
     cpanel-perl-532-Class-Accessor-0.51-1.cp1194.noarch.rpm \
     cpanel-perl-532-Class-Load-0.25-1.cp1194.noarch.rpm \
     cpanel-perl-532-Class-Load-XS-0.10-1.cp1194.x86_64.rpm \
@@ -83,6 +84,9 @@ RPMS="cpanel-perl-532-App-cpanminus-1.7044-1.cp1194.noarch.rpm \
     cpanel-perl-532-Params-Util-1.101-1.cp1194.x86_64.rpm \
     cpanel-perl-532-Ref-Util-XS-0.117-1.cp1194.x86_64.rpm \
     cpanel-perl-532-Role-Tiny-2.001004-1.cp1194.noarch.rpm \
+    cpanel-perl-532-Sereal-4.018-1.cp1194.noarch.rpm \
+    cpanel-perl-532-Sereal-Decoder-4.018-1.cp1194.x86_64.rpm \
+    cpanel-perl-532-Sereal-Encoder-4.018-1.cp1194.x86_64.rpm \
     cpanel-perl-532-Scope-Guard-0.21-1.cp1194.noarch.rpm \
     cpanel-perl-532-Socket6-0.29-1.cp1194.x86_64.rpm \
     cpanel-perl-532-Sub-Exporter-0.987-1.cp1194.noarch.rpm \
@@ -102,6 +106,7 @@ RPMS="cpanel-perl-532-App-cpanminus-1.7044-1.cp1194.noarch.rpm \
     cpanel-perl-532-Test2-Plugin-NoWarnings-0.09-1.cp1194.noarch.rpm \
     cpanel-perl-532-Test2-Suite-0.000138-1.cp1194.noarch.rpm \
     cpanel-perl-532-Test2-Tools-Explain-0.02-1.cp1194.noarch.rpm \
+    cpanel-perl-532-Text-Control-0.5-1.cp1194.noarch.rpm \
     cpanel-perl-532-TimeDate-2.33-1.cp1194.noarch.rpm \
     cpanel-perl-532-Try-Tiny-0.30-1.cp1194.noarch.rpm \
     cpanel-perl-532-Types-Serialiser-1.0-1.cp1194.noarch.rpm \
@@ -109,6 +114,7 @@ RPMS="cpanel-perl-532-App-cpanminus-1.7044-1.cp1194.noarch.rpm \
     cpanel-perl-532-WWW-RobotRules-6.02-1.cp1194.noarch.rpm \
     cpanel-perl-532-XML-Generator-1.04-1.cp1194.noarch.rpm \
     cpanel-perl-532-XML-Parser-2.46-1.cp1194.x86_64.rpm \
+    cpanel-perl-532-X-Tiny-0.21-1.cp1194.noarch.rpm \
     cpanel-perl-532-XString-0.005-1.cp1194.x86_64.rpm"
 
 TO_INSTALL=""
