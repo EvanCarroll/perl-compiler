@@ -1,3 +1,7 @@
+5.032000 2020-10-26
+
+    Support for Perl 5.32
+
 5.030003 2020-03-04
 
      Fix a SEGV when clearing UNOP_AUX
