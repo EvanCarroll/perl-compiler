@@ -47,13 +47,12 @@ jobs:
           - "uni/*.t"
 
     container:
-      image: cpanelos/perl-compiler:perl-v5.30.0
+      image: cpanelos/perl-compiler:perl-v5.32.0
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
-      - name: perl -V
-        run: perl -V
+        uses: actions/checkout@v2
+      - run: perl -V
       - name: which perl
         run: ls -l $(which perl)
       - name: ls
@@ -63,7 +62,8 @@ jobs:
       - name: make install
         run: make -j4 install
       - name: setup PATH
-        run: echo "::add-path::/usr/local/cpanel/3rdparty/perl/530/bin/"
+        run: echo "/usr/local/cpanel/3rdparty/perl/532/bin:$PATH" >> $GITHUB_PATH
+      - run: ls -l /usr/local/cpanel/3rdparty/perl/532/bin/perlcc
       - name: which perlcc
         run: which perlcc
       - name: "running test ${{ matrix.test_dir }}"
