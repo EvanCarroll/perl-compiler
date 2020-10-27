@@ -60,7 +60,7 @@ RPMS="cpanel-perl-532-App-cpanminus-1.7044-1.cp1194.noarch.rpm \
     cpanel-perl-532-IO-Socket-INET6-2.72-1.cp1194.noarch.rpm \
     cpanel-perl-532-IO-Socket-SSL-2.068-1.cp1194.noarch.rpm \
     cpanel-perl-532-IO-Stringy-2.113-1.cp1194.noarch.rpm \
-    cpanel-perl-532-JSON-XS-4.02-1.cp1194.x86_64.rpm \
+    cpanel-perl-532-JSON-XS-3.04-1.cp1194.x86_64.rpm \
     cpanel-perl-532-libwww-perl-6.49-1.cp1194.noarch.rpm \
     cpanel-perl-532-List-MoreUtils-0.430-1.cp1194.noarch.rpm \
     cpanel-perl-532-List-MoreUtils-XS-0.430-1.cp1194.x86_64.rpm \
