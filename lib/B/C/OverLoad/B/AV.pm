@@ -162,7 +162,7 @@ sub do_save {
                 while ( defined( $values[ $i + $count + 1 ] ) and $values[ $i + $count + 1 ] eq "&sv_list[" . ( $1 + $count + 1 ) . "]" ) {
                     $count++;
                 }
-                $acc .= "\tfor (gcount=" . $1 . "; gcount<" . ( $1 + $count + 1 ) . "; gcount++) {" . " *svp++ = $svpcast&sv_list[gcount]; };\n\t";
+                $acc .= "for (gcount=" . $1 . "; gcount<" . ( $1 + $count + 1 ) . "; gcount++) { *svp++ = $svpcast&sv_list[gcount]; };\n";
                 $i += $count;
             }
             elsif ($use_av_undef_speedup
@@ -176,11 +176,11 @@ sub do_save {
                 while ( defined $values[ $i + $count + 1 ] and $values[ $i + $count + 1 ] =~ /^ptr_undef|&PL_sv_undef$/ ) {
                     $count++;
                 }
-                $acc .= "\tfor (gcount=0; gcount<" . ( $count + 1 ) . "; gcount++) {" . " *svp++ = $svpcast&PL_sv_undef; };\n\t";
+                $acc .= "for (gcount=0; gcount<" . ( $count + 1 ) . "; gcount++) { *svp++ = $svpcast&PL_sv_undef; };\n";
                 $i += $count;
             }
             else {    # XXX 5.8.9d Test::NoWarnings has empty values
-                $acc .= "\t*svp++ = $svpcast" . ( $values[$i] ? $values[$i] : '&PL_sv_undef' ) . ";\n\t";
+                $acc .= "*svp++ = $svpcast " . ( $values[$i] || '&PL_sv_undef' ) . ";\n";
             }
         }
 
@@ -221,8 +221,10 @@ sub add_to_init {
         $deferred_init->{_AV} = 1;
     }
 
+    $deferred_init->no_split;
     $av->add_malloc_line_for_array_init( $deferred_init, $sym, $fill );
-    $deferred_init->add( substr( $acc, 0, -2 ) );    # AvFILLp already in XPVAV
+    $deferred_init->add( split( "\n", $acc ) );
+    $deferred_init->split;
 
     $deferred_init->close_block();
 }
