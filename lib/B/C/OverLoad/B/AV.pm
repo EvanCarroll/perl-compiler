@@ -87,6 +87,8 @@ sub do_save {
 
     debug( av => "saving AV %s 0x%x [%s] FILL=%d", $fullname, $$av, ref($av), $fill );
 
+    $section->debug( "AV for $fullname" );
+
     # XXX AVf_REAL is wrong test: need to save comppadlist but not stack
     # We used to block save on @- and @+ by checking for magic of type D. save_magic doesn't advertize this now so we don't have the "same" blocker.
     if ( $fill > -1 and $fullname !~ m/^(main::)?[-+]$/ ) {
@@ -222,7 +224,7 @@ sub add_to_init {
     }
 
     $deferred_init->no_split;
-    $av->add_malloc_line_for_array_init( $deferred_init, $sym, $fill );
+    $av->add_malloc_line_for_array_init( $deferred_init, $sym, $fill, $fullname );
     $deferred_init->add( split( "\n", $acc ) );
     $deferred_init->split;
 
@@ -230,12 +232,12 @@ sub add_to_init {
 }
 
 sub add_malloc_line_for_array_init {
-    my ( $av, $deferred_init, $sym, $fill ) = @_;
+    my ( $av, $deferred_init, $sym, $fill, $fullname ) = @_;
     return if !defined $fill;
 
     $fill = $fill < 3 ? 3 : $fill + 1;
 
-    $deferred_init->sadd( "SV **svp = %s;", B::C::Memory::INITAv( $deferred_init, $sym, $fill ) );
+    $deferred_init->sadd( "SV **svp = %s; /* %s */", B::C::Memory::INITAv( $deferred_init, $sym, $fill ), $fullname ? "AV for $fullname" : '' );
 
     return;
 }
