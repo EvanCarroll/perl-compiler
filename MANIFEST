@@ -26,6 +26,7 @@ lib/B/C/OverLoad/B/COP.pm
 lib/B/C/OverLoad/B/CV.pm
 lib/B/C/OverLoad/B/GV.pm
 lib/B/C/OverLoad/B/HV.pm
+lib/B/C/OverLoad/B/INVLIST.pm
 lib/B/C/OverLoad/B/IO.pm
 lib/B/C/OverLoad/B/IV.pm
 lib/B/C/OverLoad/B/LISTOP.pm

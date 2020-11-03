@@ -38,6 +38,7 @@
 .c.lst$
 .tmp$
 ^src/
+^debug/
 Dockerfile
 Jenkinsfile
 fullog.txt
