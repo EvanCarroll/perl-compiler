@@ -87,6 +87,8 @@ sub do_save {
 
     debug( av => "saving AV %s 0x%x [%s] FILL=%d", $fullname, $$av, ref($av), $fill );
 
+    $section->debug( "AV for $fullname" );
+
     # XXX AVf_REAL is wrong test: need to save comppadlist but not stack
     # We used to block save on @- and @+ by checking for magic of type D. save_magic doesn't advertize this now so we don't have the "same" blocker.
     if ( $fill > -1 and $fullname !~ m/^(main::)?[-+]$/ ) {
@@ -162,7 +164,7 @@ sub do_save {
                 while ( defined( $values[ $i + $count + 1 ] ) and $values[ $i + $count + 1 ] eq "&sv_list[" . ( $1 + $count + 1 ) . "]" ) {
                     $count++;
                 }
-                $acc .= "\tfor (gcount=" . $1 . "; gcount<" . ( $1 + $count + 1 ) . "; gcount++) {" . " *svp++ = $svpcast&sv_list[gcount]; };\n\t";
+                $acc .= "for (gcount=" . $1 . "; gcount<" . ( $1 + $count + 1 ) . "; gcount++) { *svp++ = $svpcast&sv_list[gcount]; };\n";
                 $i += $count;
             }
             elsif ($use_av_undef_speedup
@@ -176,11 +178,11 @@ sub do_save {
                 while ( defined $values[ $i + $count + 1 ] and $values[ $i + $count + 1 ] =~ /^ptr_undef|&PL_sv_undef$/ ) {
                     $count++;
                 }
-                $acc .= "\tfor (gcount=0; gcount<" . ( $count + 1 ) . "; gcount++) {" . " *svp++ = $svpcast&PL_sv_undef; };\n\t";
+                $acc .= "for (gcount=0; gcount<" . ( $count + 1 ) . "; gcount++) { *svp++ = $svpcast&PL_sv_undef; };\n";
                 $i += $count;
             }
             else {    # XXX 5.8.9d Test::NoWarnings has empty values
-                $acc .= "\t*svp++ = $svpcast" . ( $values[$i] ? $values[$i] : '&PL_sv_undef' ) . ";\n\t";
+                $acc .= "*svp++ = $svpcast " . ( $values[$i] || '&PL_sv_undef' ) . ";\n";
             }
         }
 
@@ -221,19 +223,21 @@ sub add_to_init {
         $deferred_init->{_AV} = 1;
     }
 
-    $av->add_malloc_line_for_array_init( $deferred_init, $sym, $fill );
-    $deferred_init->add( substr( $acc, 0, -2 ) );    # AvFILLp already in XPVAV
+    $deferred_init->no_split;
+    $av->add_malloc_line_for_array_init( $deferred_init, $sym, $fill, $fullname );
+    $deferred_init->add( split( "\n", $acc ) );
+    $deferred_init->split;
 
     $deferred_init->close_block();
 }
 
 sub add_malloc_line_for_array_init {
-    my ( $av, $deferred_init, $sym, $fill ) = @_;
+    my ( $av, $deferred_init, $sym, $fill, $fullname ) = @_;
     return if !defined $fill;
 
     $fill = $fill < 3 ? 3 : $fill + 1;
 
-    $deferred_init->sadd( "SV **svp = %s;", B::C::Memory::INITAv( $deferred_init, $sym, $fill ) );
+    $deferred_init->sadd( "SV **svp = %s; /* %s */", B::C::Memory::INITAv( $deferred_init, $sym, $fill ), $fullname ? "AV for $fullname" : '' );
 
     return;
 }
