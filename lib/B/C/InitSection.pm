@@ -216,6 +216,8 @@ sub add {
         $self->{'current'} = [];
         $self->{'count'}   = 0;
     }
+
+    return;
 }
 
 sub add_eval {
@@ -228,6 +230,8 @@ sub add_eval {
         # We need to output evals after dl_init.
         push @all_eval_pvs, qq{eval_pv("$i",1);};    # The whole string.
     }
+
+    return;
 }
 
 sub pre_destruct {
