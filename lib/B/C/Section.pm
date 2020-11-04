@@ -83,7 +83,11 @@ sub _convert_list_to_sprintf {
 
     while ( my ( $k, $v ) = splice( @list, 0, 2 ) ) {
         push @patterns, $k;
-        push @args,     $v;
+        if ( ref $v eq 'ARRAY' ) {
+            push @args,     @$v;
+        } else {
+            push @args,     $v;
+        }
     }
     my $pattern = join( ', ', @patterns );
 

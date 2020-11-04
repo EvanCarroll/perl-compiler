@@ -15,6 +15,7 @@ BEGIN {
       METHOP NULL NV OP PADNAME PMOP PV PVIV PVLV PVMG
       PVNV PVOP REGEXP RV
       SVOP UNOP UNOP_AUX UV
+      INVLIST
     };
 
     # do not use @ISA, just plug what we need

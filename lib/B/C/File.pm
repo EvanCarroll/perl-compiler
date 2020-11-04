@@ -52,7 +52,7 @@ sub re_initialize {    # only for unit tests purpose
 
 # The objects in quotes do not have any special logic.
 sub code_section_names {
-    return qw{cowpv const typedef decl init0 free sym hek lazyregex sharedhe sharedhestructs},
+    return qw{cowpv const typedef decl init0 free sym hek lazyregex sharedhe sharedhestructs invlistarray},
       struct_names(), op_sections();
 }
 
@@ -60,7 +60,9 @@ sub code_section_names {
 sub struct_names {
     return qw( malloc xpv xpvav xpvhv xpvcv padlist padname padnamelist magic
       xpviv xpvuv xpvnv xpvmg xpvlv xrv xpvbm xpvio sv gv gp xpvgv lexwarn refcounted_he
-      xsaccessor),
+      xinvlist
+      xsaccessor
+      ),
       assign_sections();
 }
 
@@ -115,6 +117,7 @@ sub new {
         $self->{$section_name} = B::C::Section::Meta->new( $section_name, get_symtable_ref(), 0 );
     }
 
+    return $self;
 }
 
 sub get_sect {

@@ -160,6 +160,13 @@ Static SHARED_HE* sharedhe_list[[% section.sharedhe.index + 1 %]] =  {
 [%- END %]
 };
 
+/* list of invlist arrays */
+[%- IF section.invlistarray.index > 0 %]
+Static UV invlist_array[[% section.invlistarray.index + 1 %]] =  {
+
+[%- section.invlistarray.output( "\t%s,\n" ) %]
+};
+[% END -%]
 
 /************************************************************************************************************
 *
